@@ -1,7 +1,9 @@
-[package]
-name = "lunaria-native"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+resolver = "2"
+members = [
+    "crates/lunaria"
+]
 
-[dependencies]
-gpui-kit = "0.6"
+default-members = [
+    "crates/lunaria"
+]
