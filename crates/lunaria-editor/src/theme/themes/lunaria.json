@@ -1,0 +1,31 @@
+{
+  "name": "Lunaria",
+  "themes": [
+    {
+      "name": "Lunaria Light",
+      "mode": "light",
+      "font.size": 16,
+      "mono_font.size": 13,
+      "radius": 6,
+      "radius.lg": 8,
+      "shadow": false,
+      "colors": {
+        "primary.background": "#7052C2",
+        "primary.foreground": "#FFFFFF"
+      }
+    },
+    {
+      "name": "Lunaria Dark",
+      "mode": "dark",
+      "font.size": 16,
+      "mono_font.size": 13,
+      "radius": 6,
+      "radius.lg": 8,
+      "shadow": false,
+      "colors": {
+        "primary.background": "#8B6FDB",
+        "primary.foreground": "#FFFFFF"
+      }
+    }
+  ]
+}

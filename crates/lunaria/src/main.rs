@@ -1,6 +1,7 @@
 use gpui_kit::component::button::*;
 use gpui_kit::component::*;
 use gpui_kit::*;
+use lunaria_editor::ThemeManager;
 
 pub struct HelloLunaria;
 
@@ -16,8 +17,12 @@ impl Render for HelloLunaria {
             .child(
                 Button::new("ok")
                     .primary()
-                    .label("Let's Go!")
-                    .on_click(|_, _, _| println!("Clicked!")),
+                    .label("Change Theme!")
+                    .on_click(|_, _, cx| {
+                        if let Err(err) = ThemeManager::toggle(cx) {
+                            eprintln!("Failed to toggle theme: {err}");
+                        }
+                    }),
             )
     }
 }
@@ -28,13 +33,17 @@ fn main() {
     app.run(move |cx| {
         gpui_kit::init(cx);
 
+        // init theme
+        ThemeManager::init(cx).expect("Failed to initialize Lunaria themes");
+
         cx.spawn(async move |cx| {
             cx.open_window(WindowOptions::default(), |window, cx| {
                 let view = cx.new(|_| HelloLunaria);
+
                 cx.new(|cx| Root::new(view, window, cx))
             })
-                .expect("Failed to open window");
+            .expect("Failed to open window");
         })
-            .detach();
+        .detach();
     });
 }

@@ -1,7 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/lunaria"
+    "crates/lunaria",
+    "crates/lunaria-editor",
 ]
 
 default-members = [
@@ -10,3 +11,5 @@ default-members = [
 
 [workspace.dependencies]
 gpui-kit = "0.6"
+thiserror = "2"
+lunaria-editor = { path = "crates/lunaria-editor" }

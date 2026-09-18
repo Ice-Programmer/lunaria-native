@@ -3759,6 +3759,15 @@ name = "lunaria"
 version = "0.1.0"
 dependencies = [
  "gpui-kit",
+ "lunaria-editor",
+]
+
+[[package]]
+name = "lunaria-editor"
+version = "0.1.0"
+dependencies = [
+ "gpui-kit",
+ "thiserror 2.0.20",
 ]
 
 [[package]]
