@@ -7,3 +7,6 @@ members = [
 default-members = [
     "crates/lunaria"
 ]
+
+[workspace.dependencies]
+gpui-kit = "0.6"
