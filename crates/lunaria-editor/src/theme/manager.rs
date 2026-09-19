@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use gpui_kit::{
-    App,
+    App, WindowAppearance,
     component::{Theme, ThemeRegistry},
 };
 
@@ -39,8 +39,16 @@ impl ThemeManager {
 
         Theme::global_mut(cx).apply_config(&config);
 
-        Theme::sync_base(cx);
 
+        let window_appearance = if Theme::global(cx).is_dark() {
+            WindowAppearance::Dark
+        } else {
+            WindowAppearance::Light
+        };
+
+        cx.set_window_appearance(Some(window_appearance));
+
+        Theme::sync_base(cx);
         cx.refresh_windows();
 
         Ok(())

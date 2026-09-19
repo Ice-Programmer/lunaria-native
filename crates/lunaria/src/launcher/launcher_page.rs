@@ -25,7 +25,7 @@ impl LaunchPage {
             )),
             window_min_size: Some(size(px(LAUNCHER_MIN_WIDTH), px(LAUNCHER_MIN_HEIGHT))),
             titlebar: Some(TitlebarOptions {
-                title: Some("Lunaria".into()),
+                title: Some("Welcome to Lunaria".into()),
                 ..Default::default()
             }),
             ..Default::default()
