@@ -9,3 +9,8 @@ pub const APPLICATION_ICON: &[u8] =
 #[cfg(target_os = "linux")]
 pub const APPLICATION_ICON: &[u8] =
     include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/assets/app/icon.png"));
+
+pub const LUNARIA_ICON: &[u8] = include_bytes!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/assets/icons/lunaria.svg",
+));

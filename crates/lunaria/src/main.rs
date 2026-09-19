@@ -1,9 +1,12 @@
+mod launcher;
 mod platform;
 
 use gpui_kit::component::button::*;
 use gpui_kit::component::*;
 use gpui_kit::*;
 use lunaria_editor::ThemeManager;
+
+use crate::launcher::launcher_page::LaunchPage;
 
 pub struct HelloLunaria;
 
@@ -40,9 +43,11 @@ fn main() {
         // init theme
         ThemeManager::init(cx).expect("Failed to initialize Lunaria themes");
 
+        let window_options = LaunchPage::window_options(cx);
+
         cx.spawn(async move |cx| {
-            cx.open_window(WindowOptions::default(), |window, cx| {
-                let view = cx.new(|_| HelloLunaria);
+            cx.open_window(window_options, |window, cx| {
+                let view = cx.new(|_| LaunchPage::new());
 
                 cx.new(|cx| Root::new(view, window, cx))
             })

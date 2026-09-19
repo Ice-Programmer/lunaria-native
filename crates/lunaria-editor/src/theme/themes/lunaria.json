@@ -4,27 +4,35 @@
     {
       "name": "Lunaria Light",
       "mode": "light",
-      "font.size": 16,
-      "mono_font.size": 13,
+      "font.size": 14,
+      "mono_font.size": 12,
       "radius": 6,
       "radius.lg": 8,
       "shadow": false,
       "colors": {
         "primary.background": "#7052C2",
-        "primary.foreground": "#FFFFFF"
+        "primary.foreground": "#FFFFFF",
+        "sidebar.border": "#DCD9E4",
+        "sidebar.background": "#F2F1F5",
+        "muted.background": "#EDECF1",
+        "muted.foreground": "#6A6876"
       }
     },
     {
       "name": "Lunaria Dark",
       "mode": "dark",
-      "font.size": 16,
-      "mono_font.size": 13,
+      "font.size": 14,
+      "mono_font.size": 12,
       "radius": 6,
       "radius.lg": 8,
       "shadow": false,
       "colors": {
         "primary.background": "#8B6FDB",
-        "primary.foreground": "#FFFFFF"
+        "primary.foreground": "#FFFFFF",
+        "sidebar.border": "#464150",
+        "sidebar.background": "#23232B",
+        "muted.background": "#1C1C23",
+        "muted.foreground": "#ABA5B8"
       }
     }
   ]
