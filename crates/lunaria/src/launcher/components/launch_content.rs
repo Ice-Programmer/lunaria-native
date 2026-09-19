@@ -2,6 +2,7 @@ use gpui_kit::assets::IconName;
 use gpui_kit::base::{h_flex, v_flex};
 use gpui_kit::component::input::{Input, InputState};
 use gpui_kit::*;
+use gpui_kit::component::Sizable;
 
 pub struct LaunchContent {
     search_input: Entity<InputState>,
@@ -30,7 +31,7 @@ impl LaunchContent {
             )
             .child(
                 div()
-                    .w(px(200.))
+                    .w(px(180.))
                     .on_mouse_down_out(|_, window, cx| {
                         window.blur(cx);
                     })
@@ -44,7 +45,6 @@ impl LaunchContent {
                             .id("search-project")
                             .aria_label("search recent project")
                             .prefix(IconName::Search)
-                            .h(px(36.)),
                     ),
             )
     }
