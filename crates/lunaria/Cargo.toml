@@ -6,3 +6,9 @@ edition = "2024"
 [dependencies]
 gpui-kit.workspace = true
 lunaria-editor.workspace = true
+lunaria-assets.workspace = true
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2.workspace = true
+objc2-app-kit = { workspace = true, features = ["NSApplication", "NSImage"] }
+objc2-foundation = { workspace = true, features = ["NSData"] }

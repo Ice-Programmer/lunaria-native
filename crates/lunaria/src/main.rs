@@ -1,3 +1,5 @@
+mod platform;
+
 use gpui_kit::component::button::*;
 use gpui_kit::component::*;
 use gpui_kit::*;
@@ -32,6 +34,8 @@ fn main() {
 
     app.run(move |cx| {
         gpui_kit::init(cx);
+
+        platform::set_application_icon();
 
         // init theme
         ThemeManager::init(cx).expect("Failed to initialize Lunaria themes");

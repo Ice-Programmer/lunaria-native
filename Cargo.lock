@@ -3759,8 +3759,16 @@ name = "lunaria"
 version = "0.1.0"
 dependencies = [
  "gpui-kit",
+ "lunaria-assets",
  "lunaria-editor",
+ "objc2 0.6.4",
+ "objc2-app-kit 0.3.2",
+ "objc2-foundation 0.3.2",
 ]
+
+[[package]]
+name = "lunaria-assets"
+version = "0.1.0"
 
 [[package]]
 name = "lunaria-editor"

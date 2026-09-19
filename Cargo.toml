@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/lunaria",
     "crates/lunaria-editor",
+    "crates/lunaria-assets",
 ]
 
 default-members = [
@@ -10,6 +11,11 @@ default-members = [
 ]
 
 [workspace.dependencies]
+lunaria-editor = { path = "crates/lunaria-editor" }
+lunaria-assets = { path = "crates/lunaria-assets" }
+
 gpui-kit = "0.6"
 thiserror = "2"
-lunaria-editor = { path = "crates/lunaria-editor" }
+objc2 = "0.6"
+objc2-app-kit = "0.3"
+objc2-foundation = "0.3"
