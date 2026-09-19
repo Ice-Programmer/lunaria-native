@@ -3,7 +3,6 @@ use gpui_kit::base::{h_flex, v_flex};
 use gpui_kit::component::button::*;
 use gpui_kit::component::{ActiveTheme, Icon};
 use gpui_kit::*;
-use std::hash::Hash;
 
 #[derive(IntoElement)]
 pub struct LaunchSidebar;

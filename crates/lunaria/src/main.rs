@@ -48,7 +48,7 @@ fn main() {
 
         cx.spawn(async move |cx| {
             cx.open_window(window_options, |window, cx| {
-                let view = cx.new(|_| LaunchPage::new());
+                let view = cx.new(|view_cx| LaunchPage::new(window, view_cx));
 
                 cx.new(|cx| Root::new(view, window, cx))
             })

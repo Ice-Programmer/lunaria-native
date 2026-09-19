@@ -1,20 +1,20 @@
-use super::components::LaunchSidebar;
+use super::components::{LaunchContent, LaunchSidebar};
 use gpui_kit::{base::h_flex, *};
 
 const LAUNCHER_WIDTH: f32 = 800.0;
 const LAUNCHER_HEIGHT: f32 = 580.0;
 const LAUNCHER_MIN_WIDTH: f32 = LAUNCHER_WIDTH;
-const LAUNCHER_MIN_HEIGHT: f32 = LAUNCHER_HEIGHT;
+const LAUNCHER_MIN_HEIGHT: f32 = 400.0;
 
 pub struct LaunchPage {
-    title: SharedString,
+    content: Entity<LaunchContent>,
 }
 
 impl LaunchPage {
-    pub fn new() -> Self {
-        Self {
-            title: "Lunaria".into(),
-        }
+    pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let content = cx.new(|cx| LaunchContent::new(window, cx));
+
+        Self { content }
     }
 
     pub fn window_options(cx: &App) -> WindowOptions {
@@ -50,7 +50,7 @@ impl Render for LaunchPage {
                     .h_full()
                     .items_center()
                     .justify_center()
-                    .child(self.title.clone()),
+                    .child(self.content.clone()),
             )
     }
 }
