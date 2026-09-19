@@ -1,6 +1,7 @@
 mod launcher;
 mod platform;
 
+use gpui_kit::assets::AllAssets;
 use gpui_kit::component::button::*;
 use gpui_kit::component::*;
 use gpui_kit::*;
@@ -33,7 +34,7 @@ impl Render for HelloLunaria {
 }
 
 fn main() {
-    let app = gpui_kit::application().with_assets(gpui_kit::assets::Assets);
+    let app = gpui_kit::application().with_assets(AllAssets);
 
     app.run(move |cx| {
         gpui_kit::init(cx);

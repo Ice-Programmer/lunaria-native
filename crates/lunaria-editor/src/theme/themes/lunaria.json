@@ -15,7 +15,9 @@
         "sidebar.border": "#DCD9E4",
         "sidebar.background": "#F2F1F5",
         "muted.background": "#EDECF1",
-        "muted.foreground": "#6A6876"
+        "muted.foreground": "#6A6876",
+        "accent.background": "#EEECF2",
+        "accent.foreground": "#292832"
       }
     },
     {
@@ -32,7 +34,9 @@
         "sidebar.border": "#464150",
         "sidebar.background": "#23232B",
         "muted.background": "#1C1C23",
-        "muted.foreground": "#ABA5B8"
+        "muted.foreground": "#ABA5B8",
+        "accent.background": "#34323E",
+        "accent.foreground": "#EEEAF4"
       }
     }
   ]
