@@ -3,7 +3,7 @@ resolver = "2"
 members = [
     "crates/lunaria",
     "crates/lunaria-editor",
-    "crates/lunaria-assets",
+    "crates/lunaria-assets", "crates/lunaria-core", "crates/lunaria-database",
 ]
 
 default-members = [

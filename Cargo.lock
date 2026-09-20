@@ -3771,6 +3771,14 @@ name = "lunaria-assets"
 version = "0.1.0"
 
 [[package]]
+name = "lunaria-core"
+version = "0.1.0"
+
+[[package]]
+name = "lunaria-database"
+version = "0.1.0"
+
+[[package]]
 name = "lunaria-editor"
 version = "0.1.0"
 dependencies = [
