@@ -3773,6 +3773,10 @@ version = "0.1.0"
 [[package]]
 name = "lunaria-core"
 version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "lunaria-database"

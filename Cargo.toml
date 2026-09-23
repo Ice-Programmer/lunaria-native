@@ -10,12 +10,26 @@ default-members = [
     "crates/lunaria"
 ]
 
+
+[profile.dev]
+debug = 1
+
 [workspace.dependencies]
 lunaria-editor = { path = "crates/lunaria-editor" }
 lunaria-assets = { path = "crates/lunaria-assets" }
+lunaria-core = { path = "crates/lunaria-core" }
+lunaria-database = { path = "crates/lunaria-database" }
 
 gpui-kit = "0.6"
 thiserror = "2"
 objc2 = "0.6"
 objc2-app-kit = "0.3"
 objc2-foundation = "0.3"
+sea-orm = {
+    version = "2.0.2",
+    default-features = false,
+    features = ["sqlx-sqlite", "runtime-tokio-rustls", "macros"]
+}
+tokio = { version = "1", features = ["fs", "macros", "rt", "sync"] }
+async-trait = "0.1"
+tempfile = "3"
