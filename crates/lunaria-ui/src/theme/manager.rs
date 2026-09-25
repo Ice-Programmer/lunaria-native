@@ -37,7 +37,10 @@ impl ThemeManager {
                 name: name.to_string(),
             })?;
 
-        Theme::global_mut(cx).apply_config(&config);
+        let theme = Theme::global_mut(cx);
+        theme.apply_config(&config);
+        // ThemeConfig JSON 不支持此开关；只保留细焦点边框。
+        theme.focus_ring = false;
 
 
         let window_appearance = if Theme::global(cx).is_dark() {

@@ -2,8 +2,10 @@
 resolver = "2"
 members = [
     "crates/lunaria",
-    "crates/lunaria-editor",
-    "crates/lunaria-assets", "crates/lunaria-core", "crates/lunaria-database",
+    "crates/lunaria-ui",
+    "crates/lunaria-assets",
+    "crates/lunaria-core",
+    "crates/lunaria-database",
 ]
 
 default-members = [
@@ -15,7 +17,7 @@ default-members = [
 debug = 1
 
 [workspace.dependencies]
-lunaria-editor = { path = "crates/lunaria-editor" }
+lunaria-ui = { path = "crates/lunaria-ui" }
 lunaria-assets = { path = "crates/lunaria-assets" }
 lunaria-core = { path = "crates/lunaria-core" }
 lunaria-database = { path = "crates/lunaria-database" }

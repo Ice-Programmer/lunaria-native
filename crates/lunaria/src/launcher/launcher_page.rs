@@ -4,10 +4,12 @@ use gpui_kit::*;
 use super::components::LaunchSidebar;
 use super::router::{LauncherRoute, LauncherRouter};
 
-const LAUNCHER_WIDTH: f32 = 800.0;
-const LAUNCHER_HEIGHT: f32 = 580.0;
+const LAUNCHER_WIDTH: f32 = 740.0;
+const LAUNCHER_HEIGHT: f32 = 540.0;
 const LAUNCHER_MIN_WIDTH: f32 = LAUNCHER_WIDTH;
 const LAUNCHER_MIN_HEIGHT: f32 = 400.0;
+
+const LAUNCHER_SIDEBAR_WIDTH: f32 = 200.0;
 
 pub struct LaunchPage {
     current_route: LauncherRoute,
@@ -58,7 +60,7 @@ impl LaunchPage {
         }
     }
 
-    
+
 }
 
 impl Render for LaunchPage {
@@ -67,7 +69,7 @@ impl Render for LaunchPage {
             .size_full()
             .child(
                 div()
-                    .w(relative(0.25))
+                    .w(px(LAUNCHER_SIDEBAR_WIDTH))
                     .h_full()
                     .flex_shrink_0()
                     .child(LaunchSidebar::new()),

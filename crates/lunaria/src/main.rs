@@ -11,7 +11,7 @@ use gpui_kit::assets::AllAssets;
 use gpui_kit::component::Root;
 use gpui_kit::*;
 use lunaria_database::DatabaseManager;
-use lunaria_editor::ThemeManager;
+use lunaria_ui::ThemeManager;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::runtime::Handle;
@@ -40,7 +40,7 @@ async fn main() {
     let app = application().with_assets(AllAssets);
 
     app.run(move |cx| {
-        gpui_kit::init(cx);
+        init(cx);
 
         platform::set_application_icon();
 

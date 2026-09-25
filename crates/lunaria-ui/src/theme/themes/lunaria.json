@@ -11,13 +11,22 @@
       "shadow": false,
       "colors": {
         "primary.background": "#7052C2",
+        "ring": "#7052C2",
         "primary.foreground": "#FFFFFF",
         "sidebar.border": "#DCD9E4",
         "sidebar.background": "#F2F1F5",
         "muted.background": "#EDECF1",
         "muted.foreground": "#6A6876",
         "accent.background": "#EEECF2",
-        "accent.foreground": "#292832"
+        "accent.foreground": "#292832",
+        "secondary.background": "#F2F1F5",
+        "secondary.foreground": "#292832",
+        "primary.hover.background": "#6343B2",
+        "primary.active.background": "#56369E",
+        "button.background": "#FFFFFF",
+        "button.foreground": "#292832",
+        "button.hover.background": "#EEECF2",
+        "button.active.background": "#E2DFE9"
       }
     },
     {
@@ -29,14 +38,23 @@
       "radius.lg": 8,
       "shadow": false,
       "colors": {
-        "primary.background": "#8B6FDB",
-        "primary.foreground": "#FFFFFF",
+        "primary.background": "#AD94EF",
+        "ring": "#AD94EF",
+        "primary.foreground": "#21162F",
         "sidebar.border": "#464150",
         "sidebar.background": "#23232B",
         "muted.background": "#1C1C23",
         "muted.foreground": "#ABA5B8",
         "accent.background": "#34323E",
-        "accent.foreground": "#EEEAF4"
+        "accent.foreground": "#EEEAF4",
+        "secondary.background": "#23232B",
+        "secondary.foreground": "#EEEAF4",
+        "primary.hover.background": "#BDA6F8",
+        "primary.active.background": "#9D82E2",
+        "button.background": "#292932",
+        "button.foreground": "#EEEAF4",
+        "button.hover.background": "#34323E",
+        "button.active.background": "#413B4F"
       }
     }
   ]
