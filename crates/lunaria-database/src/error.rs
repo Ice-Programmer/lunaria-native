@@ -1,4 +1,4 @@
-use std::{io, path::PathBuf};
+use std::{io, path::PathBuf, time::SystemTimeError};
 
 use sea_orm::DbErr;
 use thiserror::Error;
@@ -29,6 +29,12 @@ pub enum DatabaseError {
 
     #[error("database integrity check failed: {0}")]
     IntegrityCheckFailed(String),
+
+    #[error("system clock is earlier than the Unix epoch: {0}")]
+    SystemTime(#[from] SystemTimeError),
+
+    #[error("Unix timestamp is outside the supported range")]
+    TimestampOutOfRange,
 }
 
 impl DatabaseError {

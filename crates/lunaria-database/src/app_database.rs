@@ -3,7 +3,7 @@ use crate::connection::{
     check_integrity, connect, create_table, publish, set_database_metadata,
     validate_database_metadata,
 };
-use crate::entity::recent_project;
+use crate::project::recent_project;
 use sea_orm::{DatabaseConnection, EntityTrait, QuerySelect, TransactionTrait};
 use std::path::Path;
 use tempfile::NamedTempFile;

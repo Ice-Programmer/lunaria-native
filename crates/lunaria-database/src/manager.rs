@@ -6,8 +6,8 @@ use std::{
 use tokio::sync::RwLock;
 
 use crate::DatabaseError;
-use crate::database::app_database::AppDatabase;
-use crate::database::project_database::ProjectDatabase;
+use crate::app_database::AppDatabase;
+use crate::project::database::ProjectDatabase;
 
 pub struct DatabaseManager {
     app_database: AppDatabase,

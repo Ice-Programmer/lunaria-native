@@ -1,9 +1,9 @@
+use super::project_meta;
 use crate::DatabaseError;
 use crate::connection::{
     check_integrity, connect, create_table, publish, set_database_metadata,
     validate_database_metadata,
 };
-use crate::entity::project_meta;
 use sea_orm::{
     ActiveModelTrait, DatabaseConnection, EntityTrait, QuerySelect, Set, TransactionTrait,
 };
