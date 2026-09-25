@@ -1,5 +1,6 @@
+use crate::launcher::router::{LauncherRoute, LauncherRouter};
 use gpui_kit::assets::IconName;
-use gpui_kit::base::{h_flex, v_flex};
+use gpui_kit::base::{Selectable, h_flex, v_flex};
 use gpui_kit::component::button::*;
 use gpui_kit::component::{ActiveTheme, Icon};
 use gpui_kit::*;
@@ -30,7 +31,8 @@ impl LaunchSidebar {
             )
     }
 
-    fn render_action(_: &mut App) -> impl IntoElement {
+    fn render_action(cx: &mut App) -> impl IntoElement {
+        let creating = LauncherRouter::current(cx) == LauncherRoute::CreateProject;
         v_flex()
             .gap_2()
             .child(
@@ -39,8 +41,12 @@ impl LaunchSidebar {
                     .label("创建项目")
                     .primary()
                     .w_full()
+                    .selected(creating)
                     .h(px(36.))
-                    .icon(IconName::Plus),
+                    .icon(IconName::Plus)
+                    .on_click(|_, _, cx| {
+                        LauncherRouter::navigate(LauncherRoute::CreateProject, cx)
+                    }),
             )
             .child(
                 Button::new("open-project")

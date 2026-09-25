@@ -1,5 +1,8 @@
-use super::components::{LaunchContent, LaunchSidebar};
-use gpui_kit::{base::h_flex, *};
+use gpui_kit::base::h_flex;
+use gpui_kit::*;
+
+use super::components::LaunchSidebar;
+use super::router::{LauncherRoute, LauncherRouter};
 
 const LAUNCHER_WIDTH: f32 = 800.0;
 const LAUNCHER_HEIGHT: f32 = 580.0;
@@ -7,14 +10,37 @@ const LAUNCHER_MIN_WIDTH: f32 = LAUNCHER_WIDTH;
 const LAUNCHER_MIN_HEIGHT: f32 = 400.0;
 
 pub struct LaunchPage {
-    content: Entity<LaunchContent>,
+    current_route: LauncherRoute,
+    current_view: AnyView,
+    _route_subscription: Subscription,
 }
 
 impl LaunchPage {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
-        let content = cx.new(|cx| LaunchContent::new(window, cx));
+        let current_route = LauncherRouter::current(cx);
+        let current_view = current_route.build(window, cx);
 
-        Self { content }
+        let route_subscription =
+            cx.observe_global_in::<LauncherRouter>(window, |this, window, cx| {
+                let next_route = LauncherRouter::current(cx);
+
+                if this.current_route == next_route {
+                    return;
+                }
+
+                window.blur(cx);
+
+                this.current_view = next_route.build(window, cx);
+                this.current_route = next_route;
+
+                cx.notify();
+            });
+
+        Self {
+            current_route,
+            current_view,
+            _route_subscription: route_subscription,
+        }
     }
 
     pub fn window_options(cx: &App) -> WindowOptions {
@@ -48,9 +74,7 @@ impl Render for LaunchPage {
                 div()
                     .flex_1()
                     .h_full()
-                    .items_center()
-                    .justify_center()
-                    .child(self.content.clone()),
+                    .child(self.current_view.clone()),
             )
     }
 }

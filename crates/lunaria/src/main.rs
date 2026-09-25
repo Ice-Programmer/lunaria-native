@@ -4,8 +4,9 @@ mod platform;
 
 use crate::app_services::AppServices;
 use crate::launcher::launcher_page::LaunchPage;
+use crate::launcher::router::{LauncherRoute, LauncherRouter};
 use gpui_kit::assets::AllAssets;
-use gpui_kit::component::*;
+use gpui_kit::component::Root;
 use gpui_kit::*;
 use lunaria_database::DatabaseManager;
 use lunaria_editor::ThemeManager;
@@ -45,6 +46,7 @@ async fn main() {
         ThemeManager::init(cx).expect("Failed to initialize Lunaria themes");
 
         cx.set_global(app_services);
+        cx.set_global(LauncherRouter::default());
 
         let window_options = LaunchPage::window_options(cx);
 
