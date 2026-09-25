@@ -32,7 +32,7 @@ impl LaunchSidebar {
 
     fn render_action(_: &mut App) -> impl IntoElement {
         v_flex()
-            .gap_5()
+            .gap_2()
             .child(
                 Button::new("create-project")
                     .mt_8()
