@@ -1,4 +1,6 @@
 mod app_services;
+#[cfg(debug_assertions)]
+mod dev;
 mod launcher;
 mod platform;
 
@@ -47,6 +49,9 @@ async fn main() {
 
         cx.set_global(app_services);
         cx.set_global(LauncherRouter::default());
+
+        #[cfg(debug_assertions)]
+        dev::apply_dev_startup_router(cx);
 
         let window_options = LaunchPage::window_options(cx);
 

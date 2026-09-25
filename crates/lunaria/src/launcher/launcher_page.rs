@@ -57,6 +57,8 @@ impl LaunchPage {
             ..Default::default()
         }
     }
+
+    
 }
 
 impl Render for LaunchPage {
@@ -70,11 +72,7 @@ impl Render for LaunchPage {
                     .flex_shrink_0()
                     .child(LaunchSidebar::new()),
             )
-            .child(
-                div()
-                    .flex_1()
-                    .h_full()
-                    .child(self.current_view.clone()),
-            )
+            .child(div().flex_1().h_full().child(self.current_view.clone()))
     }
 }
+
