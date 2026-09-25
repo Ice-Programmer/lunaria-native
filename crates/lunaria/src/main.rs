@@ -2,38 +2,40 @@ mod launcher;
 mod platform;
 
 use gpui_kit::assets::AllAssets;
-use gpui_kit::component::button::*;
 use gpui_kit::component::*;
 use gpui_kit::*;
+use lunaria_database::DatabaseManager;
 use lunaria_editor::ThemeManager;
+use std::path::PathBuf;
+use std::sync::Arc;
 
 use crate::launcher::launcher_page::LaunchPage;
 
-pub struct HelloLunaria;
-
-impl Render for HelloLunaria {
-    fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .v_flex()
-            .gap_2()
-            .size_full()
-            .items_center()
-            .justify_center()
-            .child("Hello, Lunaria!")
-            .child(
-                Button::new("ok")
-                    .primary()
-                    .label("Change Theme!")
-                    .on_click(|_, _, cx| {
-                        if let Err(err) = ThemeManager::toggle(cx) {
-                            eprintln!("Failed to toggle theme: {err}");
-                        }
-                    }),
-            )
-    }
+pub struct AppServices {
+    pub databases: Arc<DatabaseManager>,
 }
 
-fn main() {
+impl Global for AppServices {}
+
+// get Lunaria app directory
+fn app_data_directory() -> PathBuf {
+    dirs::data_local_dir()
+        .expect("Failed to locate the operating system application data directory")
+        .join("Lunaria")
+}
+
+#[tokio::main]
+async fn main() {
+    // get the application data directory
+    let app_data_directory = app_data_directory();
+
+    // init app database
+    let databases = Arc::new(
+        DatabaseManager::initialize(&app_data_directory)
+            .await
+            .expect("Failed to initialize Lunaria databases"),
+    );
+
     let app = gpui_kit::application().with_assets(AllAssets);
 
     app.run(move |cx| {
@@ -43,6 +45,10 @@ fn main() {
 
         // init theme
         ThemeManager::init(cx).expect("Failed to initialize Lunaria themes");
+
+        cx.set_global(AppServices {
+            databases: databases.clone(),
+        });
 
         let window_options = LaunchPage::window_options(cx);
 

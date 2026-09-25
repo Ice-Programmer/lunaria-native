@@ -30,6 +30,10 @@ sea-orm = {
     default-features = false,
     features = ["sqlx-sqlite", "runtime-tokio-rustls", "macros"]
 }
-tokio = { version = "1", features = ["fs", "macros", "rt", "sync"] }
+tokio = {
+    version = "1",
+    features = ["fs", "macros", "rt-multi-thread", "sync"]
+}
 async-trait = "0.1"
 tempfile = "3"
+dirs = "7.0.0"
