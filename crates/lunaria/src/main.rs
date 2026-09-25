@@ -1,6 +1,9 @@
+mod app_services;
 mod launcher;
 mod platform;
 
+use crate::app_services::AppServices;
+use crate::launcher::launcher_page::LaunchPage;
 use gpui_kit::assets::AllAssets;
 use gpui_kit::component::*;
 use gpui_kit::*;
@@ -8,14 +11,7 @@ use lunaria_database::DatabaseManager;
 use lunaria_editor::ThemeManager;
 use std::path::PathBuf;
 use std::sync::Arc;
-
-use crate::launcher::launcher_page::LaunchPage;
-
-pub struct AppServices {
-    pub databases: Arc<DatabaseManager>,
-}
-
-impl Global for AppServices {}
+use tokio::runtime::Handle;
 
 // get Lunaria app directory
 fn app_data_directory() -> PathBuf {
@@ -36,7 +32,9 @@ async fn main() {
             .expect("Failed to initialize Lunaria databases"),
     );
 
-    let app = gpui_kit::application().with_assets(AllAssets);
+    let app_services = AppServices::new(databases, Handle::current());
+
+    let app = application().with_assets(AllAssets);
 
     app.run(move |cx| {
         gpui_kit::init(cx);
@@ -46,9 +44,7 @@ async fn main() {
         // init theme
         ThemeManager::init(cx).expect("Failed to initialize Lunaria themes");
 
-        cx.set_global(AppServices {
-            databases: databases.clone(),
-        });
+        cx.set_global(app_services);
 
         let window_options = LaunchPage::window_options(cx);
 

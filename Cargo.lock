@@ -3907,6 +3907,7 @@ dependencies = [
  "dirs 7.0.0",
  "gpui-kit",
  "lunaria-assets",
+ "lunaria-core",
  "lunaria-database",
  "lunaria-editor",
  "objc2 0.6.4",

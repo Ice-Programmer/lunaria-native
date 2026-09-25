@@ -8,6 +8,7 @@ gpui-kit.workspace = true
 lunaria-editor.workspace = true
 lunaria-assets.workspace = true
 lunaria-database.workspace = true
+lunaria-core.workspace = true
 tokio.workspace = true
 dirs.workspace = true
 
