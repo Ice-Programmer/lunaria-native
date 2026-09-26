@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use gpui_kit::{
     App, WindowAppearance,
     component::{Theme, ThemeRegistry},
+    px,
 };
 
 use crate::theme::error::ThemeError;
@@ -39,9 +40,8 @@ impl ThemeManager {
 
         let theme = Theme::global_mut(cx);
         theme.apply_config(&config);
-        // ThemeConfig JSON 不支持此开关；只保留细焦点边框。
         theme.focus_ring = false;
-
+        theme.notification.margins.top = px(16.);
 
         let window_appearance = if Theme::global(cx).is_dark() {
             WindowAppearance::Dark

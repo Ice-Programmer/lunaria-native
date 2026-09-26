@@ -1,9 +1,11 @@
+use crate::launcher::view_model::project_view_model::ProjectViewModel;
 use gpui_kit::base::input::InputState;
 use gpui_kit::base::{Disableable, h_flex, v_flex};
 use gpui_kit::component::ActiveTheme;
 use gpui_kit::component::button::ButtonVariants;
 use gpui_kit::component::form::{Field, Form};
 use gpui_kit::component::input::Input;
+use gpui_kit::component::{WindowExt, notification::Notification};
 use gpui_kit::{
     App, AppContext, Axis, Context, Entity, FontWeight, IntoElement, ParentElement, Render, Styled,
     Subscription, Window, div, px,
@@ -18,6 +20,7 @@ use std::path::PathBuf;
 pub struct CreateProjectForm {
     project_name_input: Entity<InputState>,
     project_directory_input: Entity<InputState>,
+    project_view_model: Entity<ProjectViewModel>,
     _subscriptions: Vec<Subscription>,
 }
 
@@ -47,22 +50,23 @@ impl CreateProjectForm {
                 )
         });
 
+        let project_view_model = cx.new(|_| ProjectViewModel::default());
+
         let subscriptions = vec![
             subscribe_input(&project_name_input, cx),
             subscribe_input(&project_directory_input, cx),
+            ProjectViewModel::subscribe(&project_view_model, window, cx),
         ];
 
         Self {
             project_name_input,
             project_directory_input,
+            project_view_model,
             _subscriptions: subscriptions,
         }
     }
 
-    fn fetch_project_path(&self, cx: &App) -> Option<PathBuf> {
-        let name_value = self.project_name_input.read(cx).value();
-        let project_name = name_value.trim();
-
+    fn parent_directory(&self, cx: &App) -> Option<PathBuf> {
         let directory_value = self.project_directory_input.read(cx).value();
         let project_directory = directory_value.trim();
 
@@ -78,7 +82,20 @@ impl CreateProjectForm {
             return None;
         }
 
-        Some(parent.join(project_name))
+        Some(parent)
+    }
+
+    fn submit(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        let name = self.project_name_input.read(cx).value().to_string();
+
+        let Some(parent_directory) = self.parent_directory(cx) else {
+            window.push_notification(Notification::error("please choose valid directory..."), cx);
+            return;
+        };
+
+        self.project_view_model.update(cx, |view_model, cx| {
+            view_model.create_project(name, parent_directory, cx);
+        });
     }
 
     fn render_header_title(&self) -> impl IntoElement {
@@ -89,11 +106,17 @@ impl CreateProjectForm {
     }
 
     fn render_form(&self, cx: &Context<Self>) -> impl IntoElement {
-        let project_path = self.fetch_project_path(cx);
+        let parent_directory = self.parent_directory(cx);
         let project_name = self.project_name_input.read(cx).value();
-        let can_create = project_path.is_some() && !project_name.is_empty();
-        let preview = project_path
-            .map(|path| path.to_string_lossy().into_owned())
+        let can_create = parent_directory.is_some() && !project_name.trim().is_empty();
+        let creating = self.project_view_model.read(cx).is_creating();
+        let preview = parent_directory
+            .map(|parent| {
+                parent
+                    .join(project_name.trim())
+                    .to_string_lossy()
+                    .into_owned()
+            })
             .unwrap_or_default();
 
         div().w_full().blur_on_mouse_down_out().child(
@@ -130,8 +153,12 @@ impl CreateProjectForm {
                             CustomButton::new("save")
                                 .label("创建项目")
                                 .disabled(!can_create)
+                                .loading(creating)
                                 .primary()
-                                .text_base(),
+                                .text_base()
+                                .on_click(cx.listener(|this, _, window, cx| {
+                                    this.submit(window, cx);
+                                })),
                         ),
                 ),
         )

@@ -7,6 +7,7 @@ use crate::connection::{
 use sea_orm::{
     ActiveModelTrait, DatabaseConnection, EntityTrait, QuerySelect, Set, TransactionTrait,
 };
+use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 use tempfile::NamedTempFile;
 
@@ -25,30 +26,18 @@ impl ProjectDatabase {
         project_name: &str,
         created_at: i64,
     ) -> Result<Self, DatabaseError> {
-        let metadata = tokio::fs::metadata(parent_directory)
-            .await
-            .map_err(|source| DatabaseError::io(parent_directory, source))?;
-        if !metadata.is_dir() {
-            return Err(DatabaseError::PathNotDirectory(
-                parent_directory.to_path_buf(),
-            ));
-        }
-
         let parent_directory = tokio::fs::canonicalize(parent_directory)
             .await
             .map_err(|source| DatabaseError::io(parent_directory, source))?;
         let directory = parent_directory.join(project_name);
 
-        if tokio::fs::try_exists(&directory)
-            .await
-            .map_err(|source| DatabaseError::io(&directory, source))?
-        {
-            return Err(DatabaseError::AlreadyExists(directory));
-        }
-
         tokio::fs::create_dir(&directory)
             .await
-            .map_err(|source| DatabaseError::io(&directory, source))?;
+            .map_err(|source| match source.kind() {
+                ErrorKind::AlreadyExists => DatabaseError::AlreadyExists(directory.clone()),
+                ErrorKind::NotADirectory => DatabaseError::PathNotDirectory(parent_directory),
+                _ => DatabaseError::io(&directory, source),
+            })?;
 
         let directory = tokio::fs::canonicalize(&directory)
             .await
@@ -101,7 +90,6 @@ async fn create_database_file(
         .await?;
 
         set_database_metadata(&transaction, PROJECT_DATABASE_ID, PROJECT_SCHEMA_VERSION).await?;
-        check_integrity(&transaction).await?;
         transaction.commit().await?;
         Ok(())
     }
