@@ -1,9 +1,9 @@
 use gpui_kit::base::input::InputState;
 use gpui_kit::base::{Disableable, h_flex, v_flex};
+use gpui_kit::component::ActiveTheme;
 use gpui_kit::component::button::ButtonVariants;
 use gpui_kit::component::form::{Field, Form};
 use gpui_kit::component::input::Input;
-use gpui_kit::component::ActiveTheme;
 use gpui_kit::{
     App, AppContext, Axis, Context, Entity, FontWeight, IntoElement, ParentElement, Render, Styled,
     Subscription, Window, div, px,
@@ -112,11 +112,12 @@ impl CreateProjectForm {
                 .child(
                     Field::new().label("完整路径：").child(
                         div()
-                            .w_full()
-                            .min_w_0()
+                            .w_0()
+                            .min_w_full()
                             .py_1()
                             .text_sm()
-                            .whitespace_normal()
+                            .truncate()
+                            .text_ellipsis_middle()
                             .text_color(cx.theme().muted_foreground)
                             .child(preview),
                     ),
