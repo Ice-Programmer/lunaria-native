@@ -1,9 +1,9 @@
-use gpui_kit::base::input::{InputEvent, InputState};
+use gpui_kit::base::input::InputState;
 use gpui_kit::base::{Disableable, h_flex, v_flex};
-use gpui_kit::component::button::{Button, ButtonVariants};
+use gpui_kit::component::button::ButtonVariants;
 use gpui_kit::component::form::{Field, Form};
 use gpui_kit::component::input::Input;
-use gpui_kit::component::{ActiveTheme, Sizable};
+use gpui_kit::component::ActiveTheme;
 use gpui_kit::{
     App, AppContext, Axis, Context, Entity, FontWeight, IntoElement, ParentElement, Render, Styled,
     Subscription, Window, div, px,
