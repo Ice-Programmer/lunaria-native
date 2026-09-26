@@ -9,6 +9,7 @@ use gpui_kit::{
     Subscription, Window, div, px,
 };
 use lunaria_ui::components::custom_button::CustomButton;
+use lunaria_ui::components::path_picker::PathPicker;
 use lunaria_ui::extensions::focus::FocusExt;
 use lunaria_ui::extensions::input_validator::Validator;
 use lunaria_ui::extensions::subscribe_input::subscribe_input;
@@ -104,11 +105,10 @@ impl CreateProjectForm {
                         .label("项目名称：")
                         .child(Input::new(&self.project_name_input)),
                 )
-                .child(
-                    Field::new()
-                        .label("项目位置：")
-                        .child(Input::new(&self.project_directory_input)),
-                )
+                .child(Field::new().label("项目位置：").child(PathPicker::new(
+                    "project-directory",
+                    &self.project_directory_input,
+                )))
                 .child(
                     Field::new().label("完整路径：").child(
                         div()

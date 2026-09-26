@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 gpui-kit.workspace = true
 thiserror.workspace = true
+rfd.workspace = true

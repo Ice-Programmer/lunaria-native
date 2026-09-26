@@ -39,3 +39,4 @@ tokio = {
 async-trait = "0.1"
 tempfile = "3"
 dirs = "7.0.0"
+rfd = "0.16.0"
