@@ -1,3 +1,4 @@
+use crate::launcher::router::{LauncherRoute, LauncherRouter};
 use crate::launcher::view_model::project_view_model::ProjectViewModel;
 use gpui_kit::base::input::InputState;
 use gpui_kit::base::{Disableable, h_flex, v_flex};
@@ -148,7 +149,14 @@ impl CreateProjectForm {
                 .footer(
                     h_flex()
                         .gap_3()
-                        .child(CustomButton::new("cancel").label("取消").text_base())
+                        .child(
+                            CustomButton::new("cancel")
+                                .label("取消")
+                                .text_base()
+                                .on_click(|_, _, cx| {
+                                    LauncherRouter::navigate(LauncherRoute::Recent, cx);
+                                }),
+                        )
                         .child(
                             CustomButton::new("save")
                                 .label("创建项目")
