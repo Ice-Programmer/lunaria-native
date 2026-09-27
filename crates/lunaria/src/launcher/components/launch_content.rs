@@ -1,6 +1,6 @@
 use gpui_kit::assets::IconName;
 use gpui_kit::base::{h_flex, v_flex};
-use gpui_kit::component::button::{ButtonCustomVariant, ButtonVariants};
+use gpui_kit::component::button::{Button, ButtonCustomVariant, ButtonVariants};
 use gpui_kit::component::input::{Input, InputState};
 use gpui_kit::component::list::{List, ListDelegate, ListItem, ListState};
 use gpui_kit::component::separator::Separator;
@@ -167,8 +167,8 @@ impl ListDelegate for ProjectListDelegate {
                 .gap_4()
                 .rounded_lg()
                 .px_4()
-                .cursor_pointer()
                 .py_3()
+                .cursor_pointer()
                 .child(
                     v_flex()
                         .h_full()
@@ -190,11 +190,11 @@ impl ListDelegate for ProjectListDelegate {
                         ),
                 )
                 .suffix(|_, cx| {
-                    CustomButton::new("more")
+                    Button::new("more")
                         .ghost()
                         .custom(ButtonCustomVariant::new(cx))
                         .cursor_pointer()
-                        .child(Icon::new(IconName::Ellipsis))
+                        .child(Icon::new(IconName::EllipsisVertical))
                 }),
         )
     }
