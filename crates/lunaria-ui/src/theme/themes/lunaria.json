@@ -26,7 +26,8 @@
         "button.background": "#FFFFFF",
         "button.foreground": "#292832",
         "button.hover.background": "#EEECF2",
-        "button.active.background": "#E2DFE9"
+        "button.active.background": "#E2DFE9",
+        "list.hover.background": "#F5F2FC"
       }
     },
     {
@@ -54,7 +55,8 @@
         "button.background": "#292932",
         "button.foreground": "#EEEAF4",
         "button.hover.background": "#34323E",
-        "button.active.background": "#413B4F"
+        "button.active.background": "#413B4F",
+        "list.hover.background": "#34323E"
       }
     }
   ]
