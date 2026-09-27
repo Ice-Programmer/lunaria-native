@@ -6,35 +6,34 @@ use lunaria_core::project::Project;
 
 use crate::app_services::AppServices;
 
-pub enum ProjectEvent {
-    CreateStarted,
+pub enum CreateProjectEvent {
+    Started,
     Created(Project),
-    CreateFailed(String),
+    Failed(String),
 }
 
 #[derive(Default)]
-pub struct ProjectViewModel {
+pub struct CreateProjectViewModel {
     creating: bool,
 }
 
-impl EventEmitter<ProjectEvent> for ProjectViewModel {}
+impl EventEmitter<CreateProjectEvent> for CreateProjectViewModel {}
 
-impl ProjectViewModel {
+impl CreateProjectViewModel {
     pub fn subscribe<T: 'static>(
         view_model: &Entity<Self>,
         window: &mut Window,
         cx: &mut Context<T>,
     ) -> Subscription {
         cx.subscribe_in(view_model, window, |_, _, event, window, cx| {
-            // refresh ui
             cx.notify();
 
             let notification = match event {
-                ProjectEvent::CreateStarted => return,
-                ProjectEvent::Created(project) => {
+                CreateProjectEvent::Started => return,
+                CreateProjectEvent::Created(project) => {
                     Notification::success(format!("create {} project successfully", project.name()))
                 }
-                ProjectEvent::CreateFailed(error) => Notification::error(error.clone()),
+                CreateProjectEvent::Failed(error) => Notification::error(error.clone()),
             };
             window.push_notification(notification, cx);
         })
@@ -54,30 +53,27 @@ impl ProjectViewModel {
             return;
         }
 
-        let services = cx.global::<AppServices>();
-        let service = services.project_service.clone();
-        let runtime = services.runtime.clone();
-
         self.creating = true;
-        cx.emit(ProjectEvent::CreateStarted);
+        cx.emit(CreateProjectEvent::Started);
 
-        let task = runtime.spawn(async move { service.create(name, parent_directory).await });
-
-        cx.spawn(async move |this, cx| {
-            let result = task.await;
-            let _ = this.update(cx, |this, cx| {
+        AppServices::run(
+            cx,
+            move |services| async move {
+                services
+                    .project_service
+                    .create(name, parent_directory)
+                    .await
+            },
+            |this, result, cx| {
                 this.creating = false;
 
                 let event = match result {
-                    Ok(Ok(project)) => ProjectEvent::Created(project),
-                    Ok(Err(error)) => ProjectEvent::CreateFailed(error.to_string()),
-                    Err(error) => {
-                        ProjectEvent::CreateFailed(format!("create project error：{error}"))
-                    }
+                    Ok(project) => CreateProjectEvent::Created(project),
+                    Err(error) => CreateProjectEvent::Failed(error),
                 };
+
                 cx.emit(event);
-            });
-        })
-        .detach();
+            },
+        );
     }
 }

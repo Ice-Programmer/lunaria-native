@@ -2,7 +2,9 @@ use std::{path::PathBuf, sync::Arc};
 
 use async_trait::async_trait;
 use lunaria_core::project::{Project, ProjectError, ProjectRepository};
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, Set};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder, Set,
+};
 
 use super::{database::ProjectDatabase, recent_project};
 use crate::manager::DatabaseManager;
@@ -91,5 +93,27 @@ impl ProjectRepository for Repository {
             record.created_at,
             record.last_opened_at,
         ))
+    }
+
+    async fn list_recent(&self) -> Result<Vec<Project>, ProjectError> {
+        let records = recent_project::Entity::find()
+            .order_by_desc(recent_project::Column::LastOpenedAt)
+            .order_by_desc(recent_project::Column::Id)
+            .all(self.databases.app_database())
+            .await
+            .map_err(ProjectError::storage)?;
+
+        Ok(records
+            .into_iter()
+            .map(|record| {
+                Project::new(
+                    record.id,
+                    record.project_name,
+                    PathBuf::from(record.project_path),
+                    record.created_at,
+                    record.last_opened_at,
+                )
+            })
+            .collect())
     }
 }

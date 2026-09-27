@@ -22,4 +22,8 @@ impl ProjectService {
 
         self.repository.create(name, path).await
     }
+
+    pub async fn list_recent(&self) -> Result<Vec<Project>, ProjectError> {
+        self.repository.list_recent().await
+    }
 }

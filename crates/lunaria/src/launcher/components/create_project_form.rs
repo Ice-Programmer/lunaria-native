@@ -1,5 +1,5 @@
 use crate::launcher::router::{LauncherRoute, LauncherRouter};
-use crate::launcher::view_model::project_view_model::ProjectViewModel;
+use crate::launcher::view_model::create_project_view_model::CreateProjectViewModel;
 use gpui_kit::base::input::InputState;
 use gpui_kit::base::{Disableable, h_flex, v_flex};
 use gpui_kit::component::ActiveTheme;
@@ -21,7 +21,7 @@ use std::path::PathBuf;
 pub struct CreateProjectForm {
     project_name_input: Entity<InputState>,
     project_directory_input: Entity<InputState>,
-    project_view_model: Entity<ProjectViewModel>,
+    project_view_model: Entity<CreateProjectViewModel>,
     _subscriptions: Vec<Subscription>,
 }
 
@@ -51,12 +51,12 @@ impl CreateProjectForm {
                 )
         });
 
-        let project_view_model = cx.new(|_| ProjectViewModel::default());
+        let project_view_model = cx.new(|_| CreateProjectViewModel::default());
 
         let subscriptions = vec![
             subscribe_input(&project_name_input, cx),
             subscribe_input(&project_directory_input, cx),
-            ProjectViewModel::subscribe(&project_view_model, window, cx),
+            CreateProjectViewModel::subscribe(&project_view_model, window, cx),
         ];
 
         Self {
