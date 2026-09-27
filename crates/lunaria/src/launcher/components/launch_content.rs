@@ -8,6 +8,8 @@ use gpui_kit::component::{ActiveTheme, Icon, IndexPath};
 use gpui_kit::*;
 use lunaria_ui::components::custom_button::CustomButton;
 
+use crate::launcher::view_model::recent_projects_view_model::RecentProjectsViewModel;
+
 pub struct LaunchContent {
     search_input: Entity<InputState>,
     project_list: Entity<ListState<ProjectListDelegate>>,
@@ -21,10 +23,21 @@ impl LaunchContent {
                 .default_value("")
         });
 
+        let view_model = cx.new(|_| RecentProjectsViewModel::default());
+
         let project_list = cx.new(|cx| {
-            ListState::new(ProjectListDelegate { item_count: 8 }, window, cx)
+            let delegate = ProjectListDelegate {
+                view_model: view_model.clone(),
+                _subscription: RecentProjectsViewModel::subscribe(&view_model, window, cx),
+            };
+
+            ListState::new(delegate, window, cx)
                 .searchable(false)
                 .selectable(false)
+        });
+
+        view_model.update(cx, |view_model, cx| {
+            view_model.load_recent(cx);
         });
 
         Self {
@@ -125,14 +138,15 @@ impl Render for LaunchContent {
 }
 
 struct ProjectListDelegate {
-    item_count: usize,
+    view_model: Entity<RecentProjectsViewModel>,
+    _subscription: Subscription,
 }
 
 impl ListDelegate for ProjectListDelegate {
     type Item = ListItem;
 
-    fn items_count(&self, _section: usize, _cx: &App) -> usize {
-        self.item_count
+    fn items_count(&self, _section: usize, cx: &App) -> usize {
+        self.view_model.read(cx).recent_projects().len()
     }
 
     fn render_item(
@@ -141,12 +155,14 @@ impl ListDelegate for ProjectListDelegate {
         _window: &mut Window,
         cx: &mut Context<component::list::ListState<Self>>,
     ) -> Option<Self::Item> {
-        if ix.row >= self.item_count {
-            return None;
-        }
+        let view_model = self.view_model.read(cx);
+        let project = view_model.recent_projects().get(ix.row)?;
+        let id = SharedString::from(format!("project-item-{}", project.id()));
+        let name = project.name().to_owned();
+        let path = project.path().display().to_string();
 
         Some(
-            ListItem::new(SharedString::from(format!("project-item-{}", ix.row)))
+            ListItem::new(id)
                 .w_full()
                 .gap_4()
                 .rounded_lg()
@@ -158,12 +174,19 @@ impl ListDelegate for ProjectListDelegate {
                         .h_full()
                         .justify_between()
                         .flex_1()
-                        .child(div().font_weight(FontWeight::SEMIBOLD).child("月下回声"))
+                        .min_w_0()
+                        .child(
+                            div()
+                                .truncate()
+                                .font_weight(FontWeight::SEMIBOLD)
+                                .child(name),
+                        )
                         .child(
                             div()
                                 .text_xs()
+                                .truncate()
                                 .text_color(cx.theme().muted_foreground)
-                                .child("～/Documents/Lunaria/月下回升"),
+                                .child(path),
                         ),
                 )
                 .suffix(|_, cx| {
@@ -182,6 +205,10 @@ impl ListDelegate for ProjectListDelegate {
         cx: &mut Context<component::list::ListState<Self>>,
     ) -> impl IntoElement {
         LaunchContent::render_empty_state(cx)
+    }
+
+    fn loading(&self, cx: &App) -> bool {
+        self.view_model.read(cx).is_loading()
     }
 
     fn set_selected_index(
