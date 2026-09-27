@@ -1,18 +1,18 @@
 use gpui_kit::assets::IconName;
 use gpui_kit::base::{h_flex, v_flex};
 use gpui_kit::component::button::{Button, ButtonCustomVariant, ButtonVariants};
-use gpui_kit::component::input::{Input, InputState};
+use gpui_kit::component::input::{Input, InputEvent, InputState};
 use gpui_kit::component::list::{List, ListDelegate, ListItem, ListState};
 use gpui_kit::component::separator::Separator;
 use gpui_kit::component::{ActiveTheme, Icon, IndexPath};
 use gpui_kit::*;
-use lunaria_ui::components::custom_button::CustomButton;
 
 use crate::launcher::view_model::recent_projects_view_model::RecentProjectsViewModel;
 
 pub struct LaunchContent {
     search_input: Entity<InputState>,
     project_list: Entity<ListState<ProjectListDelegate>>,
+    _search_subscription: Subscription,
 }
 
 impl LaunchContent {
@@ -36,6 +36,18 @@ impl LaunchContent {
                 .selectable(false)
         });
 
+        let search_subscription =
+            cx.subscribe_in(&search_input, window, |this, input, event, window, cx| {
+                if !matches!(event, InputEvent::Change) {
+                    return;
+                }
+
+                let query = input.read(cx).value().to_string();
+                this.project_list.update(cx, |list, cx| {
+                    list.set_query(&query, window, cx);
+                });
+            });
+
         view_model.update(cx, |view_model, cx| {
             view_model.load_recent(cx);
         });
@@ -43,6 +55,7 @@ impl LaunchContent {
         Self {
             search_input,
             project_list,
+            _search_subscription: search_subscription,
         }
     }
 
@@ -132,7 +145,6 @@ impl Render for LaunchContent {
             .min_w_0()
             .p_6()
             .child(self.render_header())
-            // .child(Self::render_empty_state(cx))
             .child(self.render_recent_project_list(cx))
     }
 }
@@ -145,8 +157,20 @@ struct ProjectListDelegate {
 impl ListDelegate for ProjectListDelegate {
     type Item = ListItem;
 
+    fn perform_search(
+        &mut self,
+        query: &str,
+        _window: &mut Window,
+        cx: &mut Context<ListState<Self>>,
+    ) -> Task<()> {
+        self.view_model.update(cx, |view_model, cx| {
+            view_model.set_query(query, cx);
+        });
+        Task::ready(())
+    }
+
     fn items_count(&self, _section: usize, cx: &App) -> usize {
-        self.view_model.read(cx).recent_projects().len()
+        self.view_model.read(cx).filtered_projects().count()
     }
 
     fn render_item(
@@ -155,14 +179,10 @@ impl ListDelegate for ProjectListDelegate {
         _window: &mut Window,
         cx: &mut Context<component::list::ListState<Self>>,
     ) -> Option<Self::Item> {
-        let view_model = self.view_model.read(cx);
-        let project = view_model.recent_projects().get(ix.row)?;
-        let id = SharedString::from(format!("project-item-{}", project.id()));
-        let name = project.name().to_owned();
-        let path = project.path().display().to_string();
+        let project = self.view_model.read(cx).filtered_projects().nth(ix.row)?;
 
         Some(
-            ListItem::new(id)
+            ListItem::new(SharedString::from(format!("project-item-{}", project.id())))
                 .w_full()
                 .gap_4()
                 .rounded_lg()
@@ -178,15 +198,14 @@ impl ListDelegate for ProjectListDelegate {
                         .child(
                             div()
                                 .truncate()
-                                .font_weight(FontWeight::SEMIBOLD)
-                                .child(name),
+                                .child(project.name().to_owned()),
                         )
                         .child(
                             div()
                                 .text_xs()
                                 .truncate()
                                 .text_color(cx.theme().muted_foreground)
-                                .child(path),
+                                .child(project.path().display().to_string()),
                         ),
                 )
                 .suffix(|_, cx| {
@@ -204,7 +223,11 @@ impl ListDelegate for ProjectListDelegate {
         _window: &mut Window,
         cx: &mut Context<component::list::ListState<Self>>,
     ) -> impl IntoElement {
-        LaunchContent::render_empty_state(cx)
+        if self.view_model.read(cx).query().is_empty() {
+            LaunchContent::render_empty_state(cx).into_any_element()
+        } else {
+            div().into_any_element()
+        }
     }
 
     fn loading(&self, cx: &App) -> bool {

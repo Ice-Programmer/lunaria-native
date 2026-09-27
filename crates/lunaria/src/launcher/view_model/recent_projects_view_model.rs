@@ -7,12 +7,14 @@ use crate::app_services::AppServices;
 pub enum RecentProjectsEvent {
     Started,
     Loaded,
+    SearchChanged,
     Failed(String),
 }
 
 #[derive(Default)]
 pub struct RecentProjectsViewModel {
     loading: bool,
+    query: String,
     recent_projects: Vec<Project>,
 }
 
@@ -39,6 +41,26 @@ impl RecentProjectsViewModel {
 
     pub fn recent_projects(&self) -> &[Project] {
         &self.recent_projects
+    }
+
+    pub fn query(&self) -> &str {
+        &self.query
+    }
+
+    pub fn set_query(&mut self, query: &str, cx: &mut Context<Self>) {
+        let query = query.trim().to_lowercase();
+        if self.query == query {
+            return;
+        }
+
+        self.query = query;
+        cx.emit(RecentProjectsEvent::SearchChanged);
+    }
+
+    pub fn filtered_projects(&self) -> impl Iterator<Item = &Project> {
+        self.recent_projects().iter().filter(|project| {
+            self.query.is_empty() || project.name().to_lowercase().contains(&self.query)
+        })
     }
 
     pub fn load_recent(&mut self, cx: &mut Context<Self>) {
