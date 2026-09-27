@@ -3,6 +3,7 @@ use gpui_kit::assets::IconName;
 use gpui_kit::base::v_flex;
 use gpui_kit::component::button::{Button, ButtonCustomVariant, ButtonVariants};
 use gpui_kit::component::list::{ListDelegate, ListItem, ListState};
+use gpui_kit::component::menu::{DropdownMenu, PopupMenuItem};
 use gpui_kit::component::{ActiveTheme, Icon, IndexPath};
 use gpui_kit::*;
 
@@ -62,9 +63,11 @@ impl ListDelegate for ProjectListDelegate {
         &mut self,
         ix: IndexPath,
         _window: &mut Window,
-        cx: &mut Context<component::list::ListState<Self>>,
+        cx: &mut Context<ListState<Self>>,
     ) -> Option<Self::Item> {
         let project = self.view_model.read(cx).filtered_projects().nth(ix.row)?;
+        let project_path = project.path().clone();
+        let project_path_text = project_path.display().to_string();
 
         Some(
             ListItem::new(SharedString::from(format!("project-item-{}", project.id())))
@@ -86,15 +89,30 @@ impl ListDelegate for ProjectListDelegate {
                                 .text_xs()
                                 .truncate()
                                 .text_color(cx.theme().muted_foreground)
-                                .child(project.path().display().to_string()),
+                                .child(project_path_text),
                         ),
                 )
-                .suffix(|_, cx| {
+                .suffix(move |_, cx| {
+                    let project_path = project_path.clone();
+
                     Button::new("more")
                         .ghost()
                         .custom(ButtonCustomVariant::new(cx))
                         .cursor_pointer()
                         .child(Icon::new(IconName::EllipsisVertical))
+                        .dropdown_menu_with_anchor(Anchor::TopRight, move |menu, _, _| {
+                            let project_path = project_path.clone();
+
+                            menu.item(
+                                PopupMenuItem::new("open in finder")
+                                    .icon(IconName::FolderOpen)
+                                    .on_click(move |_, _, cx| {
+                                        cx.open_with_system(project_path.as_path());
+                                    }),
+                            )
+                            .separator()
+                            .item(PopupMenuItem::new("delete project").icon(IconName::Trash))
+                        })
                 }),
         )
     }
@@ -102,7 +120,7 @@ impl ListDelegate for ProjectListDelegate {
     fn render_empty(
         &mut self,
         _window: &mut Window,
-        cx: &mut Context<component::list::ListState<Self>>,
+        cx: &mut Context<ListState<Self>>,
     ) -> impl IntoElement {
         if self.view_model.read(cx).query().is_empty() {
             Self::render_empty_state(cx).into_any_element()
@@ -119,8 +137,7 @@ impl ListDelegate for ProjectListDelegate {
         &mut self,
         _ix: Option<IndexPath>,
         _window: &mut Window,
-        _cx: &mut Context<component::list::ListState<Self>>,
+        _cx: &mut Context<ListState<Self>>,
     ) {
-        return;
     }
 }
