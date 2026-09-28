@@ -44,6 +44,7 @@ impl LaunchSidebar {
                     .selected(creating)
                     .h(px(36.))
                     .icon(IconName::Plus)
+                    .cursor_pointer()
                     .on_click(|_, _, cx| {
                         LauncherRouter::navigate(LauncherRoute::CreateProject, cx)
                     }),
@@ -54,6 +55,7 @@ impl LaunchSidebar {
                     .label("打开项目")
                     .icon(IconName::FolderOpen)
                     .h(px(36.))
+                    .cursor_pointer()
                     .w_full(),
             )
     }

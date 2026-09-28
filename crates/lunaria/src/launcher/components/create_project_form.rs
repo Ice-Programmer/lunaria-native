@@ -152,6 +152,7 @@ impl CreateProjectForm {
                         .child(
                             CustomButton::new("cancel")
                                 .label("取消")
+                                .cursor_pointer()
                                 .text_base()
                                 .on_click(|_, _, cx| {
                                     LauncherRouter::navigate(LauncherRoute::Recent, cx);
@@ -161,6 +162,7 @@ impl CreateProjectForm {
                             CustomButton::new("save")
                                 .label("创建项目")
                                 .disabled(!can_create)
+                                .cursor_pointer()
                                 .loading(creating)
                                 .primary()
                                 .text_base()
