@@ -6,3 +6,6 @@ edition = "2024"
 [dependencies]
 thiserror.workspace = true
 async-trait.workspace = true
+serde.workspace = true
+tokio.workspace = true
+gpui-kit.workspace = true

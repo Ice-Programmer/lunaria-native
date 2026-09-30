@@ -35,7 +35,7 @@ async fn main() {
             .expect("Failed to initialize Lunaria databases"),
     );
 
-    let app_services = AppServices::new(databases, Handle::current());
+    let app_services = AppServices::new(databases, Handle::current()).await;
 
     let app = application().with_assets(AllAssets);
 
