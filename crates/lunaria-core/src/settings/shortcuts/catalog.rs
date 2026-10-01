@@ -12,7 +12,12 @@ pub fn default_shortcuts() -> Vec<ShortcutDefinition> {
 
     vec![ShortcutDefinition {
         action: ShortcutAction::ToggleTheme,
-        title: "",
+        title: "切换明暗主题",
         defaults: vec![Shortcut::new("T", shift_command)],
+    },
+    ShortcutDefinition{
+        action: ShortcutAction::OpenSettings,
+        title: "打开设置窗口",
+        defaults: vec![Shortcut::new(",", command)],
     }]
 }

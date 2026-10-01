@@ -1,8 +1,9 @@
+use crate::settings::setting_page::SettingsPage;
 use gpui_kit::{App, KeyBinding, Keystroke, actions};
 use lunaria_core::settings::shortcuts::model::{ShortcutAction, ShortcutItem};
 use lunaria_ui::ThemeManager;
 
-actions!(lunaria, [ToggleTheme]);
+actions!(lunaria, [ToggleTheme, OpenSettings]);
 
 pub fn init(items: &[ShortcutItem], cx: &mut App) {
     apply(items, cx);
@@ -12,8 +13,11 @@ pub fn init(items: &[ShortcutItem], cx: &mut App) {
             eprintln!("Failed to toggle theme: {error}");
         }
     });
-}
 
+    cx.on_action(|_: &OpenSettings, cx| {
+        SettingsPage::open(cx);
+    });
+}
 pub fn apply(items: &[ShortcutItem], cx: &mut App) {
     let mut bindings: Vec<_> = cx
         .key_bindings()
@@ -40,6 +44,9 @@ pub fn apply(items: &[ShortcutItem], cx: &mut App) {
             let binding = match item.definition.action {
                 ShortcutAction::ToggleTheme => {
                     KeyBinding::new(&keystroke.unparse(), ToggleTheme, None)
+                }
+                ShortcutAction::OpenSettings => {
+                    KeyBinding::new(&keystroke.unparse(), OpenSettings, None)
                 }
             };
 
