@@ -1,10 +1,14 @@
+use crate::launcher::components::LaunchSidebar;
 use gpui_kit::WindowHandle;
+use gpui_kit::base::h_flex;
 use gpui_kit::component::{ActiveTheme, Root};
 use gpui_kit::*;
 
 const SETTING_WIDTH: f32 = 800.;
 
 const SETTING_HEIGHT: f32 = 600.;
+
+const SETTING_SIDEBAR_WIDTH: f32 = 200.0;
 
 struct SettingsWindow(WindowHandle<Root>);
 
@@ -40,12 +44,11 @@ impl SettingsPage {
 
             match cx.open_window(options, |window, cx| {
                 let view = cx.new(|_| Self);
-
                 cx.new(|cx| Root::new(view, window, cx))
             }) {
                 Ok(handle) => cx.set_global(SettingsWindow(handle)),
                 Err(error) => {
-                    eprintln!("Failed to open settings window: {error}");
+                    eprintln!("Failed to open setting window: {error}");
                 }
             }
         })
@@ -54,6 +57,10 @@ impl SettingsPage {
 
 impl Render for SettingsPage {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        div().size_full().bg(cx.theme().background)
+        h_flex()
+            .size_full()
+            .relative()
+            .child(div().w(px(SETTING_SIDEBAR_WIDTH)).h_full().flex_shrink_0())
+            .child(div().flex_1().h_full())
     }
 }

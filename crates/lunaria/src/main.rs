@@ -1,13 +1,13 @@
-mod app_services;
 #[cfg(debug_assertions)]
 mod dev;
 mod launcher;
 mod platform;
-pub mod settings;
+pub mod setting;
+pub mod app;
 
-use crate::app_services::AppServices;
 use crate::launcher::launcher_page::LaunchPage;
 use crate::launcher::router::LauncherRouter;
+use app::app_services::AppServices;
 use gpui_kit::assets::AllAssets;
 use gpui_kit::component::Root;
 use gpui_kit::*;
@@ -50,7 +50,7 @@ async fn main() {
         ThemeManager::init(cx).expect("Failed to initialize Lunaria themes");
 
         cx.set_global(app_services);
-        settings::shortcuts::init(&shortcut_items, cx);
+        app::shortcuts::init(&shortcut_items, cx);
         cx.set_global(LauncherRouter::default());
 
         #[cfg(debug_assertions)]

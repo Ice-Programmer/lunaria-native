@@ -1,4 +1,4 @@
-use crate::settings::setting_page::SettingsPage;
+use crate::setting::setting_page::SettingsPage;
 use gpui_kit::{App, KeyBinding, Keystroke, actions};
 use lunaria_core::settings::shortcuts::model::{ShortcutAction, ShortcutItem};
 use lunaria_ui::ThemeManager;
