@@ -7,6 +7,8 @@ use std::collections::HashMap;
 pub enum ShortcutAction {
     OpenSettings,
     ToggleTheme,
+    CloseWindow,
+    Quit
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]

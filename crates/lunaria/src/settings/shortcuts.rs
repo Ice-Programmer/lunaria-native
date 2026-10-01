@@ -3,7 +3,7 @@ use gpui_kit::{App, KeyBinding, Keystroke, actions};
 use lunaria_core::settings::shortcuts::model::{ShortcutAction, ShortcutItem};
 use lunaria_ui::ThemeManager;
 
-actions!(lunaria, [ToggleTheme, OpenSettings]);
+actions!(lunaria, [ToggleTheme, OpenSettings, CloseWindow, Quit]);
 
 pub fn init(items: &[ShortcutItem], cx: &mut App) {
     apply(items, cx);
@@ -16,6 +16,20 @@ pub fn init(items: &[ShortcutItem], cx: &mut App) {
 
     cx.on_action(|_: &OpenSettings, cx| {
         SettingsPage::open(cx);
+    });
+
+    cx.on_action(|_: &CloseWindow, cx| {
+        if let Some(handle) = cx.active_window() {
+            cx.defer(move |cx| {
+                let _ = handle.update(cx, |_, window, _| {
+                    window.remove_window();
+                });
+            });
+        }
+    });
+
+    cx.on_action(|_: &Quit, cx| {
+        cx.quit();
     });
 }
 pub fn apply(items: &[ShortcutItem], cx: &mut App) {
@@ -48,6 +62,10 @@ pub fn apply(items: &[ShortcutItem], cx: &mut App) {
                 ShortcutAction::OpenSettings => {
                     KeyBinding::new(&keystroke.unparse(), OpenSettings, None)
                 }
+                ShortcutAction::CloseWindow => {
+                    KeyBinding::new(&keystroke.unparse(), CloseWindow, None)
+                }
+                ShortcutAction::Quit => KeyBinding::new(&keystroke.unparse(), Quit, None),
             };
 
             bindings.push(binding);

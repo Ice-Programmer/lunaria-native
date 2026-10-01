@@ -7,7 +7,7 @@ pub mod settings;
 
 use crate::app_services::AppServices;
 use crate::launcher::launcher_page::LaunchPage;
-use crate::launcher::router::{LauncherRoute, LauncherRouter};
+use crate::launcher::router::LauncherRouter;
 use gpui_kit::assets::AllAssets;
 use gpui_kit::component::Root;
 use gpui_kit::*;
