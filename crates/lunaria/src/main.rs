@@ -3,6 +3,7 @@ mod app_services;
 mod dev;
 mod launcher;
 mod platform;
+pub mod settings;
 
 use crate::app_services::AppServices;
 use crate::launcher::launcher_page::LaunchPage;
@@ -36,6 +37,7 @@ async fn main() {
     );
 
     let app_services = AppServices::new(databases, Handle::current()).await;
+    let shortcut_items = app_services.shortcut_service.list().await;
 
     let app = application().with_assets(AllAssets);
 
@@ -48,6 +50,7 @@ async fn main() {
         ThemeManager::init(cx).expect("Failed to initialize Lunaria themes");
 
         cx.set_global(app_services);
+        settings::shortcuts::init(&shortcut_items, cx);
         cx.set_global(LauncherRouter::default());
 
         #[cfg(debug_assertions)]
