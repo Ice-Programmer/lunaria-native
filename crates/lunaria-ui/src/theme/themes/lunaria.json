@@ -52,10 +52,10 @@
         "secondary.foreground": "#EEEAF4",
         "primary.hover.background": "#BDA6F8",
         "primary.active.background": "#9D82E2",
-        "button.background": "#292932",
+        "button.background": "#353540",
         "button.foreground": "#EEEAF4",
-        "button.hover.background": "#34323E",
-        "button.active.background": "#413B4F",
+        "button.hover.background": "#41414D",
+        "button.active.background": "#2D2D37",
         "list.hover.background": "#34323E"
       }
     }

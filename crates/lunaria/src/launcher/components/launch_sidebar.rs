@@ -4,6 +4,7 @@ use gpui_kit::base::{Selectable, h_flex, v_flex};
 use gpui_kit::component::button::*;
 use gpui_kit::component::{ActiveTheme, Icon};
 use gpui_kit::*;
+use lunaria_ui::components::custom_button::CustomButton;
 
 #[derive(IntoElement)]
 pub struct LaunchSidebar;
@@ -50,8 +51,7 @@ impl LaunchSidebar {
                     }),
             )
             .child(
-                Button::new("open-project")
-                    .outline()
+                CustomButton::new("open-project")
                     .label("打开项目")
                     .icon(IconName::FolderOpen)
                     .h(px(36.))
