@@ -2,6 +2,10 @@ use gpui_kit::WindowHandle;
 use gpui_kit::component::{ActiveTheme, Root};
 use gpui_kit::*;
 
+const SETTING_WIDTH: f32 = 800.;
+
+const SETTING_HEIGHT: f32 = 600.;
+
 struct SettingsWindow(WindowHandle<Root>);
 
 impl Global for SettingsWindow {}
@@ -22,10 +26,13 @@ impl SettingsPage {
             }
 
             let options = WindowOptions {
-                window_bounds: Some(WindowBounds::centered(size(px(800.), px(600.)), cx)),
-                window_min_size: Some(size(px(640.), px(400.))),
+                window_bounds: Some(WindowBounds::centered(
+                    size(px(SETTING_WIDTH), px(SETTING_HEIGHT)),
+                    cx,
+                )),
+                window_min_size: Some(size(px(SETTING_WIDTH), px(SETTING_HEIGHT))),
                 titlebar: Some(TitlebarOptions {
-                    title: Some("应用设置".into()),
+                    appears_transparent: true,
                     ..Default::default()
                 }),
                 ..Default::default()
