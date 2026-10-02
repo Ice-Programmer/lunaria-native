@@ -1,4 +1,4 @@
-use crate::setting::setting_page::SettingsPage;
+use crate::setting::setting_page::SettingPage;
 use gpui_kit::{App, KeyBinding, Keystroke, actions};
 use lunaria_core::settings::shortcuts::model::{ShortcutAction, ShortcutItem};
 use lunaria_ui::ThemeManager;
@@ -15,7 +15,7 @@ pub fn init(items: &[ShortcutItem], cx: &mut App) {
     });
 
     cx.on_action(|_: &OpenSettings, cx| {
-        SettingsPage::open(cx);
+        SettingPage::open(cx);
     });
 
     cx.on_action(|_: &CloseWindow, cx| {

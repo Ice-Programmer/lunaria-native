@@ -1,7 +1,8 @@
-use crate::launcher::components::LaunchSidebar;
+use crate::setting::components::setting_sidebar::SettingSidebar;
+use crate::setting::router::{SettingRoute, SettingRouter};
 use gpui_kit::WindowHandle;
 use gpui_kit::base::h_flex;
-use gpui_kit::component::{ActiveTheme, Root};
+use gpui_kit::component::Root;
 use gpui_kit::*;
 
 const SETTING_WIDTH: f32 = 800.;
@@ -14,9 +15,40 @@ struct SettingsWindow(WindowHandle<Root>);
 
 impl Global for SettingsWindow {}
 
-pub struct SettingsPage;
+pub struct SettingPage {
+    current_route: SettingRoute,
+    current_view: AnyView,
+    _route_subscription: Subscription,
+}
 
-impl SettingsPage {
+impl SettingPage {
+    pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let current_route = SettingRouter::current(cx);
+        let current_view = current_route.build(window, cx);
+
+        let route_subscription =
+            cx.observe_global_in::<SettingRouter>(window, |this, window, cx| {
+                let next_route = SettingRouter::current(cx);
+
+                if this.current_route == next_route {
+                    return;
+                }
+
+                window.blur(cx);
+
+                this.current_view = next_route.build(window, cx);
+                this.current_route = next_route;
+
+                cx.notify();
+            });
+
+        Self {
+            current_route,
+            current_view,
+            _route_subscription: route_subscription,
+        }
+    }
+
     pub fn open(cx: &mut App) {
         cx.defer(|cx| {
             // 如果已经打开，将窗口置顶
@@ -43,7 +75,7 @@ impl SettingsPage {
             };
 
             match cx.open_window(options, |window, cx| {
-                let view = cx.new(|_| Self);
+                let view = cx.new(|cx| Self::new(window, cx));
                 cx.new(|cx| Root::new(view, window, cx))
             }) {
                 Ok(handle) => cx.set_global(SettingsWindow(handle)),
@@ -55,12 +87,18 @@ impl SettingsPage {
     }
 }
 
-impl Render for SettingsPage {
-    fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+impl Render for SettingPage {
+    fn render(&mut self, _: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         h_flex()
             .size_full()
             .relative()
-            .child(div().w(px(SETTING_SIDEBAR_WIDTH)).h_full().flex_shrink_0())
-            .child(div().flex_1().h_full())
+            .child(
+                div()
+                    .w(px(SETTING_SIDEBAR_WIDTH))
+                    .h_full()
+                    .flex_shrink_0()
+                    .child(SettingSidebar::new()),
+            )
+            .child(div().flex_1().h_full().child(self.current_view.clone()))
     }
 }

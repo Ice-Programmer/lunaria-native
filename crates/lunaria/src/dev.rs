@@ -1,4 +1,6 @@
 use crate::launcher::router::{LauncherRoute, LauncherRouter};
+use crate::setting::router::{SettingRoute, SettingRouter};
+use crate::setting::setting_page::SettingPage;
 use gpui_kit::App;
 use std::env;
 
@@ -30,6 +32,18 @@ fn navigate_dev_route(value: &str, cx: &mut App) -> Result<(), String> {
             };
 
             Ok(LauncherRouter::navigate(route, cx))
+        }
+        "setting" => {
+            let route = match page {
+                "shortcut" => SettingRoute::Shortcut,
+                unknown => {
+                    return Err(format!("Unknown setting route: {unknown}"));
+                }
+            };
+            SettingRouter::navigate(route, cx);
+            SettingPage::open(cx);
+
+            Ok(())
         }
 
         unknown => Err(format!("Unknown module: {unknown}")),
