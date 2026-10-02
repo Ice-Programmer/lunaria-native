@@ -6,9 +6,7 @@ use gpui_kit::component::Root;
 use gpui_kit::*;
 
 const SETTING_WIDTH: f32 = 800.;
-
 const SETTING_HEIGHT: f32 = 600.;
-
 const SETTING_SIDEBAR_WIDTH: f32 = 200.0;
 
 struct SettingsWindow(WindowHandle<Root>);
@@ -16,6 +14,7 @@ struct SettingsWindow(WindowHandle<Root>);
 impl Global for SettingsWindow {}
 
 pub struct SettingPage {
+    sidebar: Entity<SettingSidebar>,
     current_route: SettingRoute,
     current_view: AnyView,
     _route_subscription: Subscription,
@@ -23,6 +22,7 @@ pub struct SettingPage {
 
 impl SettingPage {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let sidebar = cx.new(|cx| SettingSidebar::new(window, cx));
         let current_route = SettingRouter::current(cx);
         let current_view = current_route.build(window, cx);
 
@@ -43,6 +43,7 @@ impl SettingPage {
             });
 
         Self {
+            sidebar,
             current_route,
             current_view,
             _route_subscription: route_subscription,
@@ -88,7 +89,7 @@ impl SettingPage {
 }
 
 impl Render for SettingPage {
-    fn render(&mut self, _: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         h_flex()
             .size_full()
             .relative()
@@ -97,7 +98,7 @@ impl Render for SettingPage {
                     .w(px(SETTING_SIDEBAR_WIDTH))
                     .h_full()
                     .flex_shrink_0()
-                    .child(SettingSidebar::new()),
+                    .child(self.sidebar.clone()),
             )
             .child(div().flex_1().h_full().child(self.current_view.clone()))
     }
