@@ -1,9 +1,10 @@
 use gpui_kit::assets::IconName;
 use gpui_kit::base::{h_flex, v_flex};
-use gpui_kit::component::input::{Input, InputEvent, InputState};
+use gpui_kit::component::input::{InputEvent, InputState};
 use gpui_kit::component::list::{List, ListState};
 use gpui_kit::component::separator::Separator;
 use gpui_kit::*;
+use lunaria_ui::components::custom_input::CustomInput;
 
 use super::recent_product_list::ProjectListDelegate;
 use crate::launcher::view_model::recent_projects_view_model::RecentProjectsViewModel;
@@ -69,22 +70,11 @@ impl LaunchContent {
                     .child("最近项目"),
             )
             .child(
-                div()
-                    .w(px(180.))
-                    .on_mouse_down_out(|_, window, cx| {
-                        window.blur(cx);
-                    })
-                    .capture_key_down(|event, window, cx| {
-                        if event.keystroke.key == "escape" {
-                            window.blur(cx);
-                        }
-                    })
-                    .child(
-                        Input::new(&self.search_input)
-                            .id("search-project")
-                            .aria_label("search recent project")
-                            .prefix(IconName::Search),
-                    ),
+                CustomInput::new(&self.search_input)
+                    .id("search-project")
+                    .aria_label("search recent project")
+                    .prefix(IconName::Search)
+                    .w(px(180.)),
             )
     }
 

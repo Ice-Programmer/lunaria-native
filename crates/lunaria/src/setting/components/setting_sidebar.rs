@@ -2,8 +2,8 @@ use gpui_kit::assets::IconName;
 use gpui_kit::base::input::InputState;
 use gpui_kit::base::v_flex;
 use gpui_kit::component::ActiveTheme;
-use gpui_kit::component::input::Input;
 use gpui_kit::*;
+use lunaria_ui::components::custom_input::CustomInput;
 
 pub struct SettingSidebar {
     search_input: Entity<InputState>,
@@ -20,13 +20,12 @@ impl SettingSidebar {
         Self { search_input }
     }
 
-    fn render_search_input(&self) -> impl IntoElement {
-        div().mt_6().child(
-            Input::new(&self.search_input)
-                .id("search-setting")
-                .aria_label("search settings")
-                .prefix(IconName::Search),
-        )
+    fn render_search_input(&self) -> CustomInput {
+        CustomInput::new(&self.search_input)
+            .id("search-setting")
+            .aria_label("search settings")
+            .prefix(IconName::Search)
+            .mt_6()
     }
 }
 
