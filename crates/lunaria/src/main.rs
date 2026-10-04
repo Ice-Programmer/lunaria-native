@@ -9,8 +9,8 @@ pub mod setting;
 use crate::init::router::init_app_router;
 use crate::launcher::launcher_page::LaunchPage;
 use app::app_services::AppServices;
+use app::window_root::create_window_root;
 use gpui_kit::assets::AllAssets;
-use gpui_kit::component::Root;
 use gpui_kit::*;
 use lunaria_database::DatabaseManager;
 use lunaria_ui::ThemeManager;
@@ -64,7 +64,7 @@ async fn main() {
             cx.open_window(window_options, |window, cx| {
                 let view = cx.new(|view_cx| LaunchPage::new(window, view_cx));
 
-                cx.new(|cx| Root::new(view, window, cx))
+                create_window_root(view, window, cx)
             })
             .expect("Failed to open window");
         })

@@ -23,6 +23,7 @@ lunaria-core = { path = "crates/lunaria-core" }
 lunaria-database = { path = "crates/lunaria-database" }
 
 gpui-kit = "0.6"
+gpui-fps = "=0.6.1"
 thiserror = "2"
 objc2 = "0.6"
 objc2-app-kit = "0.3"

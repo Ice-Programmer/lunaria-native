@@ -1,3 +1,4 @@
+use crate::app::window_root::create_window_root;
 use crate::setting::components::setting_sidebar::SettingSidebar;
 use crate::setting::router::{SettingRoute, SettingRouter};
 use gpui_kit::WindowHandle;
@@ -77,7 +78,7 @@ impl SettingPage {
 
             match cx.open_window(options, |window, cx| {
                 let view = cx.new(|cx| Self::new(window, cx));
-                cx.new(|cx| Root::new(view, window, cx))
+                create_window_root(view, window, cx)
             }) {
                 Ok(handle) => cx.set_global(SettingsWindow(handle)),
                 Err(error) => {

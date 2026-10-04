@@ -1,5 +1,4 @@
 use gpui_kit::base::h_flex;
-use gpui_kit::component::Root;
 use gpui_kit::*;
 
 use super::components::LaunchSidebar;
@@ -63,7 +62,7 @@ impl LaunchPage {
 }
 
 impl Render for LaunchPage {
-    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         h_flex()
             .relative()
             .size_full()
@@ -75,6 +74,5 @@ impl Render for LaunchPage {
                     .child(LaunchSidebar::new()),
             )
             .child(div().flex_1().h_full().child(self.current_view.clone()))
-            .children(Root::render_notification_layer(window, cx))
     }
 }
