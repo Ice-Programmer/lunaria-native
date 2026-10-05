@@ -58,9 +58,6 @@ async fn main() {
 
         init_app_router(cx);
 
-        #[cfg(debug_assertions)]
-        dev::apply_dev_startup_router(cx);
-
         let window_options = LaunchPage::window_options(cx);
 
         cx.spawn(async move |cx| {
@@ -70,6 +67,9 @@ async fn main() {
                 create_window_root(view, window, cx)
             })
             .expect("Failed to open window");
+
+            #[cfg(debug_assertions)]
+            cx.update(dev::apply_dev_startup_router);
         })
         .detach();
     });

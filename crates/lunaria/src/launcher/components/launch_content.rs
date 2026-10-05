@@ -65,7 +65,7 @@ impl LaunchContent {
             .justify_between()
             .child(
                 div()
-                    .text_2xl()
+                    .text_lg()
                     .font_weight(FontWeight::SEMIBOLD)
                     .child("最近项目"),
             )

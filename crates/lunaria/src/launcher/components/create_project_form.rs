@@ -101,7 +101,7 @@ impl CreateProjectForm {
 
     fn render_header_title(&self) -> impl IntoElement {
         div()
-            .text_2xl()
+            .text_lg()
             .font_weight(FontWeight::SEMIBOLD)
             .child("新建项目")
     }

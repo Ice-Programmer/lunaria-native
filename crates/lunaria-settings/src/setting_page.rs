@@ -35,13 +35,10 @@ impl Render for SettingPage {
                 ]),
             ));
 
-        let header_style = div().pt_6().style().clone();
-
         div().size_full().child(
             Settings::new("lunaria-settings")
                 .sidebar_width(px(SETTING_SIDEBAR_WIDTH))
-                .sidebar_size_range(px(160.)..px(280.))
-                .header_style(&header_style)
+                .header_style(&div().pt_6().style().clone())
                 .with_group_variant(GroupBoxVariant::Normal)
                 .page(shortcuts_page),
         )
