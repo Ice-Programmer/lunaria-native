@@ -13,6 +13,7 @@ use app::window_root::create_window_root;
 use gpui_kit::assets::AllAssets;
 use gpui_kit::*;
 use lunaria_database::DatabaseManager;
+use lunaria_settings::shortcuts::bindings::init_bindings;
 use lunaria_ui::ThemeManager;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -51,8 +52,10 @@ async fn main() {
         ThemeManager::init(cx).expect("Failed to initialize Lunaria themes");
 
         cx.set_global(app_services);
+
         // init global shortcut listener
-        app::shortcuts::init(&shortcut_items, cx);
+        init_bindings(&shortcut_items, settings_window::open_settings, cx);
+
         init_app_router(cx);
 
         #[cfg(debug_assertions)]

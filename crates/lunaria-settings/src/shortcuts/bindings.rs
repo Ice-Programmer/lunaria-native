@@ -1,11 +1,10 @@
-use crate::settings_window::open_settings;
+use crate::shortcuts::model::{ShortcutAction, ShortcutItem};
 use gpui_kit::{App, KeyBinding, Keystroke, actions};
-use lunaria_settings::shortcuts::model::{ShortcutAction, ShortcutItem};
 use lunaria_ui::ThemeManager;
 
 actions!(lunaria, [ToggleTheme, OpenSettings, CloseWindow, Quit]);
 
-pub fn init(items: &[ShortcutItem], cx: &mut App) {
+pub fn init_bindings(items: &[ShortcutItem], open_settings: fn(&mut App), cx: &mut App) {
     apply(items, cx);
 
     cx.on_action(|_: &ToggleTheme, cx| {
@@ -14,7 +13,9 @@ pub fn init(items: &[ShortcutItem], cx: &mut App) {
         }
     });
 
-    cx.on_action(|_: &OpenSettings, cx| open_settings(cx));
+    cx.on_action(move |_: &OpenSettings, cx| {
+        open_settings(cx);
+    });
 
     cx.on_action(|_: &CloseWindow, cx| {
         if let Some(handle) = cx.active_window() {
@@ -30,6 +31,7 @@ pub fn init(items: &[ShortcutItem], cx: &mut App) {
         cx.quit();
     });
 }
+
 pub fn apply(items: &[ShortcutItem], cx: &mut App) {
     let mut bindings: Vec<_> = cx
         .key_bindings()

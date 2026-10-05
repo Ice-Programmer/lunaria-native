@@ -7,8 +7,6 @@ use gpui_kit::component::{
 };
 use gpui_kit::*;
 
-const SETTING_WIDTH: f32 = 800.;
-const SETTING_HEIGHT: f32 = 600.;
 const SETTING_SIDEBAR_WIDTH: f32 = 200.0;
 
 pub struct SettingPage {
