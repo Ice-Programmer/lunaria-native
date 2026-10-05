@@ -13,9 +13,6 @@ default-members = [
     "crates/lunaria"
 ]
 
-[future-incompat-report]
-frequency = "never"
-
 [profile.dev]
 debug = 1
 

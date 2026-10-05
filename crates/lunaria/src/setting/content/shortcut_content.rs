@@ -1,4 +1,3 @@
-use gpui_kit::base::v_flex;
 use gpui_kit::component::input::InputState;
 use gpui_kit::*;
 
@@ -23,7 +22,7 @@ impl ShortcutContent {
 }
 
 impl Render for ShortcutContent {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div().child("hihi")
     }
 }
