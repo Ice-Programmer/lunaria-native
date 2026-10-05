@@ -4,7 +4,7 @@ mod dev;
 pub mod init;
 mod launcher;
 mod platform;
-pub mod setting;
+pub mod settings_window;
 
 use crate::init::router::init_app_router;
 use crate::launcher::launcher_page::LaunchPage;

@@ -1,9 +1,7 @@
-use crate::settings::error::SettingError;
-use crate::settings::shortcuts::catalog;
-use crate::settings::shortcuts::model::{
-    Shortcut, ShortcutAction, ShortcutDefinition, ShortcutItem, ShortcutOverrides,
-};
-use crate::settings::shortcuts::repository::ShortcutRepository;
+use crate::error::SettingError;
+use crate::shortcuts::catalog;
+use crate::shortcuts::model::{Shortcut, ShortcutAction, ShortcutDefinition, ShortcutItem, ShortcutOverrides};
+use crate::shortcuts::repository::ShortcutRepository;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 

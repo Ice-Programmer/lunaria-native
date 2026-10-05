@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 lunaria-core.workspace = true
+lunaria-settings.workspace = true
 async-trait.workspace = true
 sea-orm.workspace = true
 thiserror.workspace = true

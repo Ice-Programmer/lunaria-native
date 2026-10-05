@@ -9,6 +9,7 @@ gpui-fps.workspace = true
 lunaria-ui.workspace = true
 lunaria-assets.workspace = true
 lunaria-database.workspace = true
+lunaria-settings.workspace = true
 lunaria-core.workspace = true
 tokio.workspace = true
 dirs.workspace = true

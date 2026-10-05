@@ -5,3 +5,7 @@ edition = "2024"
 
 [dependencies]
 gpui-kit.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+async-trait.workspace = true
+tokio.workspace = true

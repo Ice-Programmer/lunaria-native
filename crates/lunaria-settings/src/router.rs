@@ -1,4 +1,4 @@
-use crate::setting::content::shortcut_content::ShortcutContent;
+use crate::shortcuts::shortcut_editor::ShortcutEditor;
 use gpui_kit::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -10,7 +10,7 @@ pub enum SettingRoute {
 impl SettingRoute {
     pub fn build(self, window: &mut Window, cx: &mut App) -> AnyView {
         match self {
-            SettingRoute::Shortcut => cx.new(|cx| ShortcutContent::new(window, cx)).into(),
+            SettingRoute::Shortcut => cx.new(|cx| ShortcutEditor::new(window, cx)).into(),
         }
     }
 }

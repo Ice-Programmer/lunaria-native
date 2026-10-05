@@ -1,6 +1,4 @@
-use crate::settings::shortcuts::model::{
-    Shortcut, ShortcutAction, ShortcutCategory, ShortcutDefinition,
-};
+use crate::shortcuts::model::{Shortcut, ShortcutAction, ShortcutCategory, ShortcutDefinition};
 use gpui_kit::Modifiers;
 
 pub fn default_shortcuts() -> Vec<ShortcutDefinition> {

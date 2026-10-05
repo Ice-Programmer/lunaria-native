@@ -21,6 +21,7 @@ lunaria-ui = { path = "crates/lunaria-ui" }
 lunaria-assets = { path = "crates/lunaria-assets" }
 lunaria-core = { path = "crates/lunaria-core" }
 lunaria-database = { path = "crates/lunaria-database" }
+lunaria-settings = { path = "crates/lunaria-settings"}
 
 gpui-kit = "0.6"
 gpui-fps = "=0.6.1"

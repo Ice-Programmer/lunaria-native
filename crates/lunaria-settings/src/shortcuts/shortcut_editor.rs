@@ -1,11 +1,11 @@
 use gpui_kit::component::input::InputState;
 use gpui_kit::*;
 
-pub struct ShortcutContent {
+pub struct ShortcutEditor {
     search_input: Entity<InputState>,
 }
 
-impl ShortcutContent {
+impl ShortcutEditor {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let search_input = cx.new(|cx| {
             InputState::new(window, cx)
@@ -21,7 +21,7 @@ impl ShortcutContent {
     }
 }
 
-impl Render for ShortcutContent {
+impl Render for ShortcutEditor {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div().child("hihi")
     }

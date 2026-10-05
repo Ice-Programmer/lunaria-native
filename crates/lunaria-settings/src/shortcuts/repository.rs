@@ -1,5 +1,5 @@
-use crate::settings::error::SettingError;
-use crate::settings::shortcuts::model::ShortcutOverrides;
+use crate::error::SettingError;
+use crate::shortcuts::model::ShortcutOverrides;
 use async_trait::async_trait;
 
 #[async_trait]
