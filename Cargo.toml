@@ -6,12 +6,15 @@ members = [
     "crates/lunaria-assets",
     "crates/lunaria-core",
     "crates/lunaria-database",
+    "crates/lunaria-settings",
 ]
 
 default-members = [
     "crates/lunaria"
 ]
 
+[future-incompat-report]
+frequency = "never"
 
 [profile.dev]
 debug = 1

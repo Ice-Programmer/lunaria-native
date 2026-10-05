@@ -1,3 +1,4 @@
+use gpui_kit::base::v_flex;
 use gpui_kit::component::input::InputState;
 use gpui_kit::*;
 
@@ -14,6 +15,10 @@ impl ShortcutContent {
         });
 
         Self { search_input }
+    }
+
+    pub fn render_header() -> impl IntoElement {
+        div()
     }
 }
 

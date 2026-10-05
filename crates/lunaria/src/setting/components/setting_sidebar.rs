@@ -1,7 +1,7 @@
+use crate::setting::router::{SettingRoute, SettingRouter};
 use gpui_kit::assets::IconName;
-use gpui_kit::base::input::InputState;
-use gpui_kit::base::v_flex;
-use gpui_kit::component::ActiveTheme;
+use gpui_kit::component::input::InputState;
+use gpui_kit::component::sidebar::{Sidebar, SidebarMenu, SidebarMenuItem};
 use gpui_kit::*;
 use lunaria_ui::components::custom_input::CustomInput;
 
@@ -30,13 +30,25 @@ impl SettingSidebar {
 }
 
 impl Render for SettingSidebar {
-    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        v_flex()
-            .size_full()
-            .px_6()
-            .py_4()
-            .border_color(cx.theme().sidebar_border)
-            .bg(cx.theme().sidebar)
-            .child(self.render_search_input())
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let current = SettingRouter::current(cx);
+
+        Sidebar::new("setting-sidebar")
+            .w_full()
+            .h_full()
+            .collapsible(false)
+            .header(div().w_full().pb_3().child(self.render_search_input()))
+            .child(
+                SidebarMenu::new().child(
+                    SidebarMenuItem::new("快捷键")
+                        .min_h(px(36.))
+                        .cursor_pointer()
+                        .icon(IconName::LayoutGrid)
+                        .active(current == SettingRoute::Shortcut)
+                        .on_click(|_, _, cx| {
+                            SettingRouter::navigate(SettingRoute::Shortcut, cx);
+                        }),
+                ),
+            )
     }
 }

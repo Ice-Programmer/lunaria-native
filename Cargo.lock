@@ -3997,6 +3997,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "lunaria-settings"
+version = "0.1.0"
+dependencies = [
+ "gpui-kit",
+]
+
+[[package]]
 name = "lunaria-ui"
 version = "0.1.0"
 dependencies = [

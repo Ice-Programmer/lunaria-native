@@ -8,7 +8,7 @@ pub enum ShortcutAction {
     OpenSettings,
     ToggleTheme,
     CloseWindow,
-    Quit
+    Quit,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
@@ -26,10 +26,18 @@ impl Shortcut {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum ShortcutCategory {
+    Application,
+    Launcher,
+    Editor,
+}
+
 #[derive(Clone, Debug)]
 pub struct ShortcutDefinition {
     pub action: ShortcutAction,
     pub title: &'static str,
+    pub category: ShortcutCategory,
     pub defaults: Vec<Shortcut>,
 }
 

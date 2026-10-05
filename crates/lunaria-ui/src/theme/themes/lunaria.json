@@ -27,7 +27,12 @@
         "button.foreground": "#292832",
         "button.hover.background": "#EEECF2",
         "button.active.background": "#E2DFE9",
-        "list.hover.background": "#F5F2FC"
+        "list.hover.background": "#F5F2FC",
+        "sidebar.accent.background": "#EDE7F8",
+        "sidebar.accent.foreground": "#5F3DA8",
+        "sidebar.foreground": "#292832",
+        "sidebar.primary.background": "#7052C2",
+        "sidebar.primary.foreground": "#FFFFFF"
       }
     },
     {
@@ -56,7 +61,13 @@
         "button.foreground": "#EEEAF4",
         "button.hover.background": "#41414D",
         "button.active.background": "#2D2D37",
-        "list.hover.background": "#34323E"
+        "list.hover.background": "#34323E",
+        "sidebar.accent.background": "#3B314F",
+        "sidebar.accent.foreground": "#D8C8FF",
+        "sidebar.foreground": "#EEEAF4",
+        "sidebar.primary.background": "#AD94EF",
+        "sidebar.primary.foreground": "#21162F",
+        "skeleton.background": "#1C1C23"
       }
     }
   ]
