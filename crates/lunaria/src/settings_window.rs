@@ -3,7 +3,7 @@ use gpui_kit::*;
 use lunaria_settings::setting_page::SettingPage;
 
 const SETTING_WINDOW_HEIGHT: f32 = 600.;
-const SETTING_WINDOW_WIDTH: f32 = 800.;
+const SETTING_WINDOW_WIDTH: f32 = 1000.;
 
 pub fn open_settings(cx: &mut App) {
     cx.defer(|cx| {

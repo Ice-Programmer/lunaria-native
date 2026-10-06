@@ -1,5 +1,11 @@
+use gpui_kit::assets::IconName;
+use gpui_kit::base::{h_flex, Disableable};
+use gpui_kit::component::button::{Button, ButtonVariants};
 use gpui_kit::component::input::InputState;
+use gpui_kit::component::{ActiveTheme, Selectable};
 use gpui_kit::*;
+use lunaria_ui::components::custom_button::CustomButton;
+use lunaria_ui::components::custom_input::CustomInput;
 
 pub struct ShortcutEditor {
     search_input: Entity<InputState>,
@@ -16,13 +22,42 @@ impl ShortcutEditor {
         Self { search_input }
     }
 
-    pub fn render_header() -> impl IntoElement {
-        div()
+    pub fn render_header(&self, cx: &mut Context<Self>) -> impl IntoElement {
+        h_flex()
+            .gap_2()
+            .child(
+                CustomInput::new(&self.search_input)
+                    .id("search-shortcuts")
+                    .aria_label("search shortcut settings")
+                    .prefix(IconName::Search)
+                    .w(relative(0.4)),
+            )
+            .child(CustomButton::new("search-shortcuts-commend").label("按键检索"))
+            .child(
+                Button::new("shortcut-filter-all")
+                    .ghost()
+                    .label("全部")
+                    .child(div().text_color(cx.theme().muted_foreground).child("12")),
+            )
+            .child(
+                Button::new("shortcut-filter-modify")
+                    .ghost()
+                    .label("已修改")
+                    .child(div().text_color(cx.theme().muted_foreground).child("8")),
+            )
+            .child(div().flex_1())
+            .child(
+                CustomButton::new("reset-shortcut-settings")
+                    .ghost()
+                    .label("恢复全部默认")
+                    .icon(IconName::Undo2)
+                    .disabled(true),
+            )
     }
 }
 
 impl Render for ShortcutEditor {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        div().child("hihi")
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        div().child(self.render_header(cx))
     }
 }
