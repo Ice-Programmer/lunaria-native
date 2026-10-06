@@ -1,6 +1,6 @@
-pub mod shortcut_editor;
+pub mod bindings;
+pub mod catalog;
 pub mod model;
 pub mod repository;
 pub mod service;
-pub mod catalog;
-pub mod bindings;
+pub mod shortcut_view;

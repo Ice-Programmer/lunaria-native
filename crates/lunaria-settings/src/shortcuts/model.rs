@@ -33,6 +33,24 @@ pub enum ShortcutCategory {
     Editor,
 }
 
+impl ShortcutCategory {
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Application => "应用",
+            Self::Launcher => "欢迎页",
+            Self::Editor => "编辑器",
+        }
+    }
+
+    pub fn description(self) -> &'static str {
+        match self {
+            Self::Application => "应用相关操作",
+            Self::Launcher => "项目创建与打开",
+            Self::Editor => "内容编辑相关操作",
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct ShortcutDefinition {
     pub action: ShortcutAction,

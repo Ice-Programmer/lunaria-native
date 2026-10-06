@@ -1,4 +1,4 @@
-use crate::shortcuts::shortcut_editor::ShortcutEditor;
+use crate::shortcuts::shortcut_view::shortcut_editor::ShortcutEditor;
 use gpui_kit::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

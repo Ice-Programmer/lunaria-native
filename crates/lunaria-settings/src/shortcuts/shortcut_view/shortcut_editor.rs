@@ -1,8 +1,8 @@
 use gpui_kit::assets::IconName;
-use gpui_kit::base::{h_flex, Disableable};
+use gpui_kit::base::{Disableable, h_flex};
 use gpui_kit::component::button::{Button, ButtonVariants};
 use gpui_kit::component::input::InputState;
-use gpui_kit::component::{ActiveTheme, Selectable};
+use gpui_kit::component::{ActiveTheme, Selectable, Sizable};
 use gpui_kit::*;
 use lunaria_ui::components::custom_button::CustomButton;
 use lunaria_ui::components::custom_input::CustomInput;
@@ -30,9 +30,9 @@ impl ShortcutEditor {
                     .id("search-shortcuts")
                     .aria_label("search shortcut settings")
                     .prefix(IconName::Search)
-                    .w(relative(0.4)),
+                    .w(relative(0.3)),
             )
-            .child(CustomButton::new("search-shortcuts-commend").label("按键检索"))
+            .child(Button::new("search-shortcuts-commend").label("按键检索"))
             .child(
                 Button::new("shortcut-filter-all")
                     .ghost()
@@ -47,7 +47,7 @@ impl ShortcutEditor {
             )
             .child(div().flex_1())
             .child(
-                CustomButton::new("reset-shortcut-settings")
+                Button::new("reset-shortcut-settings")
                     .ghost()
                     .label("恢复全部默认")
                     .icon(IconName::Undo2)

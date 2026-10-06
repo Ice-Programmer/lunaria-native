@@ -1,5 +1,5 @@
 use gpui_kit::component::button::{Button, ButtonVariant, ButtonVariants};
-use gpui_kit::component::{Disableable, Icon, Selectable};
+use gpui_kit::component::{Disableable, Icon, Selectable, Sizable, Size};
 use gpui_kit::{
     AnyElement, App, ClickEvent, ElementId, IntoElement, ParentElement, RenderOnce, SharedString,
     StyleRefinement, Styled, Window, px,
@@ -71,6 +71,13 @@ impl ButtonVariants for CustomButton {
 impl Disableable for CustomButton {
     fn disabled(mut self, disabled: bool) -> Self {
         self.inner = self.inner.disabled(disabled);
+        self
+    }
+}
+
+impl Sizable for CustomButton {
+    fn with_size(mut self, size: impl Into<Size>) -> Self {
+        self.inner = self.inner.with_size(size);
         self
     }
 }

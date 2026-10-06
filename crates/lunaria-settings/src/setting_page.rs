@@ -1,4 +1,4 @@
-use crate::shortcuts::shortcut_editor::ShortcutEditor;
+use crate::shortcuts::shortcut_view::shortcut_editor::ShortcutEditor;
 
 use gpui_kit::assets::IconName;
 use gpui_kit::component::{
