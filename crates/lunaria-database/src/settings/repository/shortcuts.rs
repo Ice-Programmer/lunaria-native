@@ -4,8 +4,7 @@ use async_trait::async_trait;
 use lunaria_core::settings::error::SettingError;
 use lunaria_core::settings::shortcuts::model::ShortcutOverrides;
 use lunaria_core::settings::shortcuts::repository::ShortcutRepository;
-use sea_orm::sea_query::OnConflict;
-use sea_orm::{EntityTrait, Set};
+use sea_orm::EntityTrait;
 use std::sync::Arc;
 
 const SHORTCUTS_KEY: &str = "shortcuts";
@@ -23,33 +22,16 @@ impl Repository {
 #[async_trait]
 impl ShortcutRepository for Repository {
     async fn load(&self) -> Result<ShortcutOverrides, SettingError> {
-        let record = app_setting::Entity::find_by_id(SHORTCUTS_KEY)
-            .one(self.databases.app_database())
-            .await
-            .map_err(SettingError::storage)?;
+        let overrides =
+            super::load_setting::<ShortcutOverrides>(self.databases.app_database(), SHORTCUTS_KEY)
+                .await?;
 
-        match record {
-            Some(record) => serde_json::from_str(&record.value).map_err(SettingError::storage),
-            None => Ok(ShortcutOverrides::new()),
-        }
+        Ok(overrides.unwrap_or_default())
     }
 
     async fn save(&self, overrides: &ShortcutOverrides) -> Result<(), SettingError> {
-        let overrides_str = serde_json::to_string(overrides).map_err(SettingError::storage)?;
+        let value = serde_json::to_string(overrides).map_err(SettingError::storage)?;
 
-        app_setting::Entity::insert(app_setting::ActiveModel {
-            key: Set(SHORTCUTS_KEY.to_owned()),
-            value: Set(overrides_str),
-        })
-        .on_conflict(
-            OnConflict::column(app_setting::Column::Key)
-                .update_column(app_setting::Column::Value)
-                .to_owned(),
-        )
-        .exec_without_returning(self.databases.app_database())
-        .await
-        .map_err(SettingError::storage)?;
-
-        Ok(())
+        super::save_setting(self.databases.app_database(), SHORTCUTS_KEY, value).await
     }
 }

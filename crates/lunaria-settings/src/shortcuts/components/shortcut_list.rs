@@ -6,7 +6,7 @@ use gpui_kit::component::kbd::Kbd;
 use gpui_kit::component::list::{ListDelegate, ListItem, ListState};
 use gpui_kit::component::{ActiveTheme, IndexPath};
 use gpui_kit::*;
-use lunaria_app::shortcuts::to_keystroke;
+use lunaria_app::setting::shortcuts::to_keystroke;
 use lunaria_core::settings::shortcuts::model::Shortcut;
 use lunaria_ui::extensions::list_search::ListSearchExt;
 

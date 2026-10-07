@@ -8,7 +8,7 @@ pub enum SettingError {
     #[error("invalid key: {0}")]
     InvalidKey(String),
 
-    #[error("shortcut storage operation failed: {0}")]
+    #[error("setting storage operation failed: {0}")]
     Storage(String),
 }
 

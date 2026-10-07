@@ -1,7 +1,7 @@
 use gpui_kit::component::kbd::Kbd;
 use gpui_kit::{Context, Entity, EventEmitter, Subscription, Window};
 use lunaria_app::app_services::AppServices;
-use lunaria_app::shortcuts::to_keystroke;
+use lunaria_app::setting::shortcuts::to_keystroke;
 use lunaria_core::settings::shortcuts::model::{ShortcutCategory, ShortcutItem};
 
 pub enum ShortcutEvent {

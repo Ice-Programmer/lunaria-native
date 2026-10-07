@@ -2,9 +2,11 @@ use std::{fmt::Display, future::Future, sync::Arc};
 
 use gpui_kit::{Context, Global};
 use lunaria_core::project::ProjectService;
+use lunaria_core::settings::language::service::LanguageService;
 use lunaria_core::settings::shortcuts::service::ShortcutService;
 use lunaria_database::DatabaseManager;
 use lunaria_database::project::Repository as ProjectRepository;
+use lunaria_database::settings::repository::language::Repository as LanguageRepository;
 use lunaria_database::settings::repository::shortcuts::Repository as ShortcutRepository;
 use tokio::runtime::Handle;
 
@@ -12,6 +14,7 @@ use tokio::runtime::Handle;
 pub struct AppServices {
     pub project_service: Arc<ProjectService>,
     pub shortcut_service: Arc<ShortcutService>,
+    pub language_service: Arc<LanguageService>,
     pub runtime: Handle,
 }
 
@@ -25,9 +28,13 @@ impl AppServices {
         let shortcut_service =
             ShortcutService::new(ShortcutRepository::new(databases.clone())).await;
 
+        let language_service =
+            LanguageService::new(LanguageRepository::new(databases.clone())).await;
+
         Self {
             project_service,
             shortcut_service,
+            language_service,
             runtime,
         }
     }

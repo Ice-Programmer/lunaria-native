@@ -9,7 +9,7 @@ use crate::launcher::launcher_page::LaunchPage;
 use gpui_kit::assets::AllAssets;
 use gpui_kit::*;
 use lunaria_app::app_services::AppServices;
-use lunaria_app::shortcuts::bindings::init_bindings;
+use lunaria_app::setting::shortcuts::bindings::init_bindings;
 use lunaria_app::window_root::create_window_root;
 use lunaria_database::DatabaseManager;
 use lunaria_settings::settings_window;
@@ -38,6 +38,9 @@ async fn main() {
     );
 
     let app_services = AppServices::new(databases, Handle::current()).await;
+
+    let init_language = app_services.language_service.current().await;
+
     let shortcut_items = app_services
         .shortcut_service
         .list()
@@ -47,6 +50,8 @@ async fn main() {
     let app = application().with_assets(AllAssets);
 
     app.run(move |cx| {
+        lunaria_ui::i18n::locale::init(init_language.locale(), cx);
+
         init(cx);
 
         platform::set_application_icon();

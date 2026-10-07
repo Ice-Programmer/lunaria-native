@@ -1,3 +1,2 @@
 pub mod shortcuts;
-pub mod error;
 pub mod language;
