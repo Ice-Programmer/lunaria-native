@@ -5,7 +5,7 @@ use gpui_kit::component::{ActiveTheme, IndexPath};
 use gpui_kit::*;
 use lunaria_ui::extensions::list_search::ListSearchExt;
 
-const ROW_HEIGHT: f32 = 48.;
+const ROW_HEIGHT: f32 = 40.;
 pub const EDIT_WIDTH: f32 = 32.0;
 
 pub struct ShortcutListDelegate {
@@ -78,7 +78,20 @@ impl ListDelegate for ShortcutListDelegate {
             .get(section)
             .copied()?;
 
-        Some(div().child(category.label()))
+        Some(
+            h_flex()
+                .gap_3()
+                .p_3()
+                .items_center()
+                .text_color(cx.theme().muted_foreground)
+                .child(
+                    div()
+                        .text_sm()
+                        .font_weight(FontWeight::SEMIBOLD)
+                        .child(category.label()),
+                )
+                .child(div().text_xs().child(category.description())),
+        )
     }
 
     fn loading(&self, cx: &App) -> bool {
