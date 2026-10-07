@@ -145,7 +145,7 @@ impl ShortcutEditor {
             .border_color(cx.theme().border)
             .text_sm()
             .text_color(cx.theme().muted_foreground)
-            .child(div().w(relative(0.5)).flex_shrink_0().child("操作"))
+            .child(div().w(relative(0.35)).flex_shrink_0().child("操作"))
             .child(
                 h_flex()
                     .flex_1()

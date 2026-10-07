@@ -1,5 +1,7 @@
 use crate::shortcuts::view_model::shortcut_view_model::ShortcutViewModel;
+use gpui_kit::assets::IconName;
 use gpui_kit::base::h_flex;
+use gpui_kit::component::button::{Button, ButtonVariants};
 use gpui_kit::component::list::{ListDelegate, ListItem, ListState};
 use gpui_kit::component::{ActiveTheme, IndexPath};
 use gpui_kit::*;
@@ -11,6 +13,9 @@ pub const EDIT_WIDTH: f32 = 32.0;
 pub struct ShortcutListDelegate {
     pub view_model: Entity<ShortcutViewModel>,
     pub _subscription: Subscription,
+}
+
+impl ShortcutListDelegate {
 }
 
 impl ListDelegate for ShortcutListDelegate {
@@ -56,11 +61,35 @@ impl ListDelegate for ShortcutListDelegate {
                 .h(px(ROW_HEIGHT))
                 .border_b_1()
                 .border_color(cx.theme().border)
+                .px_4()
+                .text_sm()
                 .child(
                     h_flex()
                         .w_full()
-                        .gap_3()
-                        .child(div().child(item.definition.title)),
+                        .child(
+                            div()
+                                .w(relative(0.35))
+                                .min_w_0()
+                                .flex_shrink_0()
+                                .overflow_hidden()
+                                .child(item.definition.title),
+                        )
+                        .child(
+                            div()
+                                .flex_1()
+                                .overflow_hidden()
+                                .min_w_0()
+                                .child(item.definition.title),
+                        )
+                        .child(
+                            Button::new(SharedString::from(format!(
+                                "edit-{}",
+                                item.definition.title
+                            )))
+                            .text_color(cx.theme().muted_foreground)
+                            .ghost()
+                            .icon(IconName::Pencil),
+                        ),
                 ),
         )
     }
@@ -81,7 +110,8 @@ impl ListDelegate for ShortcutListDelegate {
         Some(
             h_flex()
                 .gap_3()
-                .p_3()
+                .px_4()
+                .pt_2()
                 .items_center()
                 .text_color(cx.theme().muted_foreground)
                 .child(
