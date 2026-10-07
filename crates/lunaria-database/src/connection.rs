@@ -137,7 +137,7 @@ pub(crate) fn publish(temporary: TempPath, destination: &Path) -> Result<(), Dat
     Ok(())
 }
 
-async fn read_integer<C>(database: &C, sql: &str) -> Result<i64, DatabaseError>
+pub(crate) async fn read_integer<C>(database: &C, sql: &str) -> Result<i64, DatabaseError>
 where
     C: ConnectionTrait,
 {

@@ -1,5 +1,4 @@
 use crate::DatabaseManager;
-use crate::connection::create_table;
 use crate::settings::app_setting;
 use async_trait::async_trait;
 use lunaria_core::settings::error::SettingError;
@@ -16,10 +15,7 @@ pub struct Repository {
 }
 
 impl Repository {
-    pub async fn new(databases: Arc<DatabaseManager>) -> Arc<Self> {
-        create_table(databases.app_database(), app_setting::Entity)
-            .await
-            .expect("Failed to initialize shortcut repository");
+    pub fn new(databases: Arc<DatabaseManager>) -> Arc<Self> {
         Arc::new(Self { databases })
     }
 }

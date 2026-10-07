@@ -1,20 +1,21 @@
-use crate::shortcuts::shortcut_view::components::shortcut_list::{
-    EDIT_WIDTH, ShortcutListDelegate,
-};
-use crate::shortcuts::shortcut_view::shortcut_view_model::{ShortcutEvent, ShortcutViewModel};
+use crate::shortcuts::components::shortcut_list::{EDIT_WIDTH, ShortcutListDelegate};
+use crate::shortcuts::view_model::shortcut_view_model::{ShortcutEvent, ShortcutViewModel};
 use gpui_kit::assets::IconName;
-use gpui_kit::base::{Disableable, h_flex, v_flex};
+use gpui_kit::base::{Disableable, Selectable, h_flex, v_flex};
 use gpui_kit::component::ActiveTheme;
 use gpui_kit::component::button::{Button, ButtonVariants};
-use gpui_kit::component::input::InputState;
+use gpui_kit::component::input::{InputEvent, InputState};
 use gpui_kit::component::list::{List, ListState};
+use gpui_kit::component::{WindowExt, notification::Notification};
 use gpui_kit::*;
 use lunaria_ui::components::custom_input::CustomInput;
 
 pub struct ShortcutEditor {
     search_input: Entity<InputState>,
     shortcut_list: Entity<ListState<ShortcutListDelegate>>,
-    _subscription: Subscription,
+    view_model: Entity<ShortcutViewModel>,
+    _view_model_subscription: Subscription,
+    _search_subscription: Subscription,
 }
 
 impl ShortcutEditor {
@@ -38,10 +39,26 @@ impl ShortcutEditor {
                 .selectable(false)
         });
 
-        let subscription = cx.subscribe(&view_model, |this, _, _event: &ShortcutEvent, cx| {
-            this.shortcut_list.update(cx, |_, cx| cx.notify());
-            cx.notify();
-        });
+        let view_model_subscription =
+            cx.subscribe_in(&view_model, window, |_, _, event, window, cx| {
+                cx.notify();
+
+                if let ShortcutEvent::Failed(error) = event {
+                    window.push_notification(Notification::error(error.clone()), cx);
+                }
+            });
+
+        let search_subscription =
+            cx.subscribe_in(&search_input, window, |this, input, event, window, cx| {
+                if !matches!(event, InputEvent::Change) {
+                    return;
+                }
+
+                let query = input.read(cx).value().to_string();
+                this.shortcut_list.update(cx, |list, cx| {
+                    list.set_query(&query, window, cx);
+                });
+            });
 
         view_model.update(cx, |view_model, cx| {
             view_model.load_shortcut_list(cx);
@@ -50,11 +67,22 @@ impl ShortcutEditor {
         Self {
             search_input,
             shortcut_list,
-            _subscription: subscription,
+            view_model,
+            _view_model_subscription: view_model_subscription,
+            _search_subscription: search_subscription,
         }
     }
 
     pub fn render_header(&self, cx: &mut Context<Self>) -> Div {
+        let (total_count, modified_count, modified_only) = {
+            let view_model = self.view_model.read(cx);
+            (
+                view_model.total_count(),
+                view_model.modified_count(),
+                view_model.modified_only(),
+            )
+        };
+
         h_flex()
             .gap_2()
             .child(
@@ -69,13 +97,33 @@ impl ShortcutEditor {
                 Button::new("shortcut-filter-all")
                     .ghost()
                     .label("全部")
-                    .child(div().text_color(cx.theme().muted_foreground).child("12")),
+                    .selected(!modified_only)
+                    .child(
+                        div()
+                            .text_color(cx.theme().muted_foreground)
+                            .child(total_count.to_string()),
+                    )
+                    .on_click(cx.listener(|this, _, _, cx| {
+                        this.view_model.update(cx, |view_model, cx| {
+                            view_model.set_modified_only(false, cx);
+                        });
+                    })),
             )
             .child(
                 Button::new("shortcut-filter-modify")
                     .ghost()
                     .label("已修改")
-                    .child(div().text_color(cx.theme().muted_foreground).child("8")),
+                    .selected(modified_only)
+                    .child(
+                        div()
+                            .text_color(cx.theme().muted_foreground)
+                            .child(modified_count.to_string()),
+                    )
+                    .on_click(cx.listener(|this, _, _, cx| {
+                        this.view_model.update(cx, |view_model, cx| {
+                            view_model.set_modified_only(true, cx);
+                        });
+                    })),
             )
             .child(div().flex_1())
             .child(

@@ -1,19 +1,18 @@
-pub mod app;
 #[cfg(debug_assertions)]
 mod dev;
 pub mod init;
 mod launcher;
 mod platform;
-pub mod settings_window;
 
 use crate::init::router::init_app_router;
 use crate::launcher::launcher_page::LaunchPage;
-use app::window_root::create_window_root;
 use gpui_kit::assets::AllAssets;
 use gpui_kit::*;
 use lunaria_app::app_services::AppServices;
+use lunaria_app::shortcuts::bindings::init_bindings;
+use lunaria_app::window_root::create_window_root;
 use lunaria_database::DatabaseManager;
-use lunaria_settings::shortcuts::bindings::init_bindings;
+use lunaria_settings::settings_window;
 use lunaria_ui::ThemeManager;
 use std::path::PathBuf;
 use std::sync::Arc;

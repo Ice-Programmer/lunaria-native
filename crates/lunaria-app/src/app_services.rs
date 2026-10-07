@@ -2,11 +2,11 @@ use std::{fmt::Display, future::Future, sync::Arc};
 
 use gpui_kit::{Context, Global};
 use lunaria_core::project::ProjectService;
+use lunaria_core::settings::shortcuts::service::ShortcutService;
 use lunaria_database::DatabaseManager;
 use lunaria_database::project::Repository as ProjectRepository;
 use lunaria_database::settings::repository::shortcuts::Repository as ShortcutRepository;
 use tokio::runtime::Handle;
-use lunaria_core::settings::shortcuts::service::ShortcutService;
 
 #[derive(Clone)]
 pub struct AppServices {
@@ -23,7 +23,7 @@ impl AppServices {
             databases.clone(),
         ))));
         let shortcut_service =
-            ShortcutService::new(ShortcutRepository::new(databases.clone()).await).await;
+            ShortcutService::new(ShortcutRepository::new(databases.clone())).await;
 
         Self {
             project_service,

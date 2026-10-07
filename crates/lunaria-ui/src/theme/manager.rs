@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use gpui_kit::{
     App, WindowAppearance,
     component::{Theme, ThemeRegistry},
@@ -15,16 +13,12 @@ impl ThemeManager {
     pub const DARK: &'static str = "Lunaria Dark";
 
     pub fn init(cx: &mut App) -> Result<(), ThemeError> {
-        let theme_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src/theme/themes");
-
-        ThemeRegistry::watch_dir(theme_dir, cx, |cx| {
-            if let Err(err) = Self::set_theme(Self::LIGHT, cx) {
-                eprintln!("Failed to reload theme: {err}")
-            }
-        })
-        .map_err(|err| ThemeError::LoadFailed {
-            err: err.to_string(),
-        })?;
+        ThemeRegistry::global_mut(cx)
+            .load_themes_from_str(lunaria_assets::themes::LUNARIA_THEME)
+            .map_err(|err| ThemeError::LoadFailed {
+                err: err.to_string(),
+            })?;
+        Self::use_light(cx)?;
 
         Ok(())
     }

@@ -1,11 +1,12 @@
-use crate::settings::shortcuts::model::{Shortcut, ShortcutAction, ShortcutCategory, ShortcutDefinition};
-use gpui_kit::Modifiers;
+use crate::settings::shortcuts::model::{
+    Shortcut, ShortcutAction, ShortcutCategory, ShortcutDefinition, ShortcutModifiers,
+};
 
 pub fn default_shortcuts() -> Vec<ShortcutDefinition> {
     // mac: command, windows: ctrl
-    let command = Modifiers::secondary_key();
+    let command = ShortcutModifiers::secondary_key();
 
-    let shift_command = Modifiers {
+    let shift_command = ShortcutModifiers {
         shift: true,
         ..command
     };

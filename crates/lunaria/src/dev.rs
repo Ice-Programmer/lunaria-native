@@ -1,7 +1,7 @@
 use crate::launcher::router::{LauncherRoute, LauncherRouter};
 use gpui_kit::App;
+use lunaria_settings::settings_window::open_settings;
 use std::env;
-use crate::settings_window::open_settings;
 
 const DEV_ROUTE_ENV: &str = "LUNARIA_DEV_ROUTE";
 

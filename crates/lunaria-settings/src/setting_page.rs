@@ -1,10 +1,7 @@
-use crate::shortcuts::shortcut_view::shortcut_editor::ShortcutEditor;
+use crate::shortcuts::shortcut_editor::ShortcutEditor;
 
-use crate::shortcuts::shortcut_view::shortcut_page::build_shortcut_page;
-use gpui_kit::component::{
-    group_box::GroupBoxVariant,
-    setting::Settings,
-};
+use crate::shortcuts::shortcut_page::build_shortcut_page;
+use gpui_kit::component::{group_box::GroupBoxVariant, setting::Settings};
 use gpui_kit::*;
 
 const SETTING_SIDEBAR_WIDTH: f32 = 200.0;
