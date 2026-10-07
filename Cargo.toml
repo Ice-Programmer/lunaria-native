@@ -7,6 +7,7 @@ members = [
     "crates/lunaria-core",
     "crates/lunaria-database",
     "crates/lunaria-settings",
+    "crates/lunaria-app",
 ]
 
 default-members = [
@@ -21,7 +22,8 @@ lunaria-ui = { path = "crates/lunaria-ui" }
 lunaria-assets = { path = "crates/lunaria-assets" }
 lunaria-core = { path = "crates/lunaria-core" }
 lunaria-database = { path = "crates/lunaria-database" }
-lunaria-settings = { path = "crates/lunaria-settings"}
+lunaria-settings = { path = "crates/lunaria-settings" }
+lunaria-app = { path = "crates/lunaria-app" }
 
 gpui-kit = "0.6"
 gpui-fps = "=0.6.1"

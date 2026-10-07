@@ -11,6 +11,7 @@ lunaria-assets.workspace = true
 lunaria-database.workspace = true
 lunaria-settings.workspace = true
 lunaria-core.workspace = true
+lunaria-app.workspace = true
 tokio.workspace = true
 dirs.workspace = true
 

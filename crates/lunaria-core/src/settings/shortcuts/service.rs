@@ -1,7 +1,9 @@
-use crate::error::SettingError;
-use crate::shortcuts::catalog;
-use crate::shortcuts::model::{Shortcut, ShortcutAction, ShortcutDefinition, ShortcutItem, ShortcutOverrides};
-use crate::shortcuts::repository::ShortcutRepository;
+use crate::settings::error::SettingError;
+use crate::settings::shortcuts::catalog;
+use crate::settings::shortcuts::model::{
+    Shortcut, ShortcutAction, ShortcutDefinition, ShortcutItem, ShortcutOverrides,
+};
+use crate::settings::shortcuts::repository::ShortcutRepository;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -25,10 +27,11 @@ impl ShortcutService {
         })
     }
 
-    pub async fn list(&self) -> Vec<ShortcutItem> {
+    pub async fn list(&self) -> Result<Vec<ShortcutItem>, SettingError> {
         let overrides = self.overrides.read().await;
 
-        self.definitions
+        let items = self
+            .definitions
             .iter()
             .map(|definition| ShortcutItem {
                 definition: definition.clone(),
@@ -37,7 +40,9 @@ impl ShortcutService {
                     .cloned()
                     .unwrap_or_else(|| Some(definition.defaults.clone())),
             })
-            .collect()
+            .collect();
+
+        Ok(items)
     }
 
     pub async fn get(&self, action: ShortcutAction) -> Option<Vec<Shortcut>> {

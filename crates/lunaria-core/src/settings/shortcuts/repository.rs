@@ -1,6 +1,6 @@
-use crate::error::SettingError;
-use crate::shortcuts::model::ShortcutOverrides;
 use async_trait::async_trait;
+use crate::settings::error::SettingError;
+use crate::settings::shortcuts::model::ShortcutOverrides;
 
 #[async_trait]
 pub trait ShortcutRepository: Send + Sync {

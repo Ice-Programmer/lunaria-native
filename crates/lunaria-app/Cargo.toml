@@ -1,10 +1,10 @@
 [package]
-name = "lunaria-settings"
+name = "lunaria-app"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-lunaria-ui.workspace = true
+lunaria-database.workspace = true
 lunaria-core.workspace = true
-lunaria-app.workspace = true
+tokio.workspace = true
 gpui-kit.workspace = true

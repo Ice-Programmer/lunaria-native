@@ -1,8 +1,13 @@
-use crate::shortcuts::model::{Shortcut, ShortcutCategory, ShortcutItem};
-use gpui_kit::base::IndexPath;
-use gpui_kit::component::kbd::Kbd;
+use crate::shortcuts::shortcut_view::shortcut_view_model::ShortcutViewModel;
+use gpui_kit::base::h_flex;
 use gpui_kit::component::list::{ListDelegate, ListItem, ListState};
-use gpui_kit::{App, Context, Keystroke, Window};
+use gpui_kit::component::{ActiveTheme, IndexPath};
+use gpui_kit::*;
+use lunaria_core::settings::shortcuts::model::{Shortcut, ShortcutItem};
+use lunaria_ui::extensions::list_search::ListSearchExt;
+
+const ROW_HEIGHT: f32 = 48.;
+pub const EDIT_WIDTH: f32 = 32.0;
 
 pub fn is_modified(item: &ShortcutItem) -> bool {
     item.custom.as_deref().unwrap_or(&[]) != item.definition.defaults.as_slice()
@@ -17,128 +22,88 @@ fn keystroke(shortcut: &Shortcut) -> Keystroke {
 }
 
 pub struct ShortcutListDelegate {
-    items: Vec<ShortcutItem>,
-    query: String,
-    modified_only: bool,
-    loading: bool,
-}
-
-impl ShortcutListDelegate {
-    pub fn new() -> Self {
-        Self {
-            items: Vec::new(),
-            query: String::new(),
-            modified_only: false,
-            loading: true,
-        }
-    }
-
-    pub fn set_loading(&mut self, loading: bool) {
-        self.loading = loading;
-    }
-
-    pub fn is_loading(&self) -> bool {
-        self.loading
-    }
-
-    pub fn total_count(&self) -> usize {
-        self.items.len()
-    }
-
-    pub fn modified_count(&self) -> usize {
-        self.items.iter().filter(|item| is_modified(item)).count()
-    }
-
-    pub fn set_items(&mut self, items: Vec<ShortcutItem>) {
-        self.items = items;
-        self.loading = false;
-    }
-
-    pub fn set_filter(&mut self, query: &str, modified_only: bool) {
-        self.query = query.trim().to_lowercase();
-        self.modified_only = modified_only;
-    }
-
-    pub fn matches_query(&self, item: &ShortcutItem) -> bool {
-        if self.query.is_empty() {
-            return true;
-        }
-
-        let mut search_text = format!(
-            "{} {} {}",
-            item.definition.title,
-            item.definition.category.label(),
-            item.definition.category.description(),
-        );
-
-        for shortcut in item.custom.as_deref().unwrap_or(&[]) {
-            let stroke = keystroke(shortcut);
-
-            search_text.push(' ');
-            search_text.push_str(&Kbd::format(&stroke));
-
-            search_text.push(' ');
-            search_text.push_str(&stroke.unparse());
-        }
-
-        search_text.to_lowercase().contains(&search_text)
-    }
-
-    fn categories(&self) -> Vec<ShortcutCategory> {
-        let mut categories = Vec::new();
-
-        for item in &self.items {
-            let category = item.definition.category;
-
-            if !categories.contains(&category) {
-                categories.push(category);
-            }
-        }
-
-        categories
-    }
-
-    fn filtered_items(
-        &self,
-        category: ShortcutCategory,
-    ) -> impl Iterator<Item = &ShortcutItem> + '_ {
-        self.items
-            .iter()
-            .filter(move |item| item.definition.category == category)
-            .filter(|item| !self.modified_only || item.is_modified())
-            .filter(|item| self.matches_query(item))
-    }
+    pub view_model: Entity<ShortcutViewModel>,
+    pub _subscription: Subscription,
 }
 
 impl ListDelegate for ShortcutListDelegate {
     type Item = ListItem;
 
-    fn sections_count(&self, _cx: &App) -> usize {
-        self.categories().len().max(1)
+    fn perform_search(
+        &mut self,
+        query: &str,
+        _window: &mut Window,
+        cx: &mut Context<ListState<Self>>,
+    ) -> Task<()> {
+        self.view_model
+            .perform_search(query, cx, ShortcutViewModel::set_query)
     }
 
-    fn items_count(&self, section: usize, _cx: &App) -> usize {
-        self.categories()
+    fn sections_count(&self, cx: &App) -> usize {
+        self.view_model.read(cx).categories().len().max(1)
+    }
+
+    fn items_count(&self, section: usize, cx: &App) -> usize {
+        let view_model = self.view_model.read(cx);
+        view_model
+            .categories()
             .get(section)
             .copied()
-            .map_or(0, |category| self.filtered_items(category).count())
+            .map_or(0, |category| view_model.filtered_items(category).count())
     }
 
     fn render_item(
         &mut self,
         ix: IndexPath,
-        window: &mut Window,
+        _window: &mut Window,
         cx: &mut Context<ListState<Self>>,
     ) -> Option<Self::Item> {
-        todo!()
+        let view_model = self.view_model.read(cx);
+        let category = view_model.categories().get(ix.section).copied()?;
+        let item = view_model.filtered_items(category).nth(ix.row)?;
+        let action = item.definition.action;
+
+        Some(
+            ListItem::new(SharedString::from(format!("shortcut-{action:?}")))
+                .w_full()
+                .h(px(ROW_HEIGHT))
+                .border_b_1()
+                .border_color(cx.theme().border)
+                .child(
+                    h_flex()
+                        .w_full()
+                        .gap_3()
+                        .child(div().child(item.definition.title)),
+                ),
+        )
+    }
+
+    fn render_section_header(
+        &mut self,
+        section: usize,
+        window: &mut Window,
+        cx: &mut Context<ListState<Self>>,
+    ) -> Option<impl IntoElement> {
+        let category = self
+            .view_model
+            .read(cx)
+            .categories()
+            .get(section)
+            .copied()?;
+
+        Some(div().child(category.label()))
+    }
+
+    fn loading(&self, cx: &App) -> bool {
+        self.view_model.read(cx).is_loading()
     }
 
     fn set_selected_index(
         &mut self,
-        ix: Option<IndexPath>,
-        window: &mut Window,
-        cx: &mut Context<ListState<Self>>,
+        _ix: Option<IndexPath>,
+        _window: &mut Window,
+        _cx: &mut Context<ListState<Self>>,
     ) {
-        todo!()
+        return;
     }
 }

@@ -1,5 +1,6 @@
 use crate::shortcuts::shortcut_view::shortcut_editor::ShortcutEditor;
 
+use crate::shortcuts::shortcut_view::shortcut_page::build_shortcut_page;
 use gpui_kit::assets::IconName;
 use gpui_kit::component::{
     group_box::GroupBoxVariant,
@@ -8,6 +9,7 @@ use gpui_kit::component::{
 use gpui_kit::*;
 
 const SETTING_SIDEBAR_WIDTH: f32 = 200.0;
+const SHORTCUT_PAGE_HEADER_HEIGHT: f32 = 50.;
 
 pub struct SettingPage {
     shortcuts: Entity<ShortcutEditor>,
@@ -23,24 +25,12 @@ impl SettingPage {
 
 impl Render for SettingPage {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        let shortcuts = self.shortcuts.clone();
-
-        let shortcuts_page = SettingsSection::new("快捷键")
-            .icon(IconName::LayoutGrid)
-            .group(SettingGroup::new().item(
-                SettingItem::render(move |_, _, _| shortcuts.clone()).keywords([
-                    "快捷键",
-                    "键盘",
-                    "shortcut",
-                ]),
-            ));
-
         div().size_full().child(
             Settings::new("lunaria-settings")
                 .sidebar_width(px(SETTING_SIDEBAR_WIDTH))
                 .header_style(&div().pt_6().style().clone())
                 .with_group_variant(GroupBoxVariant::Normal)
-                .page(shortcuts_page),
+                .page(build_shortcut_page(self.shortcuts.clone())),
         )
     }
 }

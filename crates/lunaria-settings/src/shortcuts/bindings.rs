@@ -1,5 +1,5 @@
-use crate::shortcuts::model::{ShortcutAction, ShortcutItem};
 use gpui_kit::{App, KeyBinding, Keystroke, actions};
+use lunaria_core::settings::shortcuts::model::{ShortcutAction, ShortcutItem};
 use lunaria_ui::ThemeManager;
 
 actions!(lunaria, [ToggleTheme, OpenSettings, CloseWindow, Quit]);

@@ -4,7 +4,7 @@ use gpui_kit::component::{WindowExt, notification::Notification};
 use gpui_kit::{Context, Entity, EventEmitter, Subscription, Window};
 use lunaria_core::project::Project;
 
-use crate::app::app_services::AppServices;
+use lunaria_app::app_services::AppServices;
 
 pub enum CreateProjectEvent {
     Started,

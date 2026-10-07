@@ -32,11 +32,11 @@ fn navigate_dev_route(value: &str, cx: &mut App) -> Result<(), String> {
 
             Ok(LauncherRouter::navigate(route, cx))
         }
-        "setting" => {
+        "settings" => {
             match page {
                 "shortcut" => open_settings(cx),
                 unknown => {
-                    return Err(format!("Unknown setting page: {unknown}"));
+                    return Err(format!("Unknown settings page: {unknown}"));
                 }
             }
 

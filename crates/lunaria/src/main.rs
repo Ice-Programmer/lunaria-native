@@ -8,10 +8,10 @@ pub mod settings_window;
 
 use crate::init::router::init_app_router;
 use crate::launcher::launcher_page::LaunchPage;
-use app::app_services::AppServices;
 use app::window_root::create_window_root;
 use gpui_kit::assets::AllAssets;
 use gpui_kit::*;
+use lunaria_app::app_services::AppServices;
 use lunaria_database::DatabaseManager;
 use lunaria_settings::shortcuts::bindings::init_bindings;
 use lunaria_ui::ThemeManager;
@@ -39,7 +39,11 @@ async fn main() {
     );
 
     let app_services = AppServices::new(databases, Handle::current()).await;
-    let shortcut_items = app_services.shortcut_service.list().await;
+    let shortcut_items = app_services
+        .shortcut_service
+        .list()
+        .await
+        .expect("Failed to load shortcut list");
 
     let app = application().with_assets(AllAssets);
 
