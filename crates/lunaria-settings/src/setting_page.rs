@@ -1,15 +1,13 @@
 use crate::shortcuts::shortcut_view::shortcut_editor::ShortcutEditor;
 
 use crate::shortcuts::shortcut_view::shortcut_page::build_shortcut_page;
-use gpui_kit::assets::IconName;
 use gpui_kit::component::{
     group_box::GroupBoxVariant,
-    setting::{SettingGroup, SettingItem, SettingPage as SettingsSection, Settings},
+    setting::Settings,
 };
 use gpui_kit::*;
 
 const SETTING_SIDEBAR_WIDTH: f32 = 200.0;
-const SHORTCUT_PAGE_HEADER_HEIGHT: f32 = 50.;
 
 pub struct SettingPage {
     shortcuts: Entity<ShortcutEditor>,

@@ -13,7 +13,6 @@ use lunaria_ui::components::custom_input::CustomInput;
 
 pub struct ShortcutEditor {
     search_input: Entity<InputState>,
-    view_model: Entity<ShortcutViewModel>,
     shortcut_list: Entity<ListState<ShortcutListDelegate>>,
     _subscription: Subscription,
 }
@@ -50,7 +49,6 @@ impl ShortcutEditor {
 
         Self {
             search_input,
-            view_model,
             shortcut_list,
             _subscription: subscription,
         }

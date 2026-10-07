@@ -3,7 +3,7 @@ use gpui_kit::base::h_flex;
 use gpui_kit::component::list::{ListDelegate, ListItem, ListState};
 use gpui_kit::component::{ActiveTheme, IndexPath};
 use gpui_kit::*;
-use lunaria_core::settings::shortcuts::model::{Shortcut, ShortcutItem};
+use lunaria_core::settings::shortcuts::model::ShortcutItem;
 use lunaria_ui::extensions::list_search::ListSearchExt;
 
 const ROW_HEIGHT: f32 = 48.;
@@ -11,14 +11,6 @@ pub const EDIT_WIDTH: f32 = 32.0;
 
 pub fn is_modified(item: &ShortcutItem) -> bool {
     item.custom.as_deref().unwrap_or(&[]) != item.definition.defaults.as_slice()
-}
-
-fn keystroke(shortcut: &Shortcut) -> Keystroke {
-    Keystroke {
-        key: shortcut.key.clone(),
-        modifiers: shortcut.modifiers,
-        key_char: None,
-    }
 }
 
 pub struct ShortcutListDelegate {
@@ -81,7 +73,7 @@ impl ListDelegate for ShortcutListDelegate {
     fn render_section_header(
         &mut self,
         section: usize,
-        window: &mut Window,
+        _window: &mut Window,
         cx: &mut Context<ListState<Self>>,
     ) -> Option<impl IntoElement> {
         let category = self
