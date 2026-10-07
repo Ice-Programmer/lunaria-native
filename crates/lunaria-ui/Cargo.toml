@@ -8,6 +8,3 @@ lunaria-assets.workspace = true
 gpui-kit.workspace = true
 thiserror.workspace = true
 rfd.workspace = true
-
-[dev-dependencies]
-gpui-kit = { workspace = true, features = ["test-support"] }
