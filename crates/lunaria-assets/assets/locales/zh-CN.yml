@@ -1,3 +1,9 @@
 common:
   or: 或
   unset: 未设置
+
+launcher:
+  subtitle: 视觉小说创作空间
+  main_button:
+    create_project: 创建项目
+    open_project: 打开项目

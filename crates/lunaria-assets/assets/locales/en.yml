@@ -1,3 +1,9 @@
 common:
   or: or
   unset: Not set
+
+launcher:
+  subtitle: Visual Novel Studio
+  main_button:
+    create_project: Create project
+    open_project: Open project

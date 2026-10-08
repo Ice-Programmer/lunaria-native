@@ -5,6 +5,7 @@ use gpui_kit::component::button::*;
 use gpui_kit::component::{ActiveTheme, Icon};
 use gpui_kit::*;
 use lunaria_ui::components::custom_button::CustomButton;
+use lunaria_ui::i18n_text;
 
 #[derive(IntoElement)]
 pub struct LaunchSidebar;
@@ -28,7 +29,7 @@ impl LaunchSidebar {
                 div()
                     .text_sm()
                     .text_color(cx.theme().muted_foreground)
-                    .child("视觉小说创作空间"),
+                    .child(i18n_text!("launcher.subtitle", "视觉小说创作空间")),
             )
     }
 
@@ -39,7 +40,10 @@ impl LaunchSidebar {
             .child(
                 Button::new("create-project")
                     .mt_8()
-                    .label("创建项目")
+                    .label(i18n_text!(
+                        "launcher.main_button.create_project",
+                        "创建项目"
+                    ))
                     .primary()
                     .w_full()
                     .selected(creating)
@@ -52,7 +56,7 @@ impl LaunchSidebar {
             )
             .child(
                 CustomButton::new("open-project")
-                    .label("打开项目")
+                    .label(i18n_text!("launcher.main_button.open_project", "打开项目"))
                     .icon(IconName::FolderOpen)
                     .h(px(36.))
                     .cursor_pointer()

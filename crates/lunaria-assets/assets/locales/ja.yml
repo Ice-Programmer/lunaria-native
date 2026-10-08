@@ -1,3 +1,9 @@
 common:
   or: か
   unset: 未設定
+
+launcher:
+  subtitle: ビジュアルノベル制作スペース
+  main_button:
+    create_project: 新規作成
+    open_project: 開く
