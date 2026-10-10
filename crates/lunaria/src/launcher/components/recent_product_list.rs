@@ -6,6 +6,8 @@ use gpui_kit::component::list::{ListDelegate, ListItem, ListState};
 use gpui_kit::component::menu::{DropdownMenu, PopupMenuItem};
 use gpui_kit::component::{ActiveTheme, Icon, IndexPath};
 use gpui_kit::*;
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 
 pub struct ProjectListDelegate {
     pub view_model: Entity<RecentProjectsViewModel>,
@@ -104,14 +106,23 @@ impl ListDelegate for ProjectListDelegate {
                             let project_path = project_path.clone();
 
                             menu.item(
-                                PopupMenuItem::new("open in finder")
-                                    .icon(IconName::FolderOpen)
-                                    .on_click(move |_, _, cx| {
-                                        cx.open_with_system(project_path.as_path());
-                                    }),
+                                PopupMenuItem::new(i18n_text!(
+                                    keys::launcher::project_action::OPEN_IN_FINDER,
+                                    "finder 中打开"
+                                ))
+                                .icon(IconName::FolderOpen)
+                                .on_click(move |_, _, cx| {
+                                    cx.open_with_system(project_path.as_path());
+                                }),
                             )
                             .separator()
-                            .item(PopupMenuItem::new("delete project").icon(IconName::Trash))
+                            .item(
+                                PopupMenuItem::new(i18n_text!(
+                                    keys::launcher::project_action::REMOVE_PROJECT,
+                                    "移除项目"
+                                ))
+                                .icon(IconName::Trash),
+                            )
                         })
                 }),
         )

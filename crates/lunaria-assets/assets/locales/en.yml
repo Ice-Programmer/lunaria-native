@@ -10,3 +10,9 @@ launcher:
   footer_button:
     guide: User Guide
     feedback: Report Issue
+  recent_content:
+    recent_project: Recent Projects
+    search_project: Search projects
+  project_action:
+    open_in_finder: open in finder
+    remove_project: remove project

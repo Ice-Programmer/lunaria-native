@@ -1,3 +1,5 @@
+use super::recent_product_list::ProjectListDelegate;
+use crate::launcher::view_model::recent_projects_view_model::RecentProjectsViewModel;
 use gpui_kit::assets::IconName;
 use gpui_kit::base::{h_flex, v_flex};
 use gpui_kit::component::input::{InputEvent, InputState};
@@ -5,9 +7,9 @@ use gpui_kit::component::list::{List, ListState};
 use gpui_kit::component::separator::Separator;
 use gpui_kit::*;
 use lunaria_ui::components::custom_input::CustomInput;
-
-use super::recent_product_list::ProjectListDelegate;
-use crate::launcher::view_model::recent_projects_view_model::RecentProjectsViewModel;
+use lunaria_ui::extensions::input_18n::InputI18nExt;
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 
 pub struct LaunchContent {
     search_input: Entity<InputState>,
@@ -19,7 +21,12 @@ impl LaunchContent {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let search_input = cx.new(|cx| {
             InputState::new(window, cx)
-                .placeholder("搜索项目")
+                .placeholder_i18n(
+                    keys::launcher::recent_content::SEARCH_PROJECT,
+                    "搜索项目",
+                    window,
+                    cx,
+                )
                 .default_value("")
         });
 
@@ -67,7 +74,10 @@ impl LaunchContent {
                 div()
                     .text_lg()
                     .font_weight(FontWeight::SEMIBOLD)
-                    .child("最近项目"),
+                    .child(i18n_text!(
+                        keys::launcher::recent_content::RECENT_PROJECT,
+                        "最近项目"
+                    )),
             )
             .child(
                 CustomInput::new(&self.search_input)

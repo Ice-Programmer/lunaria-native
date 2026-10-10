@@ -10,3 +10,9 @@ launcher:
   footer_button:
     guide: 使用指南
     feedback: 问题反馈
+  recent_content:
+    recent_project: 最近项目
+    search_project: 搜索项目
+  project_action:
+    open_in_finder: finder 中打开
+    remove_project: 移除项目

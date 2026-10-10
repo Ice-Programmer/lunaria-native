@@ -71,10 +71,12 @@ impl LaunchSidebar {
     fn action_item(
         cx: &mut App,
         icon: IconName,
-        label: &'static str,
+        label: impl Into<SharedString>,
         on_click: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
     ) -> impl IntoElement {
-        Button::new(label)
+        let label: SharedString = label.into();
+
+        Button::new(label.clone())
             .ghost()
             .w_full()
             .h(px(32.))
@@ -107,7 +109,7 @@ impl LaunchSidebar {
             .child(Self::action_item(
                 cx,
                 IconName::BookOpen,
-                "使用指南",
+                i18n_text!(keys::launcher::footer_button::GUIDE, "使用指南"),
                 |_, _, _| {
                     println!("open user guide");
                 },
@@ -115,7 +117,7 @@ impl LaunchSidebar {
             .child(Self::action_item(
                 cx,
                 IconName::MessageCircle,
-                "问题反馈",
+                i18n_text!(keys::launcher::footer_button::FEEDBACK, "问题反馈"),
                 |_, _, _| {
                     println!("open feedback");
                 },
