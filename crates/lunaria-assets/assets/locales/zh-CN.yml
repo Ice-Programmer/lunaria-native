@@ -33,6 +33,16 @@ setting:
     search_label: 搜索快捷键
     search_keycaps: 按键检索
     application_description: 应用相关操作
+    launcher_description: 项目创建与打开
+    editor_description: 内容编辑相关操作
+    actions:
+      open_settings: 打开设置窗口
+      toggle_theme: 切换明暗主题
+      close_window: 关闭当前窗口
+      quit: 退出应用
+      switch_language: 切换界面语言
 
   reset_all: 恢复全部默认
   application: 应用
+  launcher: 欢迎页
+  editor: 编辑器

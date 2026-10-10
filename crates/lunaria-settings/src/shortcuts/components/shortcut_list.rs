@@ -1,3 +1,5 @@
+use crate::shortcuts::category_i18n::ShortcutCategoryI18nExt;
+use crate::shortcuts::definition_i18n::ShortcutDefinitionI18nExt;
 use crate::shortcuts::view_model::shortcut_view_model::ShortcutViewModel;
 use gpui_kit::assets::IconName;
 use gpui_kit::base::h_flex;
@@ -133,7 +135,7 @@ impl ListDelegate for ShortcutListDelegate {
                                 .min_w_0()
                                 .flex_shrink_0()
                                 .overflow_hidden()
-                                .child(item.definition.title),
+                                .child(item.definition.title_i18n()),
                         )
                         .child(
                             div()
@@ -179,9 +181,9 @@ impl ListDelegate for ShortcutListDelegate {
                     div()
                         .text_sm()
                         .font_weight(FontWeight::SEMIBOLD)
-                        .child(category.label()),
+                        .child(category.label_i18n()),
                 )
-                .child(div().text_xs().child(category.description())),
+                .child(div().text_xs().child(category.description_i18n())),
         )
     }
 

@@ -3,9 +3,11 @@ use crate::components::settings_section::{SETTINGS_HEADER_HEIGHT, render_setting
 use gpui_kit::assets::IconName;
 use gpui_kit::component::setting::{SettingGroup, SettingItem, SettingPage as SettingsSection};
 use gpui_kit::*;
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 
 pub fn build_shortcut_page(shortcuts: Entity<ShortcutEditor>) -> SettingsSection {
-    render_settings_section("快捷键")
+    render_settings_section(i18n_text!(keys::setting::shortcut::LABEL, "快捷键"))
         .icon(IconName::LayoutGrid)
         .group(
             SettingGroup::new().item(SettingItem::render(move |_, window, _| {

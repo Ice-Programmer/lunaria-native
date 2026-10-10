@@ -1,3 +1,5 @@
+use crate::shortcuts::category_i18n::ShortcutCategoryI18nExt;
+use crate::shortcuts::definition_i18n::ShortcutDefinitionI18nExt;
 use gpui_kit::component::kbd::Kbd;
 use gpui_kit::{Context, Entity, EventEmitter, Subscription, Window};
 use lunaria_app::app_services::AppServices;
@@ -137,9 +139,9 @@ impl ShortcutViewModel {
 
         let mut search_text = format!(
             "{} {} {}",
-            item.definition.title,
-            item.definition.category.label(),
-            item.definition.category.description()
+            item.definition.title_i18n(),
+            item.definition.category.label_i18n(),
+            item.definition.category.description_i18n()
         );
 
         for shortcut in item.custom.as_deref().unwrap_or(&[]) {

@@ -33,6 +33,16 @@ setting:
     search_label: Search shortcuts
     search_keycaps: Search by Key
     application_description: Application actions
+    launcher_description: Create and open projects
+    editor_description: Content editing actions
+    actions:
+      open_settings: Open Settings
+      toggle_theme: Toggle Theme
+      close_window: Close Window
+      quit: Quit App
+      switch_language: Switch Language
 
   reset_all: Restore Defaults
   application: Application
+  launcher: Welcome
+  editor: Editor

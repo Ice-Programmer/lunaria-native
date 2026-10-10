@@ -33,6 +33,16 @@ setting:
     search_label: ショートカットを検索
     search_keycaps: キーで検索
     application_description: アプリ関連の操作
+    launcher_description: プロジェクトの作成・読み込み
+    editor_description: コンテンツの編集
+    actions:
+      open_settings: 設定を開く
+      toggle_theme: テーマを切り替え
+      close_window: ウィンドウを閉じる
+      quit: アプリを終了
+      switch_language: 言語を切り替え
 
   reset_all: 初期設定に戻す
   application: アプリ
+  launcher: スタート画面
+  editor: エディター
