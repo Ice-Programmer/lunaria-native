@@ -16,6 +16,8 @@ use lunaria_ui::components::path_picker::PathPicker;
 use lunaria_ui::extensions::focus::FocusExt;
 use lunaria_ui::extensions::input_validator::Validator;
 use lunaria_ui::extensions::subscribe_input::subscribe_input;
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 use std::path::PathBuf;
 
 pub struct CreateProjectForm {
@@ -103,7 +105,10 @@ impl CreateProjectForm {
         div()
             .text_lg()
             .font_weight(FontWeight::SEMIBOLD)
-            .child("新建项目")
+            .child(i18n_text!(
+                keys::launcher::create_content::CREATE_PROJECT,
+                "新建项目"
+            ))
     }
 
     fn render_form(&self, cx: &Context<Self>) -> impl IntoElement {
@@ -126,32 +131,47 @@ impl CreateProjectForm {
                 .label_width(px(80.))
                 .child(
                     Field::new()
-                        .label("项目名称：")
+                        .label(i18n_text!(
+                            keys::launcher::create_content::PROJECT_NAME,
+                            "项目名称"
+                        ))
                         .child(Input::new(&self.project_name_input)),
                 )
-                .child(Field::new().label("项目位置：").child(PathPicker::new(
-                    "project-directory",
-                    &self.project_directory_input,
-                )))
                 .child(
-                    Field::new().label("完整路径：").child(
-                        div()
-                            .w_0()
-                            .min_w_full()
-                            .py_1()
-                            .text_sm()
-                            .truncate()
-                            .text_ellipsis_middle()
-                            .text_color(cx.theme().muted_foreground)
-                            .child(preview),
-                    ),
+                    Field::new()
+                        .label(i18n_text!(
+                            keys::launcher::create_content::PROJECT_DIRECTORY,
+                            "项目位置"
+                        ))
+                        .child(PathPicker::new(
+                            "project-directory",
+                            &self.project_directory_input,
+                        )),
+                )
+                .child(
+                    Field::new()
+                        .label(i18n_text!(
+                            keys::launcher::create_content::PROJECT_PATH,
+                            "完整路径"
+                        ))
+                        .child(
+                            div()
+                                .w_0()
+                                .min_w_full()
+                                .py_1()
+                                .text_sm()
+                                .truncate()
+                                .text_ellipsis_middle()
+                                .text_color(cx.theme().muted_foreground)
+                                .child(preview),
+                        ),
                 )
                 .footer(
                     h_flex()
                         .gap_3()
                         .child(
                             CustomButton::new("cancel")
-                                .label("取消")
+                                .label(i18n_text!(keys::common::CANCEL, "取消"))
                                 .cursor_pointer()
                                 .text_base()
                                 .on_click(|_, _, cx| {
@@ -160,7 +180,10 @@ impl CreateProjectForm {
                         )
                         .child(
                             CustomButton::new("save")
-                                .label("创建项目")
+                                .label(i18n_text!(
+                                    keys::launcher::create_content::CREATE_PROJECT,
+                                    "创建项目"
+                                ))
                                 .disabled(!can_create)
                                 .cursor_pointer()
                                 .loading(creating)

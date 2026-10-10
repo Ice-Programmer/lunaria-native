@@ -1,6 +1,11 @@
 common:
   or: 或
   unset: 未设置
+  cancel: 取消
+  review: 浏览
+  all: すべて
+  modified: 変更済み
+  operation: 操作
 
 launcher:
   subtitle: 视觉小说创作空间
@@ -16,3 +21,18 @@ launcher:
   project_action:
     open_in_finder: finder 中打开
     remove_project: 移除项目
+  create_content:
+    create_project: 新建项目
+    project_name: 项目名称
+    project_directory: 项目位置
+    project_path: 完整路径
+
+setting:
+  shortcut:
+    label: 快捷键
+    search_label: 搜索快捷键
+    search_keycaps: 按键检索
+    application_description: 应用相关操作
+
+  reset_all: 恢复全部默认
+  application: 应用

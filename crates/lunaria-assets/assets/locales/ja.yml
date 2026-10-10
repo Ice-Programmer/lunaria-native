@@ -1,6 +1,11 @@
 common:
   or: か
   unset: 未設定
+  cancel: キャンセル
+  review: 参照
+  all: すべて
+  modified: 変更済み
+  operation: 操作
 
 launcher:
   subtitle: ノベル制作スタジオ
@@ -16,3 +21,18 @@ launcher:
   project_action:
     open_in_finder: Finderで表示
     remove_project: 一覧から削除
+  create_content:
+    create_project: 新規プロジェクト
+    project_name: 名前
+    project_directory: 保存先
+    project_path: フルパス
+
+setting:
+  shortcut:
+    label: ショートカット
+    search_label: ショートカットを検索
+    search_keycaps: キーで検索
+    application_description: アプリ関連の操作
+
+  reset_all: 初期設定に戻す
+  application: アプリ

@@ -9,6 +9,9 @@ use gpui_kit::component::list::{List, ListState};
 use gpui_kit::component::{WindowExt, notification::Notification};
 use gpui_kit::*;
 use lunaria_ui::components::custom_input::CustomInput;
+use lunaria_ui::extensions::input_18n::InputI18nExt;
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 
 pub struct ShortcutEditor {
     search_input: Entity<InputState>,
@@ -22,7 +25,12 @@ impl ShortcutEditor {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let search_input = cx.new(|cx| {
             InputState::new(window, cx)
-                .placeholder("搜索快捷键")
+                .placeholder_i18n(
+                    keys::setting::shortcut::SEARCH_LABEL,
+                    "搜索快捷键",
+                    window,
+                    cx,
+                )
                 .default_value("")
         });
 
@@ -92,11 +100,14 @@ impl ShortcutEditor {
                     .prefix(IconName::Search)
                     .w(relative(0.3)),
             )
-            .child(Button::new("search-shortcuts-commend").label("按键检索"))
+            .child(Button::new("search-shortcuts-commend").label(i18n_text!(
+                keys::setting::shortcut::SEARCH_KEYCAPS,
+                "按键检索"
+            )))
             .child(
                 Button::new("shortcut-filter-all")
                     .ghost()
-                    .label("全部")
+                    .label(i18n_text!(keys::common::ALL, "全部"))
                     .selected(!modified_only)
                     .child(
                         div()
@@ -112,7 +123,7 @@ impl ShortcutEditor {
             .child(
                 Button::new("shortcut-filter-modify")
                     .ghost()
-                    .label("已修改")
+                    .label(i18n_text!(keys::common::MODIFIED, "已修改"))
                     .selected(modified_only)
                     .child(
                         div()
@@ -129,7 +140,7 @@ impl ShortcutEditor {
             .child(
                 Button::new("reset-shortcut-settings")
                     .ghost()
-                    .label("恢复全部默认")
+                    .label(i18n_text!(keys::setting::RESET_ALL, "恢复全部默认"))
                     .icon(IconName::Undo2)
                     .disabled(true),
             )
@@ -145,13 +156,18 @@ impl ShortcutEditor {
             .border_color(cx.theme().border)
             .text_sm()
             .text_color(cx.theme().muted_foreground)
-            .child(div().w(relative(0.35)).flex_shrink_0().child("操作"))
+            .child(
+                div()
+                    .w(relative(0.35))
+                    .flex_shrink_0()
+                    .child(i18n_text!(keys::common::OPERATION, "操作")),
+            )
             .child(
                 h_flex()
                     .flex_1()
                     .min_w_0()
                     .gap_3()
-                    .child("快捷键")
+                    .child(i18n_text!(keys::setting::shortcut::LABEL, "快捷键"))
                     .child("macOS"),
             )
             .child(div().w(px(EDIT_WIDTH)).flex_shrink_0())

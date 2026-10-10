@@ -1,6 +1,11 @@
 common:
   or: or
   unset: Not set
+  cancel: Cancel
+  review: Review
+  all: All
+  modified: Modified
+  operation: Operation
 
 launcher:
   subtitle: Visual Novel Studio
@@ -16,3 +21,18 @@ launcher:
   project_action:
     open_in_finder: open in finder
     remove_project: remove project
+  create_content:
+    create_project: New Project
+    project_name: Project Name
+    project_directory: Project Location
+    project_path: Full Path
+
+setting:
+  shortcut:
+    label: Shortcuts
+    search_label: Search shortcuts
+    search_keycaps: Search by Key
+    application_description: Application actions
+
+  reset_all: Restore Defaults
+  application: Application

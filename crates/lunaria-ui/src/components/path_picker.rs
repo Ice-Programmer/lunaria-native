@@ -1,4 +1,6 @@
 use crate::components::custom_button::CustomButton;
+use crate::i18n::keys;
+use crate::i18n_text;
 use gpui::base::input::{InputEvent, InputState};
 use gpui::base::{Disableable, h_flex};
 use gpui::{App, ElementId, Entity, IntoElement, RenderOnce, Styled, WeakEntity, Window};
@@ -163,7 +165,7 @@ impl RenderOnce for PathPicker {
             )
             .child(
                 CustomButton::new("browse")
-                    .label("浏览")
+                    .label(i18n_text!(keys::common::REVIEW, "浏览"))
                     .icon(IconName::Folder)
                     .flex_shrink_0()
                     .disabled(disabled)

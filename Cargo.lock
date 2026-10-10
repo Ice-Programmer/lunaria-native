@@ -3990,6 +3990,7 @@ name = "lunaria-core"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "lunaria-ui",
  "serde",
  "thiserror 2.0.20",
  "tokio",
