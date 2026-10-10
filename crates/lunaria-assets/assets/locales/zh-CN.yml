@@ -3,8 +3,8 @@ common:
   unset: 未设置
   cancel: 取消
   review: 浏览
-  all: すべて
-  modified: 変更済み
+  all: 全部
+  modified: 已修改
   operation: 操作
 
 launcher:
