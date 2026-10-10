@@ -7,3 +7,6 @@ launcher:
   main_button:
     create_project: Create project
     open_project: Open project
+  footer_button:
+    guide: User Guide
+    feedback: Report Issue

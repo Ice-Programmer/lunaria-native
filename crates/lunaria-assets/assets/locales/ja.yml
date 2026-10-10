@@ -3,7 +3,10 @@ common:
   unset: 未設定
 
 launcher:
-  subtitle: ビジュアルノベル制作スペース
+  subtitle: ノベル制作スタジオ
   main_button:
     create_project: 新規作成
     open_project: 開く
+  footer_button:
+    guide: 使い方ガイド
+    feedback: 問題を報告

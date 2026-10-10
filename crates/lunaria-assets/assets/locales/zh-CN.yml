@@ -7,3 +7,6 @@ launcher:
   main_button:
     create_project: 创建项目
     open_project: 打开项目
+  footer_button:
+    guide: 使用指南
+    feedback: 问题反馈
