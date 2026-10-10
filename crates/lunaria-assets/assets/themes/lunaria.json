@@ -32,7 +32,9 @@
         "sidebar.accent.foreground": "#5F3DA8",
         "sidebar.foreground": "#292832",
         "sidebar.primary.background": "#7052C2",
-        "sidebar.primary.foreground": "#FFFFFF"
+        "sidebar.primary.foreground": "#FFFFFF",
+        "popover.background": "#FFFFFF",
+        "popover.foreground": "#292832"
       }
     },
     {
@@ -67,7 +69,9 @@
         "sidebar.foreground": "#EEEAF4",
         "sidebar.primary.background": "#AD94EF",
         "sidebar.primary.foreground": "#21162F",
-        "skeleton.background": "#1C1C23"
+        "skeleton.background": "#1C1C23",
+        "popover.background": "#30303B",
+        "popover.foreground": "#EEEAF4"
       }
     }
   ]

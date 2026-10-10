@@ -8,6 +8,7 @@ pub enum ShortcutAction {
     ToggleTheme,
     CloseWindow,
     Quit,
+    SwitchLanguage,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

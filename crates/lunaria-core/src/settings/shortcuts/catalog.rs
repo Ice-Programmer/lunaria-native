@@ -28,13 +28,19 @@ pub fn default_shortcuts() -> Vec<ShortcutDefinition> {
             action: ShortcutAction::CloseWindow,
             title: "关闭当前窗口",
             category: ShortcutCategory::Application,
-            defaults: vec![Shortcut::new("w", command)],
+            defaults: vec![Shortcut::new("W", command)],
         },
         ShortcutDefinition {
             action: ShortcutAction::Quit,
             title: "退出应用",
             category: ShortcutCategory::Application,
-            defaults: vec![Shortcut::new("q", command)],
+            defaults: vec![Shortcut::new("Q", command)],
+        },
+        ShortcutDefinition {
+            action: ShortcutAction::SwitchLanguage,
+            title: "切换界面语言",
+            category: ShortcutCategory::Application,
+            defaults: vec![Shortcut::new("L", shift_command)],
         },
     ]
 }

@@ -1,10 +1,8 @@
 use crate::DatabaseManager;
-use crate::settings::app_setting;
 use async_trait::async_trait;
 use lunaria_core::settings::error::SettingError;
 use lunaria_core::settings::shortcuts::model::ShortcutOverrides;
 use lunaria_core::settings::shortcuts::repository::ShortcutRepository;
-use sea_orm::EntityTrait;
 use std::sync::Arc;
 
 const SHORTCUTS_KEY: &str = "shortcuts";

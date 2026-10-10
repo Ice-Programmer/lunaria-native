@@ -1,8 +1,14 @@
-use super::actions::{CloseWindow, OpenSettings, Quit, ToggleTheme};
 use super::to_keystroke;
+use crate::setting::language::language_switcher::LanguageSwitcher;
+use gpui_kit::gpui::actions;
 use gpui_kit::{App, KeyBinding};
 use lunaria_core::settings::shortcuts::model::{ShortcutAction, ShortcutItem};
 use lunaria_ui::ThemeManager;
+
+actions!(
+    lunaria,
+    [ToggleTheme, OpenSettings, CloseWindow, Quit, SwitchLanguage]
+);
 
 pub fn init_bindings(items: &[ShortcutItem], open_settings: fn(&mut App), cx: &mut App) {
     apply(items, cx);
@@ -25,6 +31,18 @@ pub fn init_bindings(items: &[ShortcutItem], open_settings: fn(&mut App), cx: &m
                 });
             });
         }
+    });
+
+    cx.on_action(|_: &SwitchLanguage, cx| {
+        let Some(handle) = cx.active_window() else {
+            return;
+        };
+
+        cx.defer(move |cx| {
+            let _ = handle.update(cx, |_, window, cx| {
+                LanguageSwitcher::show(window, cx);
+            });
+        });
     });
 
     cx.on_action(|_: &Quit, cx| {
@@ -54,7 +72,8 @@ fn refreshed_bindings(
             let managed = action.is::<ToggleTheme>()
                 || action.is::<OpenSettings>()
                 || action.is::<CloseWindow>()
-                || action.is::<Quit>();
+                || action.is::<Quit>()
+                || action.is::<SwitchLanguage>();
 
             !(binding.predicate().is_none() && managed)
         })
@@ -69,6 +88,7 @@ fn refreshed_bindings(
                 ShortcutAction::OpenSettings => KeyBinding::new(&stroke, OpenSettings, None),
                 ShortcutAction::CloseWindow => KeyBinding::new(&stroke, CloseWindow, None),
                 ShortcutAction::Quit => KeyBinding::new(&stroke, Quit, None),
+                ShortcutAction::SwitchLanguage => KeyBinding::new(&stroke, SwitchLanguage, None),
             };
 
             bindings.push(binding);
