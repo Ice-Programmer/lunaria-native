@@ -51,5 +51,6 @@ impl Render for WindowContent {
             })
             .child(deferred(self.language_switcher.clone()).with_priority(1))
             .children(Root::render_notification_layer(window, cx))
+            .children(Root::render_dialog_layer(window, cx))
     }
 }

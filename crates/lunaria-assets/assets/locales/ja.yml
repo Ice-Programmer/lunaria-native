@@ -41,6 +41,9 @@ setting:
       close_window: ウィンドウを閉じる
       quit: アプリを終了
       switch_language: 言語を切り替え
+    edit_dialog:
+      title: ショートカットを編集
+      add_shortcut: ショートカットを追加
 
   reset_all: 初期設定に戻す
   application: アプリ

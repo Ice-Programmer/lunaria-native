@@ -1,5 +1,6 @@
-use crate::shortcuts::category_i18n::ShortcutCategoryI18nExt;
-use crate::shortcuts::definition_i18n::ShortcutDefinitionI18nExt;
+use crate::shortcuts::components::edit_shortcut_dialog::EditShortcutDialog;
+use crate::shortcuts::i18n::category_i18n::ShortcutCategoryI18nExt;
+use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
 use crate::shortcuts::view_model::shortcut_view_model::ShortcutViewModel;
 use gpui_kit::assets::IconName;
 use gpui_kit::base::h_flex;
@@ -21,25 +22,6 @@ pub struct ShortcutListDelegate {
 }
 
 impl ShortcutListDelegate {
-    pub fn render_keycap_v1(shortcuts: Option<Vec<Shortcut>>) -> impl IntoElement {
-        let shortcuts = shortcuts.unwrap_or_default();
-        let mut keycaps = h_flex().gap_2();
-
-        if shortcuts.is_empty() {
-            return keycaps.child("未设置");
-        }
-
-        for (index, shortcut) in shortcuts.iter().enumerate() {
-            if index > 0 {
-                keycaps = keycaps.child(div().child("或"));
-            }
-
-            keycaps = keycaps.child(Kbd::new(to_keystroke(shortcut)).flex_shrink_0());
-        }
-
-        keycaps
-    }
-
     fn render_single_keycap(key: &str, cx: &App) -> Kbd {
         Kbd::new(Keystroke {
             modifiers: Default::default(),
@@ -115,7 +97,7 @@ impl ListDelegate for ShortcutListDelegate {
     ) -> Option<Self::Item> {
         let view_model = self.view_model.read(cx);
         let category = view_model.categories().get(ix.section).copied()?;
-        let item = view_model.filtered_items(category).nth(ix.row)?;
+        let item = view_model.filtered_items(category).nth(ix.row)?.clone();
         let action = item.definition.action;
 
         Some(
@@ -151,7 +133,12 @@ impl ListDelegate for ShortcutListDelegate {
                             )))
                             .text_color(cx.theme().muted_foreground)
                             .ghost()
-                            .icon(IconName::Pencil),
+                            .icon(IconName::Pencil)
+                            .on_click(move |_, window, cx| {
+                                cx.stop_propagation();
+
+                                EditShortcutDialog::open(item.clone(), window, cx);
+                            }),
                         ),
                 ),
         )

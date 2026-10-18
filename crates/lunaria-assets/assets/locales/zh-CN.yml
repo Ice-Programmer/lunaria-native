@@ -41,6 +41,9 @@ setting:
       close_window: 关闭当前窗口
       quit: 退出应用
       switch_language: 切换界面语言
+    edit_dialog:
+      title: 编辑快捷键
+      add_shortcut: 添加快捷键
 
   reset_all: 恢复全部默认
   application: 应用

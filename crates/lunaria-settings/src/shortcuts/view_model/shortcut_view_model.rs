@@ -1,5 +1,5 @@
-use crate::shortcuts::category_i18n::ShortcutCategoryI18nExt;
-use crate::shortcuts::definition_i18n::ShortcutDefinitionI18nExt;
+use crate::shortcuts::i18n::category_i18n::ShortcutCategoryI18nExt;
+use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
 use gpui_kit::component::kbd::Kbd;
 use gpui_kit::{Context, Entity, EventEmitter, Subscription, Window};
 use lunaria_app::app_services::AppServices;

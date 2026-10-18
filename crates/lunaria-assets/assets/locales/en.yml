@@ -41,6 +41,9 @@ setting:
       close_window: Close Window
       quit: Quit App
       switch_language: Switch Language
+    edit_dialog:
+      title: Edit Shortcut
+      add_shortcut: Add Shortcut
 
   reset_all: Restore Defaults
   application: Application
