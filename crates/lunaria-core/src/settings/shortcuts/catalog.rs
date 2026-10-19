@@ -16,7 +16,7 @@ pub fn default_shortcuts() -> Vec<ShortcutDefinition> {
             action: ShortcutAction::ToggleTheme,
             title: "切换明暗主题",
             category: ShortcutCategory::Application,
-            defaults: vec![Shortcut::new("T", shift_command)],
+            defaults: vec![Shortcut::new("t", shift_command)],
         },
         ShortcutDefinition {
             action: ShortcutAction::OpenSettings,
@@ -28,19 +28,19 @@ pub fn default_shortcuts() -> Vec<ShortcutDefinition> {
             action: ShortcutAction::CloseWindow,
             title: "关闭当前窗口",
             category: ShortcutCategory::Application,
-            defaults: vec![Shortcut::new("W", command)],
+            defaults: vec![Shortcut::new("w", command)],
         },
         ShortcutDefinition {
             action: ShortcutAction::Quit,
             title: "退出应用",
             category: ShortcutCategory::Application,
-            defaults: vec![Shortcut::new("Q", command)],
+            defaults: vec![Shortcut::new("q", command)],
         },
         ShortcutDefinition {
             action: ShortcutAction::SwitchLanguage,
             title: "切换界面语言",
             category: ShortcutCategory::Application,
-            defaults: vec![Shortcut::new("L", shift_command)],
+            defaults: vec![Shortcut::new("l", shift_command)],
         },
     ]
 }
