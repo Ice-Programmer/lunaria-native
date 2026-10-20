@@ -1,3 +1,4 @@
+use crate::shortcuts::components::shortcut_keycaps::ShortcutKeycaps;
 use gpui_kit::base::{h_flex, v_flex};
 use gpui_kit::component::button::{Button, ButtonCustomVariant, ButtonVariants};
 use gpui_kit::component::form::{Field, Form};
@@ -54,13 +55,32 @@ impl EditShortcutDialog {
     }
 
     pub fn render_binding_content(&self, cx: &App) -> Div {
-        h_flex()
-            .w_full()
-            .min_w_0()
-            .px_3()
-            .py_2()
-            .border_color(cx.theme().input)
-            .rounded_xl()
+        let shortcuts = self.shortcut.custom.as_deref().unwrap_or(&[]);
+
+        let frame = || {
+            h_flex()
+                .w_full()
+                .min_w_0()
+                .items_center()
+                .px_3()
+                .py_2()
+                .border_1()
+                .border_color(cx.theme().input)
+                .rounded_lg()
+                .bg(cx.theme().background)
+        };
+
+        let mut content = v_flex().w_full().min_w_0().gap_2();
+
+        if shortcuts.is_empty() {
+            return content.child(frame().child(ShortcutKeycaps::new(None)));
+        }
+
+        for shortcut in shortcuts {
+            content = content.child(frame().child(ShortcutKeycaps::single(shortcut.clone())));
+        }
+
+        content
     }
 
     pub fn render_footer() -> Div {
@@ -82,6 +102,7 @@ impl Render for EditShortcutDialog {
         div().w_full().pt_4().min_w_0().child(
             Form::horizontal()
                 .label_width(px(60.))
+                .gap_4()
                 .child(
                     Field::new()
                         .min_w_0()
@@ -104,7 +125,7 @@ impl Render for EditShortcutDialog {
                                 .font_weight(FontWeight::MEDIUM)
                                 .child("快捷键")
                         })
-                        .child("快捷键内容"),
+                        .child(self.render_binding_content(cx)),
                 ),
         )
     }
