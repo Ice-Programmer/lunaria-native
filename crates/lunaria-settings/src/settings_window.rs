@@ -1,6 +1,6 @@
 use crate::setting_page::SettingPage;
 use gpui_kit::*;
-use lunaria_app::window_root::create_window_root;
+use lunaria_app::windows::window_root::create_window_root;
 
 const SETTING_WINDOW_HEIGHT: f32 = 600.;
 const SETTING_WINDOW_WIDTH: f32 = 820.;

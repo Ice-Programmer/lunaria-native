@@ -1,5 +1,5 @@
 use crate::app_services::AppServices;
-use crate::window_root::get_language_switcher;
+use crate::windows::window_root::get_language_switcher;
 use gpui_kit::base::v_flex;
 use gpui_kit::component::notification::Notification;
 use gpui_kit::component::{ActiveTheme, WindowExt};

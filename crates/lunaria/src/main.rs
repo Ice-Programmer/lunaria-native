@@ -10,7 +10,7 @@ use gpui_kit::assets::AllAssets;
 use gpui_kit::*;
 use lunaria_app::app_services::AppServices;
 use lunaria_app::setting::shortcuts::bindings::init_bindings;
-use lunaria_app::window_root::create_window_root;
+use lunaria_app::windows::window_root::create_window_root;
 use lunaria_database::DatabaseManager;
 use lunaria_settings::settings_window;
 use lunaria_ui::ThemeManager;

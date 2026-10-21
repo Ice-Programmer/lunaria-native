@@ -1,0 +1,152 @@
+use crate::windows::window_root::create_window_root_with_fps;
+use gpui_kit::base::v_flex;
+use gpui_kit::component::notification::Notification;
+use gpui_kit::component::{ActiveTheme, Root, TitleBar, WindowExt};
+use gpui_kit::prelude::FluentBuilder as _;
+use gpui_kit::{div, px, AnyView, App, AppContext, Bounds, Context, FontWeight, Global, IntoElement, ParentElement, Pixels, Render, SharedString, Size, Styled, TitlebarOptions, Window, WindowBounds, WindowHandle, WindowOptions};
+use std::any::TypeId;
+use std::collections::HashMap;
+use std::hash::Hash;
+
+pub struct WindowConfig {
+    pub title: Option<SharedString>,
+    pub size: Size<Pixels>,
+    pub min_size: Size<Pixels>,
+}
+
+// 全局管理页面
+struct WindowRegistry<K> {
+    windows: HashMap<(TypeId, K), WindowHandle<Root>>,
+}
+
+impl<K> Default for WindowRegistry<K> {
+    fn default() -> Self {
+        Self {
+            windows: HashMap::new(),
+        }
+    }
+}
+
+impl<K: 'static> Global for WindowRegistry<K> {}
+
+struct WindowFrame {
+    title: Option<SharedString>,
+    content: AnyView,
+}
+
+impl Render for WindowFrame {
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let title = self
+            .title
+            .clone()
+            .map(|text| div().text_sm().truncate().child(text));
+
+        v_flex()
+            .size_full()
+            .bg(cx.theme().background)
+            .child(
+                TitleBar::new()
+                    .bg(cx.theme().background)
+                    .border_b_0()
+                    .when(cfg!(target_os = "macos"), |bar| bar.pr(px(80.)))
+                    .child(
+                        div()
+                            .flex()
+                            .flex_1()
+                            .min_w_0()
+                            .h_full()
+                            .items_center()
+                            .justify_center()
+                            .child(
+                                div()
+                                    .font_weight(FontWeight::SEMIBOLD)
+                                    .text_color(cx.theme().muted_foreground)
+                                    .children(title)
+                            ),
+                    ),
+            )
+            .child(
+                div()
+                    .flex_1()
+                    .min_h_0()
+                    .min_w_0()
+                    .w_full()
+                    .child(self.content.clone()),
+            )
+    }
+}
+
+pub fn open<K, V>(
+    key: K,
+    config: WindowConfig,
+    window: &mut Window,
+    cx: &mut App,
+    build: impl FnOnce(&mut Window, &mut Context<V>) -> V + 'static,
+) where
+    K: Eq + Hash + 'static,
+    V: Render + 'static,
+{
+    let source_window = window.window_handle();
+    let display_id = window.display(cx).map(|display| display.id());
+
+    cx.defer(move |cx| {
+        let key = (TypeId::of::<V>(), key);
+
+        let existing = cx
+            .default_global::<WindowRegistry<K>>()
+            .windows
+            .get(&key)
+            .copied();
+
+        if existing.is_some_and(|handle| {
+            // 如果存在当前页面，激活页面置前
+            handle
+                .update(cx, |_, window, _| window.activate_window())
+                .is_ok()
+        }) {
+            return;
+        }
+
+        let options = WindowOptions {
+            window_bounds: Some(WindowBounds::Windowed(Bounds::centered(
+                display_id,
+                config.size,
+                cx,
+            ))),
+            window_min_size: Some(config.min_size),
+            titlebar: Some(TitlebarOptions {
+                title: config.title.clone(),
+                ..TitleBar::title_bar_options()
+            }),
+            display_id,
+            ..TitleBar::window_options()
+        };
+
+        match cx.open_window(options, move |window, cx| {
+            let content = cx.new(|cx| build(window, cx));
+
+            let frame = cx.new(|_| WindowFrame {
+                title: config.title,
+                content: content.into(),
+            });
+
+            create_window_root_with_fps(frame, false, window, cx)
+        }) {
+            Ok(handle) => {
+                cx.global_mut::<WindowRegistry<K>>()
+                    .windows
+                    .insert(key, handle);
+            }
+            Err(error) => {
+                eprintln!("Failed to open window: {error}");
+
+                let _ = source_window.update(cx, |_, window, cx| {
+                    window.push_notification(
+                        Notification::error(format!("无法打开窗口：{error}")),
+                        cx,
+                    );
+                });
+            }
+        }
+    })
+}

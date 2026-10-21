@@ -1,16 +1,14 @@
-use crate::shortcuts::components::edit_shortcut_dialog::EditShortcutDialog;
+use crate::shortcuts::components::edit_shortcut_window::EditShortcutWindow;
+use crate::shortcuts::components::shortcut_keycaps::ShortcutKeycaps;
 use crate::shortcuts::i18n::category_i18n::ShortcutCategoryI18nExt;
 use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
 use crate::shortcuts::view_model::shortcut_view_model::ShortcutViewModel;
 use gpui_kit::assets::IconName;
 use gpui_kit::base::h_flex;
 use gpui_kit::component::button::{Button, ButtonVariants};
-use gpui_kit::component::kbd::Kbd;
 use gpui_kit::component::list::{ListDelegate, ListItem, ListState};
 use gpui_kit::component::{ActiveTheme, IndexPath};
 use gpui_kit::*;
-use lunaria_app::setting::shortcuts::to_keystroke;
-use lunaria_core::settings::shortcuts::model::Shortcut;
 use lunaria_ui::extensions::list_search::ListSearchExt;
 
 const ROW_HEIGHT: f32 = 40.;
@@ -19,48 +17,6 @@ pub const EDIT_WIDTH: f32 = 32.0;
 pub struct ShortcutListDelegate {
     pub view_model: Entity<ShortcutViewModel>,
     pub _subscription: Subscription,
-}
-
-impl ShortcutListDelegate {
-    fn render_single_keycap(key: &str, cx: &App) -> Kbd {
-        Kbd::new(Keystroke {
-            modifiers: Default::default(),
-            key: key.to_owned(),
-            key_char: None,
-        })
-        .outline()
-        .bg(cx.theme().muted)
-        .text_color(cx.theme().foreground)
-        .text_sm()
-        .items_center()
-        .justify_between()
-        .flex()
-        .whitespace_nowrap()
-        .flex_shrink_0()
-    }
-
-    pub fn render_keycap(shortcuts: Option<Vec<Shortcut>>, cx: &App) -> Div {
-        let shortcuts = shortcuts.unwrap_or_default();
-
-        if shortcuts.is_empty() {
-            return div()
-                .text_color(cx.theme().muted_foreground)
-                .child("未设置");
-        }
-
-        let mut group = h_flex().gap_1();
-        for (index, shortcut) in shortcuts.iter().enumerate() {
-            if index > 0 {
-                group = group.child(div().text_color(cx.theme().muted_foreground).child("或"))
-            }
-
-            for key in shortcut.key_parts() {
-                group = group.child(Self::render_single_keycap(key, cx));
-            }
-        }
-
-        group
-    }
 }
 
 impl ListDelegate for ShortcutListDelegate {
@@ -124,7 +80,7 @@ impl ListDelegate for ShortcutListDelegate {
                                 .flex_1()
                                 .overflow_hidden()
                                 .min_w_0()
-                                .child(Self::render_keycap(item.custom.clone(), cx)),
+                                .child(ShortcutKeycaps::new(item.custom.clone())),
                         )
                         .child(
                             Button::new(SharedString::from(format!(
@@ -137,7 +93,7 @@ impl ListDelegate for ShortcutListDelegate {
                             .on_click(move |_, window, cx| {
                                 cx.stop_propagation();
 
-                                EditShortcutDialog::open(item.clone(), window, cx);
+                                EditShortcutWindow::open(item.clone(), window, cx);
                             }),
                         ),
                 ),

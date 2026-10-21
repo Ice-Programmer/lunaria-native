@@ -4,5 +4,4 @@ pub mod components;
 pub mod extensions;
 pub mod i18n;
 pub mod theme;
-
 pub use theme::ThemeManager;
