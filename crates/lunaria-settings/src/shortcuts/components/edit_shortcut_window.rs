@@ -1,10 +1,8 @@
 use crate::shortcuts::components::shortcut_keycaps::ShortcutKeycaps;
 use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
 use gpui_kit::base::{h_flex, v_flex};
-use gpui_kit::component::button::{Button, ButtonVariants};
-use gpui_kit::component::form::{Field, Form};
-use gpui_kit::component::scroll::ScrollableElement;
-use gpui_kit::component::{ActiveTheme, Disableable, Sizable};
+use gpui_kit::component::button::{Button, ButtonCustomVariant, ButtonVariants};
+use gpui_kit::component::{ActiveTheme, Disableable, IconName, Sizable};
 use gpui_kit::gpui::actions;
 use gpui_kit::*;
 use lunaria_app::windows::custom_window::{self, WindowConfig};
@@ -56,9 +54,9 @@ impl EditShortcutWindow {
             .justify_between()
             .child(
                 div()
-                    .min_w_0()
-                    .font_weight(FontWeight::SEMIBOLD)
-                    .child(self.shortcut.definition.title_i18n()),
+                    .text_sm()
+                    .text_color(cx.theme().muted_foreground)
+                    .child("点击后按下组合键"),
             )
             .child(
                 Button::new("reset-shortcut")
@@ -96,6 +94,16 @@ impl EditShortcutWindow {
         content
     }
 
+    fn render_add_shortcut_btn(&self, cx: &App) -> Button {
+        Button::new("add-shortcut")
+            .icon(IconName::Plus)
+            .ghost()
+            .small()
+            .self_start()
+            .text_color(cx.theme().muted_foreground)
+            .child("添加快捷键")
+    }
+
     fn render_footer() -> Div {
         h_flex()
             .w_full()
@@ -119,40 +127,11 @@ impl EditShortcutWindow {
 
 impl Render for EditShortcutWindow {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .id("shortcut-editor-body")
-            .flex_1()
-            .min_h_0()
-            .overflow_y_scrollbar()
-            .child(
-                div().p_4().child(
-                    Form::horizontal()
-                        .label_width(px(60.))
-                        .child(
-                            Field::new()
-                                .min_w_0()
-                                .items_start()
-                                .label_fn(|_, cx| {
-                                    div()
-                                        .font_weight(FontWeight::MEDIUM)
-                                        .text_color(cx.theme().muted_foreground)
-                                        .child("操作")
-                                })
-                                .child(self.render_operation_line(cx)),
-                        )
-                        .child(
-                            Field::new()
-                                .min_w_0()
-                                .items_start()
-                                .label_fn(|_, cx| {
-                                    div()
-                                        .font_weight(FontWeight::MEDIUM)
-                                        .text_color(cx.theme().muted_foreground)
-                                        .child("快捷键")
-                                })
-                                .child(self.render_binding_content(cx)),
-                        ),
-                ),
-            )
+        v_flex()
+            .px_4()
+            .gap_2()
+            .child(self.render_operation_line(cx))
+            .child(self.render_binding_content(cx))
+            .child(self.render_add_shortcut_btn(cx))
     }
 }
