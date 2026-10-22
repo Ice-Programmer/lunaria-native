@@ -4,26 +4,18 @@ use gpui_kit::base::{h_flex, v_flex};
 use gpui_kit::component::button::{Button, ButtonVariants};
 use gpui_kit::component::form::{Field, Form};
 use gpui_kit::component::scroll::ScrollableElement;
-use gpui_kit::component::{ActiveTheme, Disableable, Root, Sizable};
+use gpui_kit::component::{ActiveTheme, Disableable, Sizable};
 use gpui_kit::gpui::actions;
 use gpui_kit::*;
 use lunaria_app::windows::custom_window::{self, WindowConfig};
-use lunaria_core::settings::shortcuts::model::{ShortcutAction, ShortcutItem};
+use lunaria_core::settings::shortcuts::model::ShortcutItem;
 use lunaria_ui::i18n::keys;
 use lunaria_ui::i18n_text;
-use std::collections::HashMap;
 
 actions!(shortcut_editor, [CloseShortcutEditor]);
 
 const SHORTCUT_WINDOW_WIDTH: f32 = 300.;
 const SHORTCUT_WINDOW_HEIGHT: f32 = 280.;
-
-#[derive(Default)]
-struct ShortcutEditorWindows {
-    windows: HashMap<ShortcutAction, WindowHandle<Root>>,
-}
-
-impl Global for ShortcutEditorWindows {}
 
 pub struct EditShortcutWindow {
     shortcut: ShortcutItem,
@@ -34,7 +26,7 @@ impl EditShortcutWindow {
         Self { shortcut }
     }
 
-    pub fn open(shortcut: ShortcutItem, window: &mut Window, cx: &mut App) {
+    pub fn open(shortcut: ShortcutItem, cx: &mut App) {
         custom_window::open(
             shortcut.definition.action,
             WindowConfig {
@@ -42,7 +34,6 @@ impl EditShortcutWindow {
                 size: size(px(SHORTCUT_WINDOW_WIDTH), px(SHORTCUT_WINDOW_HEIGHT)),
                 min_size: size(px(SHORTCUT_WINDOW_WIDTH), px(SHORTCUT_WINDOW_HEIGHT)),
             },
-            window,
             cx,
             move |_, _| Self::new(shortcut),
         )

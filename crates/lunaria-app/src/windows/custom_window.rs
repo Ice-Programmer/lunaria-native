@@ -3,7 +3,11 @@ use gpui_kit::base::v_flex;
 use gpui_kit::component::notification::Notification;
 use gpui_kit::component::{ActiveTheme, Root, TitleBar, WindowExt};
 use gpui_kit::prelude::FluentBuilder as _;
-use gpui_kit::{div, px, AnyView, App, AppContext, Bounds, Context, FontWeight, Global, IntoElement, ParentElement, Pixels, Render, SharedString, Size, Styled, TitlebarOptions, Window, WindowBounds, WindowHandle, WindowOptions};
+use gpui_kit::{
+    AnyView, App, AppContext, Bounds, Context, FontWeight, Global, IntoElement, ParentElement,
+    Pixels, Render, SharedString, Size, Styled, TitlebarOptions, Window, WindowBounds,
+    WindowHandle, WindowOptions, div, px,
+};
 use std::any::TypeId;
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -36,6 +40,13 @@ struct WindowFrame {
 
 impl Render for WindowFrame {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        if cfg!(target_os = "macos") && self.title.is_none() {
+            return div()
+                .size_full()
+                .bg(cx.theme().background)
+                .child(self.content.clone());
+        }
+
         let title = self
             .title
             .clone()
@@ -61,7 +72,7 @@ impl Render for WindowFrame {
                                 div()
                                     .font_weight(FontWeight::SEMIBOLD)
                                     .text_color(cx.theme().muted_foreground)
-                                    .children(title)
+                                    .children(title),
                             ),
                     ),
             )
@@ -79,15 +90,13 @@ impl Render for WindowFrame {
 pub fn open<K, V>(
     key: K,
     config: WindowConfig,
-    window: &mut Window,
     cx: &mut App,
     build: impl FnOnce(&mut Window, &mut Context<V>) -> V + 'static,
 ) where
     K: Eq + Hash + 'static,
     V: Render + 'static,
 {
-    let source_window = window.window_handle();
-    let display_id = window.display(cx).map(|display| display.id());
+    let source_window = cx.active_window();
 
     cx.defer(move |cx| {
         let key = (TypeId::of::<V>(), key);
@@ -107,6 +116,15 @@ pub fn open<K, V>(
             return;
         }
 
+        let display_id = source_window.and_then(|handle| {
+            handle
+                .update(cx, |_, window, cx| {
+                    window.display(cx).map(|display| display.id())
+                })
+                .ok()
+                .flatten()
+        });
+
         let options = WindowOptions {
             window_bounds: Some(WindowBounds::Windowed(Bounds::centered(
                 display_id,
@@ -119,6 +137,7 @@ pub fn open<K, V>(
                 ..TitleBar::title_bar_options()
             }),
             display_id,
+            app_owns_titlebar_drag: config.title.is_some(),
             ..TitleBar::window_options()
         };
 
@@ -140,12 +159,14 @@ pub fn open<K, V>(
             Err(error) => {
                 eprintln!("Failed to open window: {error}");
 
-                let _ = source_window.update(cx, |_, window, cx| {
-                    window.push_notification(
-                        Notification::error(format!("无法打开窗口：{error}")),
-                        cx,
-                    );
-                });
+                if let Some(source_window) = source_window {
+                    let _ = source_window.update(cx, |_, window, cx| {
+                        window.push_notification(
+                            Notification::error(format!("无法打开窗口：{error}")),
+                            cx,
+                        );
+                    });
+                }
             }
         }
     })

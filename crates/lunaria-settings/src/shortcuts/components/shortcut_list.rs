@@ -90,10 +90,10 @@ impl ListDelegate for ShortcutListDelegate {
                             .text_color(cx.theme().muted_foreground)
                             .ghost()
                             .icon(IconName::Pencil)
-                            .on_click(move |_, window, cx| {
+                            .on_click(move |_, _, cx| {
                                 cx.stop_propagation();
 
-                                EditShortcutWindow::open(item.clone(), window, cx);
+                                EditShortcutWindow::open(item.clone(), cx);
                             }),
                         ),
                 ),
