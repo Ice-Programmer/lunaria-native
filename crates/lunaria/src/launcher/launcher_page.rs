@@ -1,8 +1,9 @@
-use gpui_kit::base::h_flex;
-use gpui_kit::*;
-
 use super::components::LaunchSidebar;
 use super::router::{LauncherRoute, LauncherRouter};
+use gpui_kit::base::h_flex;
+use gpui_kit::*;
+use lunaria_app::windows::custom_window;
+use lunaria_app::windows::custom_window::WindowConfig;
 
 const LAUNCHER_WIDTH: f32 = 740.0;
 const LAUNCHER_HEIGHT: f32 = 540.0;
@@ -45,19 +46,18 @@ impl LaunchPage {
         }
     }
 
-    pub fn window_options(cx: &App) -> WindowOptions {
-        WindowOptions {
-            window_bounds: Some(WindowBounds::centered(
-                size(px(LAUNCHER_WIDTH), px(LAUNCHER_HEIGHT)),
-                cx,
-            )),
-            window_min_size: Some(size(px(LAUNCHER_MIN_WIDTH), px(LAUNCHER_MIN_HEIGHT))),
-            titlebar: Some(TitlebarOptions {
+    pub fn open(cx: &mut App) {
+        custom_window::open(
+            (),
+            WindowConfig {
                 title: Some("Welcome to Lunaria".into()),
+                size: size(px(LAUNCHER_WIDTH), px(LAUNCHER_HEIGHT)),
+                min_size: Some(size(px(LAUNCHER_MIN_WIDTH), px(LAUNCHER_MIN_HEIGHT))),
                 ..Default::default()
-            }),
-            ..Default::default()
-        }
+            },
+            cx,
+            Self::new,
+        )
     }
 }
 

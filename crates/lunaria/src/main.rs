@@ -10,7 +10,6 @@ use gpui_kit::assets::AllAssets;
 use gpui_kit::*;
 use lunaria_app::app_services::AppServices;
 use lunaria_app::setting::shortcuts::bindings::init_bindings;
-use lunaria_app::windows::window_root::create_window_root;
 use lunaria_database::DatabaseManager;
 use lunaria_settings::settings_window;
 use lunaria_ui::ThemeManager;
@@ -66,18 +65,13 @@ async fn main() {
 
         init_app_router(cx);
 
-        let window_options = LaunchPage::window_options(cx);
-
         cx.spawn(async move |cx| {
-            cx.open_window(window_options, |window, cx| {
-                let view = cx.new(|view_cx| LaunchPage::new(window, view_cx));
+            cx.update(|cx| {
+                LaunchPage::open(cx);
 
-                create_window_root(view, window, cx)
-            })
-            .expect("Failed to open window");
-
-            #[cfg(debug_assertions)]
-            cx.update(dev::apply_dev_startup_router);
+                #[cfg(debug_assertions)]
+                cx.defer(dev::apply_dev_startup_router);
+            });
         })
         .detach();
     });

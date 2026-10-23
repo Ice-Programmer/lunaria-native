@@ -2,41 +2,17 @@ use crate::setting_page::SettingPage;
 use gpui_kit::*;
 use lunaria_app::windows::custom_window;
 use lunaria_app::windows::custom_window::WindowConfig;
-use lunaria_app::windows::window_root::create_window_root;
 
 const SETTING_WINDOW_HEIGHT: f32 = 600.;
 const SETTING_WINDOW_WIDTH: f32 = 820.;
 
 pub fn open_settings(cx: &mut App) {
-    // cx.defer(|cx| {
-    //     let options = WindowOptions {
-    //         window_bounds: Some(WindowBounds::centered(
-    //             size(px(SETTING_WINDOW_WIDTH), px(SETTING_WINDOW_HEIGHT)),
-    //             cx,
-    //         )),
-    //         window_min_size: Some(size(px(SETTING_WINDOW_WIDTH), px(SETTING_WINDOW_HEIGHT))),
-    //         titlebar: Some(TitlebarOptions {
-    //             title: Some("Settings".into()),
-    //             appears_transparent: true,
-    //             ..Default::default()
-    //         }),
-    //         ..Default::default()
-    //     };
-    //
-    //     if let Err(error) = cx.open_window(options, |window, cx| {
-    //         let view = cx.new(|cx| SettingPage::new(window, cx));
-    //         create_window_root(view, window, cx)
-    //     }) {
-    //         eprintln!("Failed to open settings: {error}");
-    //     }
-    // });
-
     custom_window::open(
         (),
         WindowConfig {
             title: None,
             size: size(px(SETTING_WINDOW_WIDTH), px(SETTING_WINDOW_HEIGHT)),
-            min_size: size(px(SETTING_WINDOW_WIDTH), px(SETTING_WINDOW_HEIGHT)),
+            ..Default::default()
         },
         cx,
         SettingPage::new,

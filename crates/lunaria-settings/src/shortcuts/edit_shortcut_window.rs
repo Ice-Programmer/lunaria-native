@@ -2,9 +2,7 @@ use crate::shortcuts::components::shortcut_keycaps::ShortcutKeycaps;
 use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
 use gpui_kit::base::{h_flex, v_flex};
 use gpui_kit::component::button::{Button, ButtonVariants};
-use gpui_kit::component::{
-    ActiveTheme, ElementExt, IconName, Sizable, TITLE_BAR_HEIGHT,
-};
+use gpui_kit::component::{ActiveTheme, ElementExt, IconName, Sizable, TITLE_BAR_HEIGHT};
 use gpui_kit::gpui::actions;
 use gpui_kit::*;
 use lunaria_app::windows::custom_window::{self, WindowConfig};
@@ -33,7 +31,7 @@ impl EditShortcutWindow {
             WindowConfig {
                 title: Some(format!("{}", shortcut.definition.title_i18n()).into()),
                 size: size(px(SHORTCUT_WINDOW_WIDTH), px(SHORTCUT_WINDOW_MIN_HEIGHT)),
-                min_size: size(px(SHORTCUT_WINDOW_WIDTH), px(SHORTCUT_WINDOW_MIN_HEIGHT)),
+                ..Default::default()
             },
             cx,
             move |_, _| Self::new(shortcut),

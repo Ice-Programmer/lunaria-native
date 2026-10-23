@@ -12,10 +12,12 @@ use std::any::TypeId;
 use std::collections::HashMap;
 use std::hash::Hash;
 
+#[derive(Default)]
 pub struct WindowConfig {
     pub title: Option<SharedString>,
     pub size: Size<Pixels>,
-    pub min_size: Size<Pixels>,
+    pub min_size: Option<Size<Pixels>>,
+    pub block_other_windows: bool,
 }
 
 // 全局管理页面
@@ -131,7 +133,7 @@ pub fn open<K, V>(
                 config.size,
                 cx,
             ))),
-            window_min_size: Some(config.min_size),
+            window_min_size: Some(config.min_size.unwrap_or(config.size)),
             titlebar: Some(TitlebarOptions {
                 title: config.title.clone(),
                 ..TitleBar::title_bar_options()
