@@ -1,5 +1,5 @@
-use crate::shortcuts::components::edit_shortcut_window::EditShortcutWindow;
 use crate::shortcuts::components::shortcut_keycaps::ShortcutKeycaps;
+use crate::shortcuts::edit_shortcut_window::EditShortcutWindow;
 use crate::shortcuts::i18n::category_i18n::ShortcutCategoryI18nExt;
 use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
 use crate::shortcuts::view_model::shortcut_view_model::ShortcutViewModel;
