@@ -12,12 +12,24 @@ use std::any::TypeId;
 use std::collections::HashMap;
 use std::hash::Hash;
 
-#[derive(Default)]
 pub struct WindowConfig {
     pub title: Option<SharedString>,
     pub size: Size<Pixels>,
     pub min_size: Option<Size<Pixels>>,
-    pub block_other_windows: bool,
+    pub need_minimizable: bool,
+    pub need_fullscreen: bool,
+}
+
+impl Default for WindowConfig {
+    fn default() -> Self {
+        Self {
+            title: None,
+            size: Size::default(),
+            min_size: None,
+            need_minimizable: true,
+            need_fullscreen: true,
+        }
+    }
 }
 
 // 全局管理页面
@@ -140,6 +152,8 @@ pub fn open<K, V>(
             }),
             display_id,
             app_owns_titlebar_drag: config.title.is_some(),
+            is_minimizable: config.need_minimizable,
+            is_resizable: config.need_fullscreen,
             ..TitleBar::window_options()
         };
 

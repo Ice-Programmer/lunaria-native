@@ -18,11 +18,15 @@ const SHORTCUT_FOOTER_HEIGHT: f32 = 56.;
 
 pub struct EditShortcutWindow {
     shortcut: ShortcutItem,
+    last_auto_height: Option<Pixels>,
 }
 
 impl EditShortcutWindow {
     fn new(shortcut: ShortcutItem) -> Self {
-        Self { shortcut }
+        Self {
+            shortcut,
+            last_auto_height: None,
+        }
     }
 
     pub fn open(shortcut: ShortcutItem, cx: &mut App) {
@@ -31,6 +35,7 @@ impl EditShortcutWindow {
             WindowConfig {
                 title: Some(format!("{}", shortcut.definition.title_i18n()).into()),
                 size: size(px(SHORTCUT_WINDOW_WIDTH), px(SHORTCUT_WINDOW_MIN_HEIGHT)),
+                need_fullscreen: false,
                 ..Default::default()
             },
             cx,
@@ -96,7 +101,12 @@ impl EditShortcutWindow {
             .child("添加快捷键")
     }
 
-    fn resize_to_fit_content(bounds: Bounds<Pixels>, window: &mut Window, cx: &mut App) {
+    fn resize_to_fit_content(
+        &mut self,
+        bounds: Bounds<Pixels>,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
         // 内容高度 + 自定义标题栏高度 + footer
         let height = (bounds.size.height + TITLE_BAR_HEIGHT + px(SHORTCUT_FOOTER_HEIGHT))
             .ceil()
@@ -104,6 +114,13 @@ impl EditShortcutWindow {
                 px(SHORTCUT_WINDOW_MIN_HEIGHT),
                 px(SHORTCUT_WINDOW_MAX_HEIGHT),
             );
+
+        // 内容高度不变，不发生改变
+        if self.last_auto_height == Some(height) {
+            return;
+        }
+
+        self.last_auto_height = Some(height);
 
         window.defer(cx, move |window, _| {
             if window.is_fullscreen() || window.is_maximized() {
@@ -113,6 +130,7 @@ impl EditShortcutWindow {
             let current = window.viewport_size();
 
             if (current.height - height).abs() >= px(1.) {
+                eprintln!("自动调整高度：{:?} -> {:?}", current.height, height);
                 window.resize(size(current.width, height))
             }
         })
@@ -150,10 +168,10 @@ impl Render for EditShortcutWindow {
                     .px_4()
                     .gap_2()
                     .flex_shrink_0()
+                    .on_prepaint(cx.processor(Self::resize_to_fit_content))
                     .child(self.render_operation_line(cx))
                     .child(self.render_binding_content(cx))
-                    .child(self.render_add_shortcut_btn(cx))
-                    .on_prepaint(Self::resize_to_fit_content),
+                    .child(self.render_add_shortcut_btn(cx)),
             )
             .child(Self::render_footer())
     }
