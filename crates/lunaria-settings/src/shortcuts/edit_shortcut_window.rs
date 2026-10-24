@@ -1,4 +1,5 @@
 use crate::shortcuts::components::shortcut_keycaps::ShortcutKeycaps;
+use crate::shortcuts::components::shortcut_recorder::ShortcutRecorder;
 use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
 use gpui_kit::base::{h_flex, v_flex};
 use gpui_kit::component::button::{Button, ButtonVariants};
@@ -17,14 +18,24 @@ const SHORTCUT_WINDOW_MAX_HEIGHT: f32 = 600.;
 const SHORTCUT_FOOTER_HEIGHT: f32 = 56.;
 
 pub struct EditShortcutWindow {
-    shortcut: ShortcutItem,
+    recorders: Vec<Entity<ShortcutRecorder>>,
     last_auto_height: Option<Pixels>,
 }
 
 impl EditShortcutWindow {
-    fn new(shortcut: ShortcutItem) -> Self {
+    fn new(shortcut: ShortcutItem, window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let mut recorders = Vec::new();
+
+        for value in shortcut.custom.unwrap_or_default() {
+            recorders.push(cx.new(|cx| ShortcutRecorder::new(Some(value), window, cx)));
+        }
+
+        if recorders.is_empty() {
+            recorders.push(cx.new(|cx| ShortcutRecorder::new(None, window, cx)));
+        }
+
         Self {
-            shortcut,
+            recorders,
             last_auto_height: None,
         }
     }
@@ -39,7 +50,7 @@ impl EditShortcutWindow {
                 ..Default::default()
             },
             cx,
-            move |_, _| Self::new(shortcut),
+            move |window, cx| Self::new(shortcut, window, cx),
         )
     }
 
@@ -65,30 +76,11 @@ impl EditShortcutWindow {
     }
 
     fn render_binding_content(&self, cx: &App) -> Div {
-        let shortcuts = self.shortcut.custom.as_deref().unwrap_or(&[]);
-        let frame = || {
-            h_flex()
-                .w_full()
-                .min_w_0()
-                .items_center()
-                .px_3()
-                .py_2()
-                .border_1()
-                .border_color(cx.theme().input)
-                .rounded_lg()
-                .bg(cx.theme().background)
-        };
-
-        let mut content = v_flex().w_full().min_w_0().gap_2();
-        if shortcuts.is_empty() {
-            return content.child(frame().child(ShortcutKeycaps::new(None)));
-        }
-
-        for shortcut in shortcuts {
-            content =
-                content.child(frame().child(ShortcutKeycaps::single(shortcut.clone()).flex_wrap()));
-        }
-        content
+        v_flex()
+            .w_full()
+            .min_w_0()
+            .gap_2()
+            .children(self.recorders.iter().cloned())
     }
 
     fn render_add_shortcut_btn(&self, cx: &App) -> Button {
@@ -115,7 +107,6 @@ impl EditShortcutWindow {
                 px(SHORTCUT_WINDOW_MAX_HEIGHT),
             );
 
-        // 内容高度不变，不发生改变
         if self.last_auto_height == Some(height) {
             return;
         }

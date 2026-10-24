@@ -7,18 +7,11 @@ use gpui_kit::{
 };
 use lunaria_core::settings::shortcuts::model::{Shortcut, ShortcutModifiers};
 
-#[derive(Clone, Debug)]
-pub enum ShortcutRecorderEvent {
-    Change(Shortcut),
-}
-
 pub struct ShortcutRecorder {
     current_shortcut: Option<Shortcut>,
     focus_handle: FocusHandle,
     _subscriptions: Vec<Subscription>,
 }
-
-impl EventEmitter<ShortcutRecorderEvent> for ShortcutRecorder {}
 
 impl ShortcutRecorder {
     pub fn new(
@@ -49,6 +42,10 @@ impl ShortcutRecorder {
             focus_handle,
             _subscriptions: vec![key_subscription, activation_subscription],
         }
+    }
+
+    pub fn value(&self) -> Option<&Shortcut> {
+        self.current_shortcut.as_ref()
     }
 
     /// 点击录入框外，结束录入
@@ -104,7 +101,6 @@ impl ShortcutRecorder {
         }
 
         self.current_shortcut = Some(shortcut.clone());
-        cx.emit(ShortcutRecorderEvent::Change(shortcut));
         cx.notify();
     }
 
