@@ -83,14 +83,25 @@ impl EditShortcutWindow {
             .children(self.recorders.iter().cloned())
     }
 
-    fn render_add_shortcut_btn(&self, cx: &App) -> Button {
-        Button::new("add-shortcut")
-            .icon(IconName::Plus)
-            .ghost()
-            .small()
-            .self_start()
-            .text_color(cx.theme().muted_foreground)
-            .child("添加快捷键")
+    fn render_add_shortcut_btn(&mut self, cx: &mut Context<Self>) -> Option<Button> {
+        if self.recorders.len() >= 3 {
+            return None;
+        }
+
+        Some(
+            Button::new("add-shortcut")
+                .icon(IconName::Plus)
+                .ghost()
+                .small()
+                .self_start()
+                .text_color(cx.theme().muted_foreground)
+                .child("添加快捷键")
+                .on_click(cx.listener(|this, _, window, cx| {
+                    this.recorders
+                        .push(cx.new(|cx| ShortcutRecorder::new(None, window, cx)));
+                    cx.notify();
+                })),
+        )
     }
 
     fn resize_to_fit_content(
@@ -162,7 +173,7 @@ impl Render for EditShortcutWindow {
                     .on_prepaint(cx.processor(Self::resize_to_fit_content))
                     .child(self.render_operation_line(cx))
                     .child(self.render_binding_content(cx))
-                    .child(self.render_add_shortcut_btn(cx)),
+                    .children(self.render_add_shortcut_btn(cx)),
             )
             .child(Self::render_footer())
     }

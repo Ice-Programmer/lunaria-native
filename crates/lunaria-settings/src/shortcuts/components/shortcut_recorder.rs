@@ -2,7 +2,7 @@ use crate::shortcuts::components::shortcut_keycaps::ShortcutKeycaps;
 use gpui_kit::base::h_flex;
 use gpui_kit::component::ActiveTheme;
 use gpui_kit::{
-    Context, EventEmitter, FocusHandle, InteractiveElement, IntoElement, KeystrokeEvent, Modifiers,
+    Context, FocusHandle, InteractiveElement, IntoElement, KeystrokeEvent, Modifiers,
     MouseDownEvent, ParentElement, Render, Styled, Subscription, Window, div,
 };
 use lunaria_core::settings::shortcuts::model::{Shortcut, ShortcutModifiers};
