@@ -1,12 +1,11 @@
 use crate::shortcuts::components::shortcut_list::{EDIT_WIDTH, ShortcutListDelegate};
-use crate::shortcuts::view_model::shortcut_view_model::{ShortcutEvent, ShortcutViewModel};
+use crate::shortcuts::view_model::shortcut_view_model::ShortcutViewModel;
 use gpui_kit::assets::IconName;
 use gpui_kit::base::{Disableable, Selectable, h_flex, v_flex};
 use gpui_kit::component::ActiveTheme;
 use gpui_kit::component::button::{Button, ButtonVariants};
 use gpui_kit::component::input::{InputEvent, InputState};
 use gpui_kit::component::list::{List, ListState};
-use gpui_kit::component::{WindowExt, notification::Notification};
 use gpui_kit::*;
 use lunaria_ui::components::custom_input::CustomInput;
 use lunaria_ui::extensions::input_18n::InputI18nExt;
@@ -17,44 +16,32 @@ pub struct ShortcutEditor {
     search_input: Entity<InputState>,
     shortcut_list: Entity<ListState<ShortcutListDelegate>>,
     view_model: Entity<ShortcutViewModel>,
-    _view_model_subscription: Subscription,
-    _search_subscription: Subscription,
+    _subscriptions: Vec<Subscription>,
 }
 
 impl ShortcutEditor {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let search_input = cx.new(|cx| {
-            InputState::new(window, cx)
-                .placeholder_i18n(
-                    keys::setting::shortcut::SEARCH_LABEL,
-                    "搜索快捷键",
-                    window,
-                    cx,
-                )
-                .default_value("")
+            InputState::new(window, cx).placeholder_i18n(
+                keys::setting::shortcut::SEARCH_LABEL,
+                "搜索快捷键",
+                window,
+                cx,
+            )
         });
 
         let view_model = cx.new(|_| ShortcutViewModel::new());
 
         let shortcut_list = cx.new(|cx| {
-            let delegate = ShortcutListDelegate {
-                view_model: view_model.clone(),
-                _subscription: ShortcutViewModel::subscribe(&view_model, window, cx),
-            };
-
-            ListState::new(delegate, window, cx)
-                .searchable(false)
-                .selectable(false)
+            ListState::new(
+                ShortcutListDelegate {
+                    view_model: view_model.clone(),
+                },
+                window,
+                cx,
+            )
+            .selectable(false)
         });
-
-        let view_model_subscription =
-            cx.subscribe_in(&view_model, window, |_, _, event, window, cx| {
-                cx.notify();
-
-                if let ShortcutEvent::Failed(error) = event {
-                    window.push_notification(Notification::error(error.clone()), cx);
-                }
-            });
 
         let search_subscription =
             cx.subscribe_in(&search_input, window, |this, input, event, window, cx| {
@@ -62,7 +49,7 @@ impl ShortcutEditor {
                     return;
                 }
 
-                let query = input.read(cx).value().to_string();
+                let query = input.read(cx).value();
                 this.shortcut_list.update(cx, |list, cx| {
                     list.set_query(&query, window, cx);
                 });
@@ -75,9 +62,11 @@ impl ShortcutEditor {
         Self {
             search_input,
             shortcut_list,
+            _subscriptions: vec![
+                search_subscription,
+                ShortcutViewModel::subscribe(&view_model, window, cx),
+            ],
             view_model,
-            _view_model_subscription: view_model_subscription,
-            _search_subscription: search_subscription,
         }
     }
 

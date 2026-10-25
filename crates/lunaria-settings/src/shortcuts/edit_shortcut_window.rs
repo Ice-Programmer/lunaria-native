@@ -1,4 +1,3 @@
-use crate::shortcuts::components::shortcut_keycaps::ShortcutKeycaps;
 use crate::shortcuts::components::shortcut_recorder::ShortcutRecorder;
 use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
 use gpui_kit::base::{h_flex, v_flex};
@@ -75,12 +74,30 @@ impl EditShortcutWindow {
             )
     }
 
-    fn render_binding_content(&self, cx: &App) -> Div {
+    fn render_binding_content(&self, cx: &Context<Self>) -> Div {
         v_flex()
             .w_full()
             .min_w_0()
             .gap_2()
-            .children(self.recorders.iter().cloned())
+            .children(self.recorders.iter().map(|recorder| {
+                let recorder_id = recorder.entity_id();
+                div().w_full().child(recorder.clone()).child(
+                    h_flex().absolute().top_0().right_2().bottom_0().child(
+                        Button::new(("remove-shortcut", recorder_id))
+                            .ghost()
+                            .xsmall()
+                            .icon(IconName::Close)
+                            .text_color(cx.theme().muted_foreground)
+                            .cursor_pointer()
+                            .on_click(cx.listener(move |this, _, _, cx| {
+                                this.recorders
+                                    .retain(|item| item.entity_id() != recorder_id);
+
+                                cx.notify();
+                            })),
+                    ),
+                )
+            }))
     }
 
     fn render_add_shortcut_btn(&mut self, cx: &mut Context<Self>) -> Option<Button> {
@@ -132,7 +149,6 @@ impl EditShortcutWindow {
             let current = window.viewport_size();
 
             if (current.height - height).abs() >= px(1.) {
-                eprintln!("自动调整高度：{:?} -> {:?}", current.height, height);
                 window.resize(size(current.width, height))
             }
         })

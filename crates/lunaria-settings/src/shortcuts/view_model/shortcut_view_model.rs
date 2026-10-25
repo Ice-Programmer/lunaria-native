@@ -1,16 +1,21 @@
 use crate::shortcuts::i18n::category_i18n::ShortcutCategoryI18nExt;
 use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
+use gpui_kit::component::WindowExt;
 use gpui_kit::component::kbd::Kbd;
+use gpui_kit::component::notification::Notification;
 use gpui_kit::{Context, Entity, EventEmitter, Subscription, Window};
 use lunaria_app::app_services::AppServices;
-use lunaria_app::setting::shortcuts::to_keystroke;
-use lunaria_core::settings::shortcuts::model::{ShortcutCategory, ShortcutItem};
+use lunaria_app::setting::shortcuts::{bindings, to_keystroke};
+use lunaria_core::settings::shortcuts::model::{
+    Shortcut, ShortcutAction, ShortcutCategory, ShortcutItem,
+};
 
 pub enum ShortcutEvent {
-    Started,
-    Loaded,
-    FilterChanged,
+    Changed,
+
     Failed(String),
+
+    Saved(Vec<ShortcutItem>),
 }
 
 #[derive(Default)]
@@ -19,6 +24,7 @@ pub struct ShortcutViewModel {
     query: String,
     modified_only: bool,
     loading: bool,
+    saving: bool,
 }
 
 impl EventEmitter<ShortcutEvent> for ShortcutViewModel {}
@@ -33,7 +39,21 @@ impl ShortcutViewModel {
         window: &mut Window,
         cx: &mut Context<T>,
     ) -> Subscription {
-        cx.subscribe_in(view_model, window, |_, _, _, _, cx| cx.notify())
+        cx.subscribe_in(view_model, window, |_, vm, event, window, cx| {
+            cx.notify();
+
+            let notification = match event {
+                ShortcutEvent::Changed => return,
+                ShortcutEvent::Failed(error) => Notification::error(error.clone()),
+                ShortcutEvent::Saved(items) => {
+                    bindings::apply(items, cx);
+
+                    vm.update(cx, |vm, _| vm.items = items.clone());
+                    Notification::success("快捷键已保存")
+                }
+            };
+            window.push_notification(notification, cx);
+        })
     }
 
     pub fn is_loading(&self) -> bool {
@@ -68,7 +88,7 @@ impl ShortcutViewModel {
         }
 
         self.query = query;
-        cx.emit(ShortcutEvent::FilterChanged);
+        cx.emit(ShortcutEvent::Changed);
     }
 
     pub fn set_modified_only(&mut self, modified_only: bool, cx: &mut Context<Self>) {
@@ -77,7 +97,7 @@ impl ShortcutViewModel {
         }
 
         self.modified_only = modified_only;
-        cx.emit(ShortcutEvent::FilterChanged);
+        cx.emit(ShortcutEvent::Changed);
     }
 
     pub fn load_shortcut_list(&mut self, cx: &mut Context<Self>) {
@@ -86,7 +106,6 @@ impl ShortcutViewModel {
         }
 
         self.loading = true;
-        cx.emit(ShortcutEvent::Started);
 
         AppServices::run(
             cx,
@@ -94,17 +113,48 @@ impl ShortcutViewModel {
             |this, result, cx| {
                 this.loading = false;
 
-                let event = match result {
+                match result {
                     Ok(items) => {
                         this.items = items;
-                        ShortcutEvent::Loaded
+                        cx.emit(ShortcutEvent::Changed);
                     }
-                    Err(error) => ShortcutEvent::Failed(error),
+                    Err(error) => cx.emit(ShortcutEvent::Failed(error)),
                 };
-
-                cx.emit(event);
             },
         )
+    }
+
+    pub fn save_shortcut(
+        &mut self,
+        cx: &mut Context<Self>,
+        action: ShortcutAction,
+        shortcuts: Vec<Shortcut>,
+    ) {
+        if self.saving {
+            return;
+        }
+
+        self.saving = true;
+
+        AppServices::run(
+            cx,
+            |services| async move {
+                services.shortcut_service.set(action, shortcuts).await?;
+                services.shortcut_service.list().await
+            },
+            |this, result, cx| {
+                this.saving = false;
+
+                match result {
+                    Ok(items) => {
+                        cx.emit(ShortcutEvent::Saved(items));
+                    }
+                    Err(error) => {
+                        cx.emit(ShortcutEvent::Failed(error));
+                    }
+                }
+            },
+        );
     }
 
     pub fn categories(&self) -> Vec<ShortcutCategory> {

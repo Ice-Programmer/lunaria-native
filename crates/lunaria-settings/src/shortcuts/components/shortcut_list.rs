@@ -16,7 +16,6 @@ pub const EDIT_WIDTH: f32 = 32.0;
 
 pub struct ShortcutListDelegate {
     pub view_model: Entity<ShortcutViewModel>,
-    pub _subscription: Subscription,
 }
 
 impl ListDelegate for ShortcutListDelegate {
