@@ -54,6 +54,7 @@ impl ListDelegate for ShortcutListDelegate {
         let category = view_model.categories().get(ix.section).copied()?;
         let item = view_model.filtered_items(category).nth(ix.row)?.clone();
         let action = item.definition.action;
+        let editor_view_model = self.view_model.clone();
 
         Some(
             ListItem::new(SharedString::from(format!("shortcut-{action:?}")))
@@ -92,7 +93,11 @@ impl ListDelegate for ShortcutListDelegate {
                             .on_click(move |_, _, cx| {
                                 cx.stop_propagation();
 
-                                EditShortcutWindow::open(item.clone(), cx);
+                                EditShortcutWindow::open(
+                                    item.clone(),
+                                    editor_view_model.clone(),
+                                    cx,
+                                );
                             }),
                         ),
                 ),

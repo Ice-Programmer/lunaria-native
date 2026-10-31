@@ -1,12 +1,13 @@
 use crate::shortcuts::components::shortcut_recorder::ShortcutRecorder;
 use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
+use crate::shortcuts::view_model::shortcut_view_model::ShortcutViewModel;
 use gpui_kit::base::{h_flex, v_flex};
 use gpui_kit::component::button::{Button, ButtonVariants};
 use gpui_kit::component::{ActiveTheme, ElementExt, IconName, Sizable, TITLE_BAR_HEIGHT};
 use gpui_kit::gpui::actions;
 use gpui_kit::*;
 use lunaria_app::windows::custom_window::{self, WindowConfig};
-use lunaria_core::settings::shortcuts::model::ShortcutItem;
+use lunaria_core::settings::shortcuts::model::{Shortcut, ShortcutAction, ShortcutItem};
 
 actions!(shortcut_editor, [CloseShortcutEditor]);
 
@@ -17,12 +18,19 @@ const SHORTCUT_WINDOW_MAX_HEIGHT: f32 = 600.;
 const SHORTCUT_FOOTER_HEIGHT: f32 = 56.;
 
 pub struct EditShortcutWindow {
+    action: ShortcutAction,
+    view_model: Entity<ShortcutViewModel>,
     recorders: Vec<Entity<ShortcutRecorder>>,
     last_auto_height: Option<Pixels>,
 }
 
 impl EditShortcutWindow {
-    fn new(shortcut: ShortcutItem, window: &mut Window, cx: &mut Context<Self>) -> Self {
+    fn new(
+        shortcut: ShortcutItem,
+        view_model: Entity<ShortcutViewModel>,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> Self {
         let mut recorders = Vec::new();
 
         for value in shortcut.custom.unwrap_or_default() {
@@ -34,12 +42,14 @@ impl EditShortcutWindow {
         }
 
         Self {
+            action: shortcut.definition.action,
+            view_model,
             recorders,
             last_auto_height: None,
         }
     }
 
-    pub fn open(shortcut: ShortcutItem, cx: &mut App) {
+    pub fn open(shortcut: ShortcutItem, view_model: Entity<ShortcutViewModel>, cx: &mut App) {
         custom_window::open(
             shortcut.definition.action,
             WindowConfig {
@@ -49,7 +59,7 @@ impl EditShortcutWindow {
                 ..Default::default()
             },
             cx,
-            move |window, cx| Self::new(shortcut, window, cx),
+            move |window, cx| Self::new(shortcut, view_model, window, cx),
         )
     }
 
@@ -154,7 +164,7 @@ impl EditShortcutWindow {
         })
     }
 
-    fn render_footer() -> Div {
+    fn render_footer(&self, cx: &Context<Self>) -> Div {
         h_flex()
             .w_full()
             .flex_shrink_0()
@@ -166,7 +176,24 @@ impl EditShortcutWindow {
                     .label("取消")
                     .on_click(|_, window, _| window.remove_window()),
             )
-            .child(Button::new("submit-shortcut").primary().label("保存"))
+            .child(
+                Button::new("submit-shortcut")
+                    .primary()
+                    .label("保存")
+                    .on_click(cx.listener(|this, _, window, cx| {
+                        let shortcuts: Vec<Shortcut> = this
+                            .recorders
+                            .iter()
+                            .filter_map(|recorder| recorder.read(cx).value().cloned())
+                            .collect();
+
+                        window.blur(cx);
+
+                        this.view_model.update(cx, |view_model, cx| {
+                            view_model.save_shortcut(cx, this.action, shortcuts, window);
+                        })
+                    })),
+            )
     }
 }
 
@@ -191,6 +218,6 @@ impl Render for EditShortcutWindow {
                     .child(self.render_binding_content(cx))
                     .children(self.render_add_shortcut_btn(cx)),
             )
-            .child(Self::render_footer())
+            .child(self.render_footer(cx))
     }
 }

@@ -15,7 +15,7 @@ pub enum ShortcutEvent {
 
     Failed(String),
 
-    Saved(Vec<ShortcutItem>),
+    Saved,
 }
 
 #[derive(Default)]
@@ -39,18 +39,13 @@ impl ShortcutViewModel {
         window: &mut Window,
         cx: &mut Context<T>,
     ) -> Subscription {
-        cx.subscribe_in(view_model, window, |_, vm, event, window, cx| {
+        cx.subscribe_in(view_model, window, |_, _, event, window, cx| {
             cx.notify();
 
             let notification = match event {
                 ShortcutEvent::Changed => return,
                 ShortcutEvent::Failed(error) => Notification::error(error.clone()),
-                ShortcutEvent::Saved(items) => {
-                    bindings::apply(items, cx);
-
-                    vm.update(cx, |vm, _| vm.items = items.clone());
-                    Notification::success("快捷键已保存")
-                }
+                ShortcutEvent::Saved => Notification::success("快捷键已保存"),
             };
             window.push_notification(notification, cx);
         })
@@ -129,12 +124,14 @@ impl ShortcutViewModel {
         cx: &mut Context<Self>,
         action: ShortcutAction,
         shortcuts: Vec<Shortcut>,
+        window: &mut Window,
     ) {
         if self.saving {
             return;
         }
 
         self.saving = true;
+        let window_handle = window.window_handle();
 
         AppServices::run(
             cx,
@@ -142,12 +139,20 @@ impl ShortcutViewModel {
                 services.shortcut_service.set(action, shortcuts).await?;
                 services.shortcut_service.list().await
             },
-            |this, result, cx| {
+            move |this, result, cx| {
                 this.saving = false;
 
                 match result {
                     Ok(items) => {
-                        cx.emit(ShortcutEvent::Saved(items));
+                        bindings::apply(&items, cx);
+
+                        this.items = items;
+
+                        cx.emit(ShortcutEvent::Saved);
+
+                        let _ = window_handle.update(cx, |_, window, _| {
+                            window.remove_window();
+                        });
                     }
                     Err(error) => {
                         cx.emit(ShortcutEvent::Failed(error));
