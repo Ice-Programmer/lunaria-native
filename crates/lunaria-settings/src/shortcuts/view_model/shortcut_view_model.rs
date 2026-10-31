@@ -12,10 +12,9 @@ use lunaria_core::settings::shortcuts::model::{
 
 pub enum ShortcutEvent {
     Changed,
-
     Failed(String),
-
     Saved,
+    ResetAll,
 }
 
 #[derive(Default)]
@@ -46,6 +45,7 @@ impl ShortcutViewModel {
                 ShortcutEvent::Changed => return,
                 ShortcutEvent::Failed(error) => Notification::error(error.clone()),
                 ShortcutEvent::Saved => Notification::success("快捷键已保存"),
+                ShortcutEvent::ResetAll => Notification::success("全部快捷键已恢复默认"),
             };
             window.push_notification(notification, cx);
         })
@@ -153,6 +153,37 @@ impl ShortcutViewModel {
                         let _ = window_handle.update(cx, |_, window, _| {
                             window.remove_window();
                         });
+                    }
+                    Err(error) => {
+                        cx.emit(ShortcutEvent::Failed(error));
+                    }
+                }
+            },
+        );
+    }
+
+    pub fn reset_all_shortcuts(&mut self, cx: &mut Context<Self>) {
+        if self.loading || self.saving {
+            return;
+        }
+
+        self.saving = true;
+        cx.emit(ShortcutEvent::Changed);
+
+        AppServices::run(
+            cx,
+            |services| async move {
+                services.shortcut_service.reset_all().await?;
+                services.shortcut_service.list().await
+            },
+            |this, result, cx| {
+                this.saving = false;
+
+                match result {
+                    Ok(items) => {
+                        bindings::apply(&items, cx);
+                        this.items = items;
+                        cx.emit(ShortcutEvent::ResetAll);
                     }
                     Err(error) => {
                         cx.emit(ShortcutEvent::Failed(error));

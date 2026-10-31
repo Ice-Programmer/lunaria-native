@@ -27,6 +27,13 @@ impl ShortcutService {
         })
     }
 
+    pub async fn reset_all(&self) -> Result<(), SettingError> {
+        self.update(|overrides| {
+            overrides.clear();
+        })
+        .await
+    }
+
     pub async fn list(&self) -> Result<Vec<ShortcutItem>, SettingError> {
         let overrides = self.overrides.read().await;
 

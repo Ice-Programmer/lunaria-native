@@ -131,7 +131,11 @@ impl ShortcutEditor {
                     .ghost()
                     .label(i18n_text!(keys::setting::RESET_ALL, "恢复全部默认"))
                     .icon(IconName::Undo2)
-                    .disabled(true),
+                    .on_click(cx.listener(|this, _, _, cx| {
+                        this.view_model.update(cx, |view_model, cx| {
+                            view_model.reset_all_shortcuts(cx);
+                        });
+                    })),
             )
     }
 
