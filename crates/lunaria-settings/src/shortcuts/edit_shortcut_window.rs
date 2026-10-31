@@ -18,7 +18,7 @@ const SHORTCUT_WINDOW_MAX_HEIGHT: f32 = 600.;
 const SHORTCUT_FOOTER_HEIGHT: f32 = 56.;
 
 pub struct EditShortcutWindow {
-    action: ShortcutAction,
+    shortcut: ShortcutItem,
     view_model: Entity<ShortcutViewModel>,
     recorders: Vec<Entity<ShortcutRecorder>>,
     last_auto_height: Option<Pixels>,
@@ -33,8 +33,8 @@ impl EditShortcutWindow {
     ) -> Self {
         let mut recorders = Vec::new();
 
-        for value in shortcut.custom.unwrap_or_default() {
-            recorders.push(cx.new(|cx| ShortcutRecorder::new(Some(value), window, cx)));
+        for value in shortcut.custom.as_deref().unwrap_or_default() {
+            recorders.push(cx.new(|cx| ShortcutRecorder::new(Some(value.clone()), window, cx)));
         }
 
         if recorders.is_empty() {
@@ -42,11 +42,30 @@ impl EditShortcutWindow {
         }
 
         Self {
-            action: shortcut.definition.action,
+            shortcut,
             view_model,
             recorders,
             last_auto_height: None,
         }
+    }
+
+    fn resotre_defaults(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        window.blur(cx);
+
+        let mut recorders = self
+            .shortcut
+            .definition
+            .defaults
+            .iter()
+            .map(|record| cx.new(|cx| ShortcutRecorder::new(Some(record.clone()), window, cx)))
+            .collect::<Vec<_>>();
+
+        if recorders.is_empty() {
+            recorders.push(cx.new(|cx| ShortcutRecorder::new(None, window, cx)));
+        }
+
+        self.recorders = recorders;
+        cx.notify()
     }
 
     pub fn open(shortcut: ShortcutItem, view_model: Entity<ShortcutViewModel>, cx: &mut App) {
@@ -63,7 +82,7 @@ impl EditShortcutWindow {
         )
     }
 
-    fn render_operation_line(&self, cx: &App) -> Div {
+    fn render_operation_line(&self, cx: &Context<Self>) -> Div {
         h_flex()
             .w_full()
             .min_w_0()
@@ -80,7 +99,10 @@ impl EditShortcutWindow {
                     .ghost()
                     .small()
                     .text_color(cx.theme().muted_foreground)
-                    .label("恢复默认"),
+                    .label("恢复默认")
+                    .on_click(cx.listener(|this, _, window, cx| {
+                        this.resotre_defaults(window, cx);
+                    })),
             )
     }
 
@@ -190,7 +212,12 @@ impl EditShortcutWindow {
                         window.blur(cx);
 
                         this.view_model.update(cx, |view_model, cx| {
-                            view_model.save_shortcut(cx, this.action, shortcuts, window);
+                            view_model.save_shortcut(
+                                cx,
+                                this.shortcut.definition.action,
+                                shortcuts,
+                                window,
+                            );
                         })
                     })),
             )
