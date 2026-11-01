@@ -11,6 +11,8 @@ use lunaria_core::settings::shortcuts::model::{
     Shortcut, ShortcutAction, ShortcutCategory, ShortcutItem,
 };
 use lunaria_ui::components::custom_notification::Notification;
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 
 pub enum ShortcutEvent {
     Changed,
@@ -48,36 +50,52 @@ impl ShortcutViewModel {
 
             let notification = match event {
                 ShortcutEvent::Changed => return,
-                ShortcutEvent::Failed(error) => Notification::error(error.clone()),
-                ShortcutEvent::Saved => Notification::success("快捷键已保存"),
+                ShortcutEvent::Failed(error) => Notification::error(i18n_text!(
+                    keys::setting::shortcut::notifications::FAILED,
+                    "快捷键操作失败：%{error}",
+                    error = error
+                )),
+                ShortcutEvent::Saved => Notification::success(i18n_text!(
+                    keys::setting::shortcut::notifications::SAVED,
+                    "快捷键已保存"
+                )),
                 ShortcutEvent::ResetAll => {
                     let view_model = vm.clone();
 
-                    Notification::success("全部快捷键已恢复默认")
-                        .id::<ResetAllNotification>()
-                        .placement(Anchor::BottomRight)
-                        .action(move |_, _, cx| {
-                            let view_model = view_model.clone();
-                            Button::new("undo-reset-shortcuts")
-                                .ghost()
-                                .text_color(cx.theme().primary)
-                                .label("撤销")
-                                .on_click(move |_, _, cx| {
-                                    cx.stop_propagation();
+                    Notification::success(i18n_text!(
+                        keys::setting::shortcut::notifications::RESET_ALL,
+                        "全部快捷键已恢复默认"
+                    ))
+                    .id::<ResetAllNotification>()
+                    .placement(Anchor::BottomRight)
+                    .action(move |_, _, cx| {
+                        let view_model = view_model.clone();
+                        Button::new("undo-reset-shortcuts")
+                            .ghost()
+                            .text_color(cx.theme().primary)
+                            .label(i18n_text!(keys::common::UNDO, "撤销"))
+                            .on_click(move |_, _, cx| {
+                                cx.stop_propagation();
 
-                                    view_model.update(cx, |view_model, cx| {
-                                        view_model.undo_reset_all_shortcuts(cx);
-                                    })
+                                view_model.update(cx, |view_model, cx| {
+                                    view_model.undo_reset_all_shortcuts(cx);
                                 })
-                        })
+                            })
+                    })
                 }
                 ShortcutEvent::UndoFinished { restored } => {
                     window.remove_notification::<ResetAllNotification>(cx);
 
                     if *restored {
-                        Notification::success("已撤销恢复默认")
+                        Notification::success(i18n_text!(
+                            keys::setting::shortcut::notifications::UNDO_RESET,
+                            "已撤销恢复默认"
+                        ))
                     } else {
-                        Notification::warning("关键键已再次修改，无法撤销此次恢复")
+                        Notification::warning(i18n_text!(
+                            keys::setting::shortcut::notifications::UNDO_UNAVAILABLE,
+                            "快捷键已再次修改，无法撤销此次恢复"
+                        ))
                     }
                 }
             };

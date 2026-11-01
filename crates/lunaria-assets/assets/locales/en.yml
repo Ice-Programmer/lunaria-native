@@ -1,4 +1,6 @@
 common:
+  save: Save
+  undo: Undo
   or: or
   unset: Not set
   cancel: Cancel
@@ -44,6 +46,17 @@ setting:
     edit_dialog:
       title: Edit Shortcut
       add_shortcut: Add Shortcut
+      remove_shortcut: "Remove Shortcut"
+      restore_defaults: "Restore Defaults"
+      record_hint: "Click, then press keys"
+      record_idle: "Click to record"
+      record_active: "Press a key combination"
+    notifications:
+      saved: "Shortcut saved"
+      reset_all: "All shortcuts restored to defaults"
+      undo_reset: "Reset undone"
+      undo_unavailable: "Shortcuts have changed. This reset can no longer be undone."
+      failed: "Shortcut operation failed: %{error}"
 
   reset_all: Restore Defaults
   application: Application

@@ -8,6 +8,8 @@ use gpui_kit::gpui::actions;
 use gpui_kit::*;
 use lunaria_app::windows::custom_window::{self, WindowConfig};
 use lunaria_core::settings::shortcuts::model::{Shortcut, ShortcutAction, ShortcutItem};
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 
 actions!(shortcut_editor, [CloseShortcutEditor]);
 
@@ -90,16 +92,25 @@ impl EditShortcutWindow {
             .justify_between()
             .child(
                 div()
+                    .flex_1()
+                    .min_w_0()
                     .text_sm()
                     .text_color(cx.theme().muted_foreground)
-                    .child("点击后按下组合键"),
+                    .child(i18n_text!(
+                        keys::setting::shortcut::edit_dialog::RECORD_HINT,
+                        "点击后按下组合键"
+                    )),
             )
             .child(
                 Button::new("reset-shortcut")
                     .ghost()
                     .small()
+                    .flex_shrink_0()
                     .text_color(cx.theme().muted_foreground)
-                    .label("恢复默认")
+                    .label(i18n_text!(
+                        keys::setting::shortcut::edit_dialog::RESTORE_DEFAULTS,
+                        "恢复默认"
+                    ))
                     .on_click(cx.listener(|this, _, window, cx| {
                         this.resotre_defaults(window, cx);
                     })),
@@ -119,6 +130,10 @@ impl EditShortcutWindow {
                             .ghost()
                             .xsmall()
                             .icon(IconName::Close)
+                            .tooltip(i18n_text!(
+                                keys::setting::shortcut::edit_dialog::REMOVE_SHORTCUT,
+                                "删除快捷键"
+                            ))
                             .text_color(cx.theme().muted_foreground)
                             .cursor_pointer()
                             .on_click(cx.listener(move |this, _, _, cx| {
@@ -144,7 +159,10 @@ impl EditShortcutWindow {
                 .small()
                 .self_start()
                 .text_color(cx.theme().muted_foreground)
-                .child("添加快捷键")
+                .label(i18n_text!(
+                    keys::setting::shortcut::edit_dialog::ADD_SHORTCUT,
+                    "添加快捷键"
+                ))
                 .on_click(cx.listener(|this, _, window, cx| {
                     this.recorders
                         .push(cx.new(|cx| ShortcutRecorder::new(None, window, cx)));
@@ -195,13 +213,13 @@ impl EditShortcutWindow {
             .gap_3()
             .child(
                 Button::new("cancel-shortcut")
-                    .label("取消")
+                    .label(i18n_text!(keys::common::CANCEL, "取消"))
                     .on_click(|_, window, _| window.remove_window()),
             )
             .child(
                 Button::new("submit-shortcut")
                     .primary()
-                    .label("保存")
+                    .label(i18n_text!(keys::common::SAVE, "保存"))
                     .on_click(cx.listener(|this, _, window, cx| {
                         let shortcuts: Vec<Shortcut> = this
                             .recorders

@@ -10,6 +10,8 @@ use gpui_kit::component::list::{ListDelegate, ListItem, ListState};
 use gpui_kit::component::{ActiveTheme, IndexPath};
 use gpui_kit::*;
 use lunaria_ui::extensions::list_search::ListSearchExt;
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 
 const ROW_HEIGHT: f32 = 40.;
 pub const EDIT_WIDTH: f32 = 32.0;
@@ -90,6 +92,10 @@ impl ListDelegate for ShortcutListDelegate {
                             .text_color(cx.theme().muted_foreground)
                             .ghost()
                             .icon(IconName::Pencil)
+                            .tooltip(i18n_text!(
+                                keys::setting::shortcut::edit_dialog::TITLE,
+                                "编辑快捷键"
+                            ))
                             .on_click(move |_, _, cx| {
                                 cx.stop_propagation();
 

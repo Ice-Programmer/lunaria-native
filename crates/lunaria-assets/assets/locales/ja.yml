@@ -1,4 +1,6 @@
 common:
+  save: 保存
+  undo: 元に戻す
   or: か
   unset: 未設定
   cancel: キャンセル
@@ -43,7 +45,18 @@ setting:
       switch_language: 言語を切り替え
     edit_dialog:
       title: ショートカットを編集
-      add_shortcut: ショートカットを追加
+      add_shortcut: 追加
+      remove_shortcut: "削除"
+      restore_defaults: "初期値に戻す"
+      record_hint: "クリックして入力"
+      record_idle: "クリックで入力"
+      record_active: "キーを押す"
+    notifications:
+      saved: "ショートカットを保存"
+      reset_all: "全ショートカットをリセット"
+      undo_reset: "リセットを取り消しました"
+      undo_unavailable: "変更済みのため、元に戻せません"
+      failed: "操作に失敗：%{error}"
 
   reset_all: 初期設定に戻す
   application: アプリ

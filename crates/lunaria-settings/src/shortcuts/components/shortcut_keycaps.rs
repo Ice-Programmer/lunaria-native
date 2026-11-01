@@ -6,6 +6,8 @@ use gpui_kit::{
     div,
 };
 use lunaria_core::settings::shortcuts::model::Shortcut;
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 
 #[derive(IntoElement)]
 pub struct ShortcutKeycaps {
@@ -56,7 +58,7 @@ impl RenderOnce for ShortcutKeycaps {
         if self.shortcuts.is_empty() {
             return group
                 .text_color(cx.theme().muted_foreground)
-                .child("未设置");
+                .child(i18n_text!(keys::common::UNSET, "未设置"));
         }
 
         for (index, shortcut) in self.shortcuts.iter().enumerate() {
@@ -64,7 +66,7 @@ impl RenderOnce for ShortcutKeycaps {
                 group = group.child(
                     div()
                         .text_color(cx.theme().muted_foreground)
-                        .child("或"),
+                        .child(i18n_text!(keys::common::OR, "或")),
                 );
             }
 

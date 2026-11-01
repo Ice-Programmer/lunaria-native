@@ -85,7 +85,10 @@ impl ShortcutEditor {
             .child(
                 CustomInput::new(&self.search_input)
                     .id("search-shortcuts")
-                    .aria_label("search shortcut settings")
+                    .aria_label(i18n_text!(
+                        keys::setting::shortcut::SEARCH_LABEL,
+                        "搜索快捷键"
+                    ))
                     .prefix(IconName::Search)
                     .w(relative(0.3)),
             )

@@ -6,6 +6,8 @@ use gpui_kit::{
     MouseDownEvent, ParentElement, Render, Styled, Subscription, Window, div,
 };
 use lunaria_core::settings::shortcuts::model::{Shortcut, ShortcutModifiers};
+use lunaria_ui::i18n::keys;
+use lunaria_ui::i18n_text;
 
 pub struct ShortcutRecorder {
     current_shortcut: Option<Shortcut>,
@@ -115,7 +117,17 @@ impl ShortcutRecorder {
             None => div()
                 .text_sm()
                 .text_color(cx.theme().muted_foreground)
-                .child(focused.then_some("请按下组合键").unwrap_or("点击录入"))
+                .child(if focused {
+                    i18n_text!(
+                        keys::setting::shortcut::edit_dialog::RECORD_ACTIVE,
+                        "请按下组合键"
+                    )
+                } else {
+                    i18n_text!(
+                        keys::setting::shortcut::edit_dialog::RECORD_IDLE,
+                        "点击录入"
+                    )
+                })
                 .into_any_element(),
         }
     }
