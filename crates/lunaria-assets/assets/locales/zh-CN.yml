@@ -1,56 +1,58 @@
 common:
-  save: 保存
-  undo: 撤销
-  or: 或
-  unset: 未设置
-  cancel: 取消
-  review: 浏览
-  all: 全部
-  modified: 已修改
-  operation: 操作
+  save: "保存"
+  undo: "撤销"
+  or: "或"
+  unset: "未设置"
+  cancel: "取消"
+  review: "浏览"
+  all: "全部"
+  modified: "已修改"
+  operation: "操作"
 
 launcher:
-  subtitle: 视觉小说创作空间
+  subtitle: "视觉小说创作空间"
   main_button:
-    create_project: 创建项目
-    open_project: 打开项目
+    create_project: "创建项目"
+    open_project: "打开项目"
   footer_button:
-    guide: 使用指南
-    feedback: 问题反馈
+    guide: "使用指南"
+    feedback: "问题反馈"
   recent_content:
-    recent_project: 最近项目
-    search_project: 搜索项目
+    recent_project: "最近项目"
+    search_project: "搜索项目"
   project_action:
-    open_in_finder: finder 中打开
-    remove_project: 移除项目
+    open_in_finder: "finder 中打开"
+    remove_project: "移除项目"
   create_content:
-    create_project: 新建项目
-    project_name: 项目名称
-    project_directory: 项目位置
-    project_path: 完整路径
+    create_project: "新建项目"
+    project_name: "项目名称"
+    project_directory: "项目位置"
+    project_path: "完整路径"
 
 setting:
   shortcut:
-    label: 快捷键
-    search_label: 搜索快捷键
-    search_keycaps: 按键检索
-    application_description: 应用相关操作
-    launcher_description: 项目创建与打开
-    editor_description: 内容编辑相关操作
+    label: "快捷键"
+    search_label: "搜索快捷键"
+    search_keycaps: "按键检索"
+    application_description: "应用相关操作"
+    launcher_description: "项目创建与打开"
+    editor_description: "内容编辑相关操作"
     actions:
-      open_settings: 打开设置窗口
-      toggle_theme: 切换明暗主题
-      close_window: 关闭当前窗口
-      quit: 退出应用
-      switch_language: 切换界面语言
+      open_settings: "打开设置窗口"
+      toggle_theme: "切换明暗主题"
+      close_window: "关闭当前窗口"
+      quit: "退出应用"
+      switch_language: "切换界面语言"
     edit_dialog:
-      title: 编辑快捷键
-      add_shortcut: 添加快捷键
+      title: "编辑快捷键"
+      add_shortcut: "添加快捷键"
       remove_shortcut: "删除快捷键"
       restore_defaults: "恢复默认"
       record_hint: "点击后按下组合键"
       record_idle: "点击录入"
       record_active: "请按下组合键"
+      duplicate: "快捷键重复"
+      conflict: "已被 ${action} 使用"
     notifications:
       saved: "快捷键已保存"
       reset_all: "全部快捷键已恢复默认"
@@ -58,7 +60,7 @@ setting:
       undo_unavailable: "快捷键已再次修改，无法撤销此次恢复"
       failed: "快捷键操作失败：%{error}"
 
-  reset_all: 恢复全部默认
-  application: 应用
-  launcher: 欢迎页
-  editor: 编辑器
+  reset_all: "恢复全部默认"
+  application: "应用"
+  launcher: "欢迎页"
+  editor: "编辑器"

@@ -3,7 +3,7 @@ use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
 use gpui_kit::component::button::{Button, ButtonVariants};
 use gpui_kit::component::kbd::Kbd;
 use gpui_kit::component::{ActiveTheme, WindowExt};
-use gpui_kit::{Anchor, Context, Entity, EventEmitter, Styled, Subscription, Window};
+use gpui_kit::{Anchor, Context, Entity, EventEmitter, SharedString, Styled, Subscription, Window};
 use lunaria_app::app_services::AppServices;
 use lunaria_app::setting::shortcuts::{bindings, to_keystroke};
 use lunaria_core::settings::error::SettingError;
@@ -103,6 +103,47 @@ impl ShortcutViewModel {
         })
     }
 
+    pub fn validate_shortcuts(
+        &self,
+        action: ShortcutAction,
+        shortcuts: &[Option<Shortcut>],
+    ) -> Vec<Option<SharedString>> {
+        shortcuts
+            .iter()
+            .enumerate()
+            .map(|(index, shortcut)| {
+                let shortcut = shortcut.as_ref()?;
+
+                // 快捷键内部重复
+                if shortcuts[..index]
+                    .iter()
+                    .flatten()
+                    .any(|previous| previous == shortcut)
+                {
+                    return Some(i18n_text!(
+                        keys::setting::shortcut::edit_dialog::DUPLICATE,
+                        "快捷键重复"
+                    ));
+                }
+
+                // 判断与其他快捷键是否有重复
+                self.items
+                    .iter()
+                    .find(|item| {
+                        item.definition.action != action
+                            && item.custom.as_deref().unwrap_or(&[]).contains(shortcut)
+                    })
+                    .map(|item| {
+                        i18n_text!(
+                            keys::setting::shortcut::edit_dialog::CONFLICT,
+                            "已被 ${action} 使用",
+                            action = item.definition.title_i18n()
+                        )
+                    })
+            })
+            .collect()
+    }
+
     pub fn is_loading(&self) -> bool {
         self.loading
     }
@@ -128,9 +169,7 @@ impl ShortcutViewModel {
     }
 
     pub fn can_reset_all(&self) -> bool {
-        !self.loading
-            && !self.saving
-            && self.items.iter().any(|item| item.is_modified())
+        !self.loading && !self.saving && self.items.iter().any(|item| item.is_modified())
     }
 
     pub fn set_query(&mut self, query: &str, cx: &mut Context<Self>) {

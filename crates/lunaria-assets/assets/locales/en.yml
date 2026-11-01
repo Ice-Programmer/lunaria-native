@@ -1,64 +1,66 @@
 common:
-  save: Save
-  undo: Undo
-  or: or
-  unset: Not set
-  cancel: Cancel
-  review: Review
-  all: All
-  modified: Modified
-  operation: Operation
+  save: "Save"
+  undo: "Undo"
+  or: "or"
+  unset: "Not set"
+  cancel: "Cancel"
+  review: "Review"
+  all: "All"
+  modified: "Modified"
+  operation: "Operation"
 
 launcher:
-  subtitle: Visual Novel Studio
+  subtitle: "Visual Novel Studio"
   main_button:
-    create_project: Create project
-    open_project: Open project
+    create_project: "Create project"
+    open_project: "Open project"
   footer_button:
-    guide: User Guide
-    feedback: Report Issue
+    guide: "User Guide"
+    feedback: "Report Issue"
   recent_content:
-    recent_project: Recent Projects
-    search_project: Search projects
+    recent_project: "Recent Projects"
+    search_project: "Search projects"
   project_action:
-    open_in_finder: open in finder
-    remove_project: remove project
+    open_in_finder: "open in finder"
+    remove_project: "remove project"
   create_content:
-    create_project: New Project
-    project_name: Project Name
-    project_directory: Project Location
-    project_path: Full Path
+    create_project: "New Project"
+    project_name: "Project Name"
+    project_directory: "Project Location"
+    project_path: "Full Path"
 
 setting:
   shortcut:
-    label: Shortcuts
-    search_label: Search shortcuts
-    search_keycaps: Search by Key
-    application_description: Application actions
-    launcher_description: Create and open projects
-    editor_description: Content editing actions
+    label: "Shortcuts"
+    search_label: "Search shortcuts"
+    search_keycaps: "Search by Key"
+    application_description: "Application actions"
+    launcher_description: "Create and open projects"
+    editor_description: "Content editing actions"
     actions:
-      open_settings: Open Settings
-      toggle_theme: Toggle Theme
-      close_window: Close Window
-      quit: Quit App
-      switch_language: Switch Language
+      open_settings: "Open Settings"
+      toggle_theme: "Toggle Theme"
+      close_window: "Close Window"
+      quit: "Quit App"
+      switch_language: "Switch Language"
     edit_dialog:
-      title: Edit Shortcut
-      add_shortcut: Add Shortcut
+      title: "Edit Shortcut"
+      add_shortcut: "Add Shortcut"
       remove_shortcut: "Remove Shortcut"
       restore_defaults: "Restore Defaults"
       record_hint: "Click, then press keys"
       record_idle: "Click to record"
       record_active: "Press a key combination"
+      duplicate: "Duplicate shortcut"
+      conflict: "Used by %{action}"
     notifications:
       saved: "Shortcut saved"
       reset_all: "All shortcuts restored to defaults"
       undo_reset: "Reset undone"
-      undo_unavailable: "Shortcuts have changed. This reset can no longer be undone."
+      undo_unavailable: "Shortcuts have changed. This reset can no longer be undone"
       failed: "Shortcut operation failed: %{error}"
 
-  reset_all: Restore Defaults
-  application: Application
-  launcher: Welcome
-  editor: Editor
+  reset_all: "Restore Defaults"
+  application: "Application"
+  launcher: "Welcome"
+  editor: "Editor"
