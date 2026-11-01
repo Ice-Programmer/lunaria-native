@@ -7,9 +7,14 @@ use crate::settings::shortcuts::repository::ShortcutRepository;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
+pub struct ShortcutState {
+    overrides: ShortcutOverrides,
+    undo: Option<ShortcutOverrides>,
+}
+
 pub struct ShortcutService {
     definitions: Vec<ShortcutDefinition>,
-    overrides: RwLock<ShortcutOverrides>,
+    state: RwLock<ShortcutState>,
     repository: Arc<dyn ShortcutRepository>,
 }
 
@@ -22,20 +27,44 @@ impl ShortcutService {
 
         Arc::new(Self {
             definitions: catalog::default_shortcuts(),
-            overrides: RwLock::new(overrides),
+            state: RwLock::new(ShortcutState {
+                overrides,
+                undo: None,
+            }),
             repository,
         })
     }
 
     pub async fn reset_all(&self) -> Result<(), SettingError> {
-        self.update(|overrides| {
-            overrides.clear();
-        })
-        .await
+        let mut state = self.state.write().await;
+        let defaults = ShortcutOverrides::new();
+
+        self.repository.save(&defaults).await?;
+
+        let previous = std::mem::take(&mut state.overrides);
+        state.undo = Some(previous);
+
+        Ok(())
+    }
+
+    pub async fn undo_reset_all(&self) -> Result<bool, SettingError> {
+        let mut state = self.state.write().await;
+
+        let Some(previous) = state.undo.clone() else {
+            return Ok(false);
+        };
+
+        self.repository.save(&previous).await?;
+
+        state.overrides = previous;
+        state.undo = None;
+
+        Ok(true)
     }
 
     pub async fn list(&self) -> Result<Vec<ShortcutItem>, SettingError> {
-        let overrides = self.overrides.read().await;
+        let state = self.state.read().await;
+        let overrides = &state.overrides;
 
         let items = self
             .definitions
@@ -53,7 +82,8 @@ impl ShortcutService {
     }
 
     pub async fn get(&self, action: ShortcutAction) -> Option<Vec<Shortcut>> {
-        let overrides = self.overrides.read().await;
+        let state = self.state.read().await;
+        let overrides = &state.overrides;
 
         overrides.get(&action).cloned().unwrap_or_else(|| {
             self.definitions
@@ -142,13 +172,15 @@ impl ShortcutService {
         &self,
         change: impl FnOnce(&mut ShortcutOverrides),
     ) -> Result<(), SettingError> {
-        let mut current = self.overrides.write().await;
-        let mut next = current.clone();
+        let mut state = self.state.write().await;
+        let mut next = state.overrides.clone();
 
         change(&mut next);
         self.repository.save(&next).await?;
 
-        *current = next;
+        state.overrides = next;
+        state.undo = None;
+
         Ok(())
     }
 }

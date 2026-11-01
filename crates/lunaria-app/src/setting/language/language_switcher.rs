@@ -1,7 +1,6 @@
 use crate::app_services::AppServices;
 use crate::windows::window_root::get_language_switcher;
 use gpui_kit::base::v_flex;
-use gpui_kit::component::notification::Notification;
 use gpui_kit::component::{ActiveTheme, WindowExt};
 use gpui_kit::prelude::FluentBuilder;
 use gpui_kit::{
@@ -9,6 +8,7 @@ use gpui_kit::{
     px,
 };
 use lunaria_core::settings::language::model::Language;
+use lunaria_ui::components::custom_notification::Notification;
 use lunaria_ui::extensions::focus::FocusExt;
 use lunaria_ui::i18n::locale;
 use lunaria_ui::i18n::locale::LocaleState;

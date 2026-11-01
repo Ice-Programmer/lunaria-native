@@ -1,4 +1,5 @@
 use crate::components::custom_button::CustomButton;
+use crate::components::custom_notification::Notification;
 use crate::i18n::keys;
 use crate::i18n_text;
 use gpui::base::input::{InputEvent, InputState};
@@ -8,7 +9,6 @@ use gpui_kit as gpui;
 use gpui_kit::assets::IconName;
 use gpui_kit::component::WindowExt;
 use gpui_kit::component::input::Input;
-use gpui_kit::component::notification::Notification;
 use gpui_kit::{Div, InteractiveElement, ParentElement, StyleRefinement, div};
 use rfd::{AsyncFileDialog, FileHandle};
 use std::path::PathBuf;

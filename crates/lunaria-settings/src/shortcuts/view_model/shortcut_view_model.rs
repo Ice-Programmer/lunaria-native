@@ -1,21 +1,26 @@
 use crate::shortcuts::i18n::category_i18n::ShortcutCategoryI18nExt;
 use crate::shortcuts::i18n::definition_i18n::ShortcutDefinitionI18nExt;
-use gpui_kit::component::WindowExt;
+use gpui_kit::component::button::{Button, ButtonVariants};
 use gpui_kit::component::kbd::Kbd;
-use gpui_kit::component::notification::Notification;
-use gpui_kit::{Context, Entity, EventEmitter, Subscription, Window};
+use gpui_kit::component::{ActiveTheme, WindowExt};
+use gpui_kit::{Anchor, Context, Entity, EventEmitter, Styled, Subscription, Window};
 use lunaria_app::app_services::AppServices;
 use lunaria_app::setting::shortcuts::{bindings, to_keystroke};
+use lunaria_core::settings::error::SettingError;
 use lunaria_core::settings::shortcuts::model::{
     Shortcut, ShortcutAction, ShortcutCategory, ShortcutItem,
 };
+use lunaria_ui::components::custom_notification::Notification;
 
 pub enum ShortcutEvent {
     Changed,
     Failed(String),
     Saved,
     ResetAll,
+    UndoFinished { restored: bool },
 }
+
+struct ResetAllNotification;
 
 #[derive(Default)]
 pub struct ShortcutViewModel {
@@ -38,14 +43,43 @@ impl ShortcutViewModel {
         window: &mut Window,
         cx: &mut Context<T>,
     ) -> Subscription {
-        cx.subscribe_in(view_model, window, |_, _, event, window, cx| {
+        cx.subscribe_in(view_model, window, |_, vm, event, window, cx| {
             cx.notify();
 
             let notification = match event {
                 ShortcutEvent::Changed => return,
                 ShortcutEvent::Failed(error) => Notification::error(error.clone()),
                 ShortcutEvent::Saved => Notification::success("快捷键已保存"),
-                ShortcutEvent::ResetAll => Notification::success("全部快捷键已恢复默认"),
+                ShortcutEvent::ResetAll => {
+                    let view_model = vm.clone();
+
+                    Notification::success("全部快捷键已恢复默认")
+                        .id::<ResetAllNotification>()
+                        .placement(Anchor::BottomRight)
+                        .action(move |_, _, cx| {
+                            let view_model = view_model.clone();
+                            Button::new("undo-reset-shortcuts")
+                                .ghost()
+                                .text_color(cx.theme().primary)
+                                .label("撤销")
+                                .on_click(move |_, _, cx| {
+                                    cx.stop_propagation();
+
+                                    view_model.update(cx, |view_model, cx| {
+                                        view_model.undo_reset_all_shortcuts(cx);
+                                    })
+                                })
+                        })
+                }
+                ShortcutEvent::UndoFinished { restored } => {
+                    window.remove_notification::<ResetAllNotification>(cx);
+
+                    if *restored {
+                        Notification::success("已撤销恢复默认")
+                    } else {
+                        Notification::warning("关键键已再次修改，无法撤销此次恢复")
+                    }
+                }
             };
             window.push_notification(notification, cx);
         })
@@ -73,6 +107,12 @@ impl ShortcutViewModel {
 
     pub fn modified_only(&self) -> bool {
         self.modified_only
+    }
+
+    pub fn can_reset_all(&self) -> bool {
+        !self.loading
+            && !self.saving
+            && self.items.iter().any(|item| item.is_modified())
     }
 
     pub fn set_query(&mut self, query: &str, cx: &mut Context<Self>) {
@@ -115,6 +155,40 @@ impl ShortcutViewModel {
                     }
                     Err(error) => cx.emit(ShortcutEvent::Failed(error)),
                 };
+            },
+        )
+    }
+
+    pub fn undo_reset_all_shortcuts(&mut self, cx: &mut Context<Self>) {
+        if self.loading || self.saving {
+            return;
+        }
+
+        self.saving = true;
+        cx.emit(ShortcutEvent::Changed);
+
+        let keep_alive = cx.entity();
+
+        AppServices::run(
+            cx,
+            |services| async move {
+                let restored = services.shortcut_service.undo_reset_all().await?;
+                let items = services.shortcut_service.list().await?;
+
+                Ok::<_, SettingError>((restored, items))
+            },
+            move |this, result, cx| {
+                let _keep_alive = keep_alive;
+                this.saving = false;
+
+                match result {
+                    Ok((restored, items)) => {
+                        bindings::apply(&items, cx);
+                        this.items = items;
+                        cx.emit(ShortcutEvent::UndoFinished { restored })
+                    }
+                    Err(error) => cx.emit(ShortcutEvent::Failed(error)),
+                }
             },
         )
     }

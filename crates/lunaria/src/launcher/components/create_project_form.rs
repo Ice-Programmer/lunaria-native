@@ -6,12 +6,13 @@ use gpui_kit::component::ActiveTheme;
 use gpui_kit::component::button::ButtonVariants;
 use gpui_kit::component::form::{Field, Form};
 use gpui_kit::component::input::Input;
-use gpui_kit::component::{WindowExt, notification::Notification};
+use gpui_kit::component::WindowExt;
 use gpui_kit::{
     App, AppContext, Axis, Context, Entity, FontWeight, IntoElement, ParentElement, Render, Styled,
     Subscription, Window, div, px,
 };
 use lunaria_ui::components::custom_button::CustomButton;
+use lunaria_ui::components::custom_notification::Notification;
 use lunaria_ui::components::path_picker::PathPicker;
 use lunaria_ui::extensions::focus::FocusExt;
 use lunaria_ui::extensions::input_validator::Validator;

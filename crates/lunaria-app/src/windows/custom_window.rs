@@ -1,6 +1,5 @@
 use crate::windows::window_root::create_window_root_with_fps;
 use gpui_kit::base::v_flex;
-use gpui_kit::component::notification::Notification;
 use gpui_kit::component::{ActiveTheme, Root, TitleBar, WindowExt};
 use gpui_kit::prelude::FluentBuilder as _;
 use gpui_kit::{
@@ -8,6 +7,7 @@ use gpui_kit::{
     Pixels, Render, SharedString, Size, Styled, TitlebarOptions, Window, WindowBounds,
     WindowHandle, WindowOptions, div, px,
 };
+use lunaria_ui::components::custom_notification::Notification;
 use std::any::TypeId;
 use std::collections::HashMap;
 use std::hash::Hash;
