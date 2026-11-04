@@ -148,6 +148,10 @@ impl ShortcutViewModel {
         self.loading
     }
 
+    pub fn is_saving(&self) -> bool {
+        self.saving
+    }
+
     pub fn items(&self) -> &[ShortcutItem] {
         &self.items
     }
@@ -254,15 +258,29 @@ impl ShortcutViewModel {
         &mut self,
         cx: &mut Context<Self>,
         action: ShortcutAction,
-        shortcuts: Vec<Shortcut>,
+        shortcuts: Vec<Option<Shortcut>>,
         window: &mut Window,
     ) {
-        if self.saving {
+        if self.saving || self.loading {
             return;
         }
 
+        if self
+            .validate_shortcuts(action, &shortcuts)
+            .iter()
+            .any(Option::is_some)
+        {
+            return;
+        }
+
+        let shortcuts: Vec<Shortcut> = shortcuts.into_iter().flatten().collect();
         self.saving = true;
+
+        cx.emit(ShortcutEvent::Changed);
+
         let window_handle = window.window_handle();
+
+        let keep_alive = cx.entity();
 
         AppServices::run(
             cx,
@@ -271,6 +289,7 @@ impl ShortcutViewModel {
                 services.shortcut_service.list().await
             },
             move |this, result, cx| {
+                let _keep_alive = keep_alive;
                 this.saving = false;
 
                 match result {

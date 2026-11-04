@@ -12,6 +12,7 @@ use lunaria_ui::i18n_text;
 pub struct ShortcutRecorder {
     current_shortcut: Option<Shortcut>,
     focus_handle: FocusHandle,
+    invalid: bool,
     _subscriptions: Vec<Subscription>,
 }
 
@@ -42,12 +43,22 @@ impl ShortcutRecorder {
         Self {
             current_shortcut,
             focus_handle,
+            invalid: false,
             _subscriptions: vec![key_subscription, activation_subscription],
         }
     }
 
     pub fn value(&self) -> Option<&Shortcut> {
         self.current_shortcut.as_ref()
+    }
+
+    pub fn set_invalid(&mut self, invalid: bool, cx: &mut Context<Self>) {
+        if self.invalid == invalid {
+            return;
+        }
+
+        self.invalid = invalid;
+        cx.notify();
     }
 
     /// 点击录入框外，结束录入
@@ -102,7 +113,8 @@ impl ShortcutRecorder {
             return;
         }
 
-        self.current_shortcut = Some(shortcut.clone());
+        self.current_shortcut = Some(shortcut);
+
         cx.notify();
     }
 
@@ -142,14 +154,17 @@ impl Render for ShortcutRecorder {
             .w_full()
             .min_w_0()
             .items_center()
-            .px_3()
+            .pl_3()
+            .pr_8()
             .py_2()
             .border_1()
-            .border_color(
-                focused
-                    .then_some(cx.theme().primary)
-                    .unwrap_or(cx.theme().input),
-            )
+            .border_color(if self.invalid {
+                cx.theme().danger
+            } else if focused {
+                cx.theme().primary
+            } else {
+                cx.theme().input
+            })
             .rounded_lg()
             .bg(cx.theme().background)
             .on_mouse_down_out(cx.listener(Self::on_mouse_down_out))

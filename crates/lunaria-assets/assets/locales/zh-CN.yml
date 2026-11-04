@@ -52,7 +52,7 @@ setting:
       record_idle: "点击录入"
       record_active: "请按下组合键"
       duplicate: "快捷键重复"
-      conflict: "已被 ${action} 使用"
+      conflict: "已被 %{action} 使用"
     notifications:
       saved: "快捷键已保存"
       reset_all: "全部快捷键已恢复默认"
