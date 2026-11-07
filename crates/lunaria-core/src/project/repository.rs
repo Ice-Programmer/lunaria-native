@@ -6,5 +6,8 @@ use std::path::PathBuf;
 #[async_trait]
 pub trait ProjectRepository: Send + Sync {
     async fn create(&self, name: String, path: PathBuf) -> Result<Project, ProjectError>;
+
+    async fn open(&self, path: PathBuf) -> Result<Project, ProjectError>;
+
     async fn list_recent(&self) -> Result<Vec<Project>, ProjectError>;
 }

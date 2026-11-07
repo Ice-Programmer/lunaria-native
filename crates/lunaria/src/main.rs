@@ -5,7 +5,7 @@ mod launcher;
 mod platform;
 
 use crate::init::router::init_app_router;
-use crate::launcher::launcher_page::LaunchPage;
+use crate::launcher::launcher_window::LaunchWindow;
 use gpui_kit::assets::AllAssets;
 use gpui_kit::*;
 use lunaria_app::app_services::AppServices;
@@ -67,7 +67,7 @@ async fn main() {
 
         cx.spawn(async move |cx| {
             cx.update(|cx| {
-                LaunchPage::open(cx);
+                LaunchWindow::open(cx);
 
                 #[cfg(debug_assertions)]
                 cx.defer(dev::apply_dev_startup_router);

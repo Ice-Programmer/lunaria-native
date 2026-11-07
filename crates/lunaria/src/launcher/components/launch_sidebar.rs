@@ -1,4 +1,5 @@
 use crate::launcher::router::{LauncherRoute, LauncherRouter};
+use crate::launcher::view_model::open_project_view_model::OpenProjectViewModel;
 use gpui_kit::assets::IconName;
 use gpui_kit::base::{Selectable, h_flex, v_flex};
 use gpui_kit::component::button::*;
@@ -7,6 +8,9 @@ use gpui_kit::*;
 use lunaria_ui::components::custom_button::CustomButton;
 use lunaria_ui::i18n::keys;
 use lunaria_ui::i18n_text;
+use rfd::AsyncFileDialog;
+
+const BUTTON_HEIGHT: f32 = 36.;
 
 #[derive(IntoElement)]
 pub struct LaunchSidebar;
@@ -34,7 +38,11 @@ impl LaunchSidebar {
             )
     }
 
-    fn render_action(cx: &mut App) -> impl IntoElement {
+    fn render_action(window: &mut Window, cx: &mut App) -> impl IntoElement {
+        let view_model = window.use_keyed_state("launcher-open-project", cx, |_, _| {
+            OpenProjectViewModel::default()
+        });
+
         let creating = LauncherRouter::current(cx) == LauncherRoute::CreateProject;
         v_flex()
             .gap_2()
@@ -48,7 +56,7 @@ impl LaunchSidebar {
                     .primary()
                     .w_full()
                     .selected(creating)
-                    .h(px(36.))
+                    .h(px(BUTTON_HEIGHT))
                     .icon(IconName::Plus)
                     .cursor_pointer()
                     .on_click(|_, _, cx| {
@@ -61,10 +69,31 @@ impl LaunchSidebar {
                         keys::launcher::main_button::OPEN_PROJECT,
                         "打开项目"
                     ))
+                    .w_full()
                     .icon(IconName::FolderOpen)
-                    .h(px(36.))
+                    .h(px(BUTTON_HEIGHT))
                     .cursor_pointer()
-                    .w_full(),
+                    .loading(view_model.read(cx).is_opening())
+                    .on_click(move |_, window, cx| {
+                        let view_model = view_model.clone();
+                        let dialog = AsyncFileDialog::new().set_parent(&*window);
+
+                        window
+                            .spawn(cx, async move |cx| {
+                                let Some(folder) = dialog.pick_folder().await else {
+                                    return;
+                                };
+
+                                let path = folder.path().to_path_buf();
+
+                                let _ = cx.update(|window, cx| {
+                                    view_model.update(cx, |view_model, cx| {
+                                        view_model.open_project(path, window, cx);
+                                    });
+                                });
+                            })
+                            .detach();
+                    }),
             )
     }
 
@@ -142,7 +171,7 @@ impl LaunchSidebar {
 }
 
 impl RenderOnce for LaunchSidebar {
-    fn render(self, _window: &mut Window, cx: &mut App) -> impl IntoElement {
+    fn render(self, window: &mut Window, cx: &mut App) -> impl IntoElement {
         v_flex()
             .size_full()
             .px_6()
@@ -151,7 +180,7 @@ impl RenderOnce for LaunchSidebar {
             .border_color(cx.theme().sidebar_border)
             .bg(cx.theme().sidebar)
             .child(Self::render_brand(cx))
-            .child(Self::render_action(cx))
+            .child(Self::render_action(window, cx))
             .child(div().flex_1())
             .child(Self::render_action_bottom(cx))
     }

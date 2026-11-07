@@ -12,13 +12,13 @@ const LAUNCHER_MIN_HEIGHT: f32 = 400.0;
 
 const LAUNCHER_SIDEBAR_WIDTH: f32 = 200.0;
 
-pub struct LaunchPage {
+pub struct LaunchWindow {
     current_route: LauncherRoute,
     current_view: AnyView,
     _route_subscription: Subscription,
 }
 
-impl LaunchPage {
+impl LaunchWindow {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let current_route = LauncherRouter::current(cx);
         let current_view = current_route.build(window, cx);
@@ -61,7 +61,7 @@ impl LaunchPage {
     }
 }
 
-impl Render for LaunchPage {
+impl Render for LaunchWindow {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         h_flex()
             .relative()

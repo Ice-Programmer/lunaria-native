@@ -11,7 +11,7 @@ use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 use tempfile::NamedTempFile;
 
-const PROJECT_DATABASE_FILE: &str = "lunaria.db";
+pub(crate) const PROJECT_DATABASE_FILE: &str = "lunaria.db";
 const PROJECT_DATABASE_ID: i64 = 0x4c554e41;
 const PROJECT_SCHEMA_VERSION: i64 = 1;
 
@@ -63,6 +63,32 @@ impl ProjectDatabase {
         let directory = self.directory.clone();
         let _ = self.connection.close().await;
         remove_created_project(&directory).await;
+    }
+
+    /// fetch opened project's database
+    pub(crate) async fn open(path: &PathBuf) -> Result<Self, DatabaseError> {
+        let directory = tokio::fs::canonicalize(path)
+            .await
+            .map_err(|source| DatabaseError::io(path, source))?;
+
+        let project_database_path = directory.join(PROJECT_DATABASE_FILE);
+        let project_database_connection = connect(&project_database_path).await?;
+
+        validate(&project_database_connection, &project_database_path).await?;
+
+        Ok(Self {
+            directory,
+            connection: project_database_connection,
+        })
+    }
+
+    pub(crate) async fn fetch_metadata(&self) -> Result<project_meta::Model, DatabaseError> {
+        project_meta::Entity::find_by_id(1)
+            .one(&self.connection)
+            .await?
+            .ok_or_else(|| {
+                DatabaseError::InvalidDatabase(self.directory.join(PROJECT_DATABASE_FILE))
+            })
     }
 }
 

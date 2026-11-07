@@ -11,8 +11,10 @@ lunaria-database.workspace = true
 lunaria-settings.workspace = true
 lunaria-core.workspace = true
 lunaria-app.workspace = true
+lunaria-editor.workspace = true
 tokio.workspace = true
 dirs.workspace = true
+rfd.workspace = true
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2.workspace = true

@@ -26,4 +26,8 @@ impl ProjectService {
     pub async fn list_recent(&self) -> Result<Vec<Project>, ProjectError> {
         self.repository.list_recent().await
     }
+
+    pub async fn open(&self, path: PathBuf) -> Result<Project, ProjectError> {
+        self.repository.open(path).await
+    }
 }

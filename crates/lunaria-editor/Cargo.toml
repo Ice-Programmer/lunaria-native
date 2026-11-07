@@ -1,0 +1,9 @@
+[package]
+name = "lunaria-editor"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+gpui-kit.workspace = true
+lunaria-app.workspace = true
+lunaria-core.workspace = true
