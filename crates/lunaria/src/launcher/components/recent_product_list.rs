@@ -1,3 +1,4 @@
+use crate::launcher::view_model::open_project_view_model::OpenProjectViewModel;
 use crate::launcher::view_model::recent_projects_view_model::RecentProjectsViewModel;
 use gpui_kit::assets::IconName;
 use gpui_kit::base::v_flex;
@@ -11,6 +12,7 @@ use lunaria_ui::i18n_text;
 
 pub struct ProjectListDelegate {
     pub view_model: Entity<RecentProjectsViewModel>,
+    pub open_project_view_model: Entity<OpenProjectViewModel>,
     pub _subscription: Subscription,
 }
 
@@ -70,6 +72,8 @@ impl ListDelegate for ProjectListDelegate {
         let project = self.view_model.read(cx).filtered_projects().nth(ix.row)?;
         let project_path = project.path().clone();
         let project_path_text = project_path.display().to_string();
+        let open_project_view_model = self.open_project_view_model.clone();
+        let open_path = project_path.clone();
 
         Some(
             ListItem::new(SharedString::from(format!("project-item-{}", project.id())))
@@ -79,6 +83,11 @@ impl ListDelegate for ProjectListDelegate {
                 .px_4()
                 .py_3()
                 .cursor_pointer()
+                .on_click(move |_, window, cx| {
+                    open_project_view_model.update(cx, |view_model, cx| {
+                        view_model.open_project(open_path.clone(), window, cx);
+                    });
+                })
                 .child(
                     v_flex()
                         .h_full()

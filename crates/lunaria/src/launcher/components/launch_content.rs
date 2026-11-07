@@ -10,6 +10,7 @@ use lunaria_ui::components::custom_input::CustomInput;
 use lunaria_ui::extensions::input_18n::InputI18nExt;
 use lunaria_ui::i18n::keys;
 use lunaria_ui::i18n_text;
+use crate::launcher::view_model::open_project_view_model::OpenProjectViewModel;
 
 pub struct LaunchContent {
     search_input: Entity<InputState>,
@@ -35,6 +36,7 @@ impl LaunchContent {
         let project_list = cx.new(|cx| {
             let delegate = ProjectListDelegate {
                 view_model: view_model.clone(),
+                open_project_view_model: cx.new(|_| OpenProjectViewModel::default()),
                 _subscription: RecentProjectsViewModel::subscribe(&view_model, window, cx),
             };
 
