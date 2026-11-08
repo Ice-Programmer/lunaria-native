@@ -47,6 +47,17 @@ async fn main() {
         .expect("Failed to load shortcut list");
 
     let app = application().with_assets(AllAssets);
+    
+    app.on_reopen(|cx| {
+        cx.spawn(async move |cx| {
+            cx.update(|cx| {
+                if cx.windows().is_empty() {
+                    LaunchWindow::open(cx);
+                }
+            });
+        })
+        .detach();
+    });
 
     app.run(move |cx| {
         lunaria_ui::i18n::locale::init(init_language.locale(), cx);
