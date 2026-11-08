@@ -2,22 +2,37 @@ use gpui_kit::*;
 use lunaria_app::windows::custom_window;
 use lunaria_app::windows::custom_window::WindowConfig;
 use lunaria_core::project::Project;
+use crate::layout::editor_layout::EditorLayout;
+use crate::layout::sidebar::EditorSidebar;
+use crate::layout::status_bar::EditorStatusBar;
+use crate::layout::title_bar::EditorTitleBar;
 
 const EDITOR_WIDTH: f32 = 1200.;
 const EDITOR_HEIGHT: f32 = 800.;
 const EDITOR_MIN_WIDTH: f32 = 800.;
 const EDITOR_MIN_HEIGHT: f32 = 600.;
 
-pub struct ProjectEditorWindow;
+pub struct ProjectEditorWindow {
+    title_bar: Entity<EditorTitleBar>,
+    sidebar: Entity<EditorSidebar>,
+    status_bar: Entity<EditorStatusBar>,
+}
 
 impl ProjectEditorWindow {
-    pub fn open(project: &Project, launcher: &mut Window, cx: &mut App) {
+    fn new(cx: &mut Context<Self>) -> Self {
+        Self {
+            title_bar: cx.new(|_| EditorTitleBar),
+            sidebar: cx.new(|_| EditorSidebar),
+            status_bar: cx.new(|_| EditorStatusBar),
+        }
+    }
+
+    pub fn open(_project: &Project, launcher: &mut Window, cx: &mut App) {
         let launcher_handler = launcher.window_handle();
 
         custom_window::open(
             (),
             WindowConfig {
-                title: Some(project.name().to_owned().into()),
                 size: size(px(EDITOR_WIDTH), px(EDITOR_HEIGHT)),
                 min_size: Some(size(px(EDITOR_MIN_WIDTH), px(EDITOR_MIN_HEIGHT))),
                 ..Default::default()
@@ -30,7 +45,7 @@ impl ProjectEditorWindow {
                     });
                 });
 
-                Self
+                Self::new(cx)
             },
         );
     }
@@ -38,6 +53,15 @@ impl ProjectEditorWindow {
 
 impl Render for ProjectEditorWindow {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        div().size_full()
+        EditorLayout::new(
+            self.title_bar.clone(),
+            self.sidebar.clone(),
+            div()
+                .size_full()
+                .p_4()
+                .items_center()
+                .child("编辑区"),
+            self.status_bar.clone(),
+        )
     }
 }

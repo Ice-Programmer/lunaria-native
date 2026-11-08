@@ -7,3 +7,4 @@ edition = "2024"
 gpui-kit.workspace = true
 lunaria-app.workspace = true
 lunaria-core.workspace = true
+lunaria-ui.workspace = true

@@ -4019,6 +4019,7 @@ dependencies = [
  "gpui-kit",
  "lunaria-app",
  "lunaria-core",
+ "lunaria-ui",
 ]
 
 [[package]]
