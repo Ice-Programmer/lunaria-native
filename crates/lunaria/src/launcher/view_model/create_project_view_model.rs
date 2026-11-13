@@ -57,6 +57,8 @@ impl CreateProjectViewModel {
         self.creating = true;
         cx.emit(CreateProjectEvent::Started);
 
+        let this = cx.weak_entity();
+
         AppServices::run(
             cx,
             move |services| async move {
@@ -65,15 +67,17 @@ impl CreateProjectViewModel {
                     .create(name, parent_directory)
                     .await
             },
-            |this, result, cx| {
-                this.creating = false;
+            move |result, cx| {
+                this.update(cx, |this, cx| {
+                    this.creating = false;
 
-                let event = match result {
-                    Ok(project) => CreateProjectEvent::Created(project),
-                    Err(error) => CreateProjectEvent::Failed(error),
-                };
+                    let event = match result {
+                        Ok(project) => CreateProjectEvent::Created(project),
+                        Err(error) => CreateProjectEvent::Failed(error),
+                    };
 
-                cx.emit(event);
+                    cx.emit(event);
+                })
             },
         );
     }

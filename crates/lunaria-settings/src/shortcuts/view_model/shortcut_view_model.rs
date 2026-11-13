@@ -203,19 +203,23 @@ impl ShortcutViewModel {
 
         self.loading = true;
 
+        let this = cx.weak_entity();
+
         AppServices::run(
             cx,
             |services| async move { services.shortcut_service.list().await },
-            |this, result, cx| {
-                this.loading = false;
+            move |result, cx| {
+                this.update(cx, |this, cx| {
+                    this.loading = false;
 
-                match result {
-                    Ok(items) => {
-                        this.items = items;
-                        cx.emit(ShortcutEvent::Changed);
-                    }
-                    Err(error) => cx.emit(ShortcutEvent::Failed(error)),
-                };
+                    match result {
+                        Ok(items) => {
+                            this.items = items;
+                            cx.emit(ShortcutEvent::Changed);
+                        }
+                        Err(error) => cx.emit(ShortcutEvent::Failed(error)),
+                    };
+                })
             },
         )
     }
@@ -229,6 +233,7 @@ impl ShortcutViewModel {
         cx.emit(ShortcutEvent::Changed);
 
         let keep_alive = cx.entity();
+        let this = cx.weak_entity();
 
         AppServices::run(
             cx,
@@ -238,18 +243,20 @@ impl ShortcutViewModel {
 
                 Ok::<_, SettingError>((restored, items))
             },
-            move |this, result, cx| {
-                let _keep_alive = keep_alive;
-                this.saving = false;
+            move |result, cx| {
+                this.update(cx, |this, cx| {
+                    let _keep_alive = keep_alive;
+                    this.saving = false;
 
-                match result {
-                    Ok((restored, items)) => {
-                        bindings::apply(&items, cx);
-                        this.items = items;
-                        cx.emit(ShortcutEvent::UndoFinished { restored })
+                    match result {
+                        Ok((restored, items)) => {
+                            bindings::apply(&items, cx);
+                            this.items = items;
+                            cx.emit(ShortcutEvent::UndoFinished { restored })
+                        }
+                        Err(error) => cx.emit(ShortcutEvent::Failed(error)),
                     }
-                    Err(error) => cx.emit(ShortcutEvent::Failed(error)),
-                }
+                })
             },
         )
     }
@@ -281,6 +288,7 @@ impl ShortcutViewModel {
         let window_handle = window.window_handle();
 
         let keep_alive = cx.entity();
+        let this = cx.weak_entity();
 
         AppServices::run(
             cx,
@@ -288,26 +296,28 @@ impl ShortcutViewModel {
                 services.shortcut_service.set(action, shortcuts).await?;
                 services.shortcut_service.list().await
             },
-            move |this, result, cx| {
-                let _keep_alive = keep_alive;
-                this.saving = false;
+            move |result, cx| {
+                this.update(cx, |this, cx| {
+                    let _keep_alive = keep_alive;
+                    this.saving = false;
 
-                match result {
-                    Ok(items) => {
-                        bindings::apply(&items, cx);
+                    match result {
+                        Ok(items) => {
+                            bindings::apply(&items, cx);
 
-                        this.items = items;
+                            this.items = items;
 
-                        cx.emit(ShortcutEvent::Saved);
+                            cx.emit(ShortcutEvent::Saved);
 
-                        let _ = window_handle.update(cx, |_, window, _| {
-                            window.remove_window();
-                        });
+                            let _ = window_handle.update(cx, |_, window, _| {
+                                window.remove_window();
+                            });
+                        }
+                        Err(error) => {
+                            cx.emit(ShortcutEvent::Failed(error));
+                        }
                     }
-                    Err(error) => {
-                        cx.emit(ShortcutEvent::Failed(error));
-                    }
-                }
+                })
             },
         );
     }
@@ -320,25 +330,29 @@ impl ShortcutViewModel {
         self.saving = true;
         cx.emit(ShortcutEvent::Changed);
 
+        let this = cx.weak_entity();
+
         AppServices::run(
             cx,
             |services| async move {
                 services.shortcut_service.reset_all().await?;
                 services.shortcut_service.list().await
             },
-            |this, result, cx| {
-                this.saving = false;
+            move |result, cx| {
+                this.update(cx, |this, cx| {
+                    this.saving = false;
 
-                match result {
-                    Ok(items) => {
-                        bindings::apply(&items, cx);
-                        this.items = items;
-                        cx.emit(ShortcutEvent::ResetAll);
+                    match result {
+                        Ok(items) => {
+                            bindings::apply(&items, cx);
+                            this.items = items;
+                            cx.emit(ShortcutEvent::ResetAll);
+                        }
+                        Err(error) => {
+                            cx.emit(ShortcutEvent::Failed(error));
+                        }
                     }
-                    Err(error) => {
-                        cx.emit(ShortcutEvent::Failed(error));
-                    }
-                }
+                })
             },
         );
     }

@@ -72,6 +72,8 @@ impl LanguageSwitcher {
 
         self.close(cx);
 
+        let this = cx.weak_entity();
+
         AppServices::run(
             cx,
             |services| async move {
@@ -79,22 +81,24 @@ impl LanguageSwitcher {
                     .language_service
                     .set(language)
                     .await
-                    .map(|()| language)
+                    .map(|_| language)
             },
-            |_, result, cx| match result {
-                Ok(language) => {
-                    locale::set_locale(language.locale(), cx);
-                }
-                Err(error) => {
-                    if let Some(handle) = cx.active_window() {
-                        let _ = handle.update(cx, |_, window, cx| {
-                            window.push_notification(
-                                Notification::error(format!("切换界面语言失败 {}", error)),
-                                cx,
-                            );
-                        });
+            move |result, cx| {
+                this.update(cx, |_, cx| match result {
+                    Ok(language) => {
+                        locale::set_locale(language.locale(), cx);
                     }
-                }
+                    Err(error) => {
+                        if let Some(handle) = cx.active_window() {
+                            let _ = handle.update(cx, |_, window, cx| {
+                                window.push_notification(
+                                    Notification::error(format!("切换界面语言失败 {}", error)),
+                                    cx,
+                                );
+                            });
+                        }
+                    }
+                })
             },
         );
     }

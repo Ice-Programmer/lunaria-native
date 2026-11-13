@@ -72,21 +72,25 @@ impl RecentProjectsViewModel {
         self.loading = true;
         cx.emit(RecentProjectsEvent::Started);
 
+        let this = cx.weak_entity();
+
         AppServices::run(
             cx,
             |services| async move { services.project_service.list_recent().await },
-            |this, result, cx| {
-                this.loading = false;
+            move |result, cx| {
+                this.update(cx, |this, cx| {
+                    this.loading = false;
 
-                let event = match result {
-                    Ok(projects) => {
-                        this.recent_projects = projects;
-                        RecentProjectsEvent::Loaded
-                    }
-                    Err(error) => RecentProjectsEvent::Failed(error),
-                };
+                    let event = match result {
+                        Ok(projects) => {
+                            this.recent_projects = projects;
+                            RecentProjectsEvent::Loaded
+                        }
+                        Err(error) => RecentProjectsEvent::Failed(error),
+                    };
 
-                cx.emit(event);
+                    cx.emit(event);
+                })
             },
         );
     }

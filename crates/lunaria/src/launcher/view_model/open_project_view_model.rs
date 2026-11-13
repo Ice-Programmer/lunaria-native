@@ -29,20 +29,24 @@ impl OpenProjectViewModel {
 
         let window_handle = window.window_handle();
 
+        let this = cx.weak_entity();
+
         AppServices::run(
             cx,
             move |services| async move { services.project_service.open(path).await },
-            move |this, result, cx| {
-                this.set_opening(false, cx);
+            move |result, cx| {
+                this.update(cx, |this, cx| {
+                    this.set_opening(false, cx);
 
-                let _ = window_handle.update(cx, |_, window, cx| match result {
-                    Ok(project) => {
-                        ProjectEditorWindow::open(&project, window, cx);
-                    }
-                    Err(error) => {
-                        window.push_notification(Notification::error(error), cx);
-                    }
-                });
+                    let _ = window_handle.update(cx, |_, window, cx| match result {
+                        Ok(_) => {
+                            ProjectEditorWindow::open(window, cx);
+                        }
+                        Err(error) => {
+                            window.push_notification(Notification::error(error), cx);
+                        }
+                    });
+                })
             },
         );
     }

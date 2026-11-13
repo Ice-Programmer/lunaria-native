@@ -28,7 +28,7 @@ impl ProjectEditorWindow {
         }
     }
 
-    pub fn open(_project: &Project, launcher: &mut Window, cx: &mut App) {
+    pub fn open(launcher: &mut Window, cx: &mut App) {
         let launcher_handler = launcher.window_handle();
 
         custom_window::open(
@@ -49,6 +49,19 @@ impl ProjectEditorWindow {
                 Self::new(cx)
             },
         );
+    }
+
+    pub fn direct_open(cx: &mut App) {
+        custom_window::open(
+            (),
+            WindowConfig {
+                size: size(px(EDITOR_WIDTH), px(EDITOR_HEIGHT)),
+                min_size: Some(size(px(EDITOR_MIN_WIDTH), px(EDITOR_MIN_HEIGHT))),
+                ..Default::default()
+            },
+            cx,
+            |_, cx| Self::new(cx),
+        )
     }
 }
 

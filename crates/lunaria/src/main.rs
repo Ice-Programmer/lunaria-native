@@ -16,6 +16,8 @@ use lunaria_ui::ThemeManager;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::runtime::Handle;
+#[cfg(debug_assertions)]
+use crate::dev::router;
 
 // get Lunaria app directory
 fn app_data_directory() -> PathBuf {
@@ -47,7 +49,7 @@ async fn main() {
         .expect("Failed to load shortcut list");
 
     let app = application().with_assets(AllAssets);
-    
+
     app.on_reopen(|cx| {
         cx.spawn(async move |cx| {
             cx.update(|cx| {
@@ -81,7 +83,7 @@ async fn main() {
                 LaunchWindow::open(cx);
 
                 #[cfg(debug_assertions)]
-                cx.defer(dev::apply_dev_startup_router);
+                cx.defer(router::apply_dev_startup_router);
             });
         })
         .detach();
