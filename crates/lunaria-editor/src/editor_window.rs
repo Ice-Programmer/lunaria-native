@@ -1,11 +1,12 @@
-use gpui_kit::*;
-use lunaria_app::windows::custom_window;
-use lunaria_app::windows::custom_window::WindowConfig;
-use lunaria_core::project::Project;
 use crate::layout::editor_layout::EditorLayout;
 use crate::layout::sidebar::EditorSidebar;
 use crate::layout::status_bar::EditorStatusBar;
 use crate::layout::title_bar::EditorTitleBar;
+use gpui_kit::*;
+use lunaria_app::windows::custom_window;
+use lunaria_app::windows::custom_window::WindowConfig;
+use lunaria_core::project::Project;
+use lunaria_ui::components::placeholder::Placeholder;
 
 const EDITOR_WIDTH: f32 = 1200.;
 const EDITOR_HEIGHT: f32 = 800.;
@@ -58,9 +59,8 @@ impl Render for ProjectEditorWindow {
             self.sidebar.clone(),
             div()
                 .size_full()
-                .p_4()
                 .items_center()
-                .child("编辑区"),
+                .child(Placeholder::new("编辑区").w_full().h_full()),
             self.status_bar.clone(),
         )
     }
