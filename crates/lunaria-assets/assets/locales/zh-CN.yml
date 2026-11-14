@@ -64,3 +64,9 @@ setting:
   application: "应用"
   launcher: "欢迎页"
   editor: "编辑器"
+
+editor:
+  menu:
+    script: "脚本"
+    stage: "舞台"
+    character: "角色"

@@ -64,3 +64,9 @@ setting:
   application: "Application"
   launcher: "Welcome"
   editor: "Editor"
+
+editor:
+  menu:
+    script: "Script"
+    stage: "Stage"
+    character: "Character"

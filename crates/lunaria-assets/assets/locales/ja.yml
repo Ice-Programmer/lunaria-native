@@ -64,3 +64,9 @@ setting:
   application: "アプリ"
   launcher: "スタート画面"
   editor: "エディター"
+
+editor:
+  menu:
+    script: "シナリオ"
+    stage: "ステージ"
+    character: "キャラクター"

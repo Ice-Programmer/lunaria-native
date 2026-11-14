@@ -2,6 +2,7 @@ use crate::layout::editor_layout::EditorLayout;
 use crate::layout::sidebar::EditorSidebar;
 use crate::layout::status_bar::EditorStatusBar;
 use crate::layout::title_bar::EditorTitleBar;
+use crate::route::editor_route::EditorRoute;
 use gpui_kit::*;
 use lunaria_app::windows::custom_window;
 use lunaria_app::windows::custom_window::WindowConfig;
@@ -23,7 +24,7 @@ impl ProjectEditorWindow {
     fn new(cx: &mut Context<Self>, project: Project) -> Self {
         Self {
             title_bar: cx.new(|_| EditorTitleBar::new(project)),
-            sidebar: cx.new(|_| EditorSidebar),
+            sidebar: cx.new(|_| EditorSidebar::new(EditorRoute::default())),
             status_bar: cx.new(|_| EditorStatusBar),
         }
     }
