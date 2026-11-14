@@ -7,7 +7,7 @@ use gpui_kit::*;
 use lunaria_app::windows::custom_window;
 use lunaria_app::windows::custom_window::WindowConfig;
 use lunaria_core::project::Project;
-use lunaria_ui::components::placeholder::Placeholder;
+use std::collections::HashMap;
 
 const EDITOR_WIDTH: f32 = 1200.;
 const EDITOR_HEIGHT: f32 = 800.;
@@ -18,6 +18,7 @@ pub struct ProjectEditorWindow {
     title_bar: Entity<EditorTitleBar>,
     sidebar: Entity<EditorSidebar>,
     status_bar: Entity<EditorStatusBar>,
+    pages: HashMap<EditorRoute, AnyView>,
 }
 
 impl ProjectEditorWindow {
@@ -26,6 +27,7 @@ impl ProjectEditorWindow {
             title_bar: cx.new(|_| EditorTitleBar::new(project)),
             sidebar: cx.new(|_| EditorSidebar::new(EditorRoute::default())),
             status_bar: cx.new(|_| EditorStatusBar),
+            pages: HashMap::new(),
         }
     }
 
@@ -67,14 +69,19 @@ impl ProjectEditorWindow {
 }
 
 impl Render for ProjectEditorWindow {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let route = self.sidebar.read(cx).route();
+
+        let content = self
+            .pages
+            .entry(route)
+            .or_insert_with(|| route.build(cx))
+            .clone();
+
         EditorLayout::new(
             self.title_bar.clone(),
             self.sidebar.clone(),
-            div()
-                .size_full()
-                .items_center()
-                .child(Placeholder::new("编辑区").w_full().h_full()),
+            div().size_full().items_center().child(content),
             self.status_bar.clone(),
         )
     }

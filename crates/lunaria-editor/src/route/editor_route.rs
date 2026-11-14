@@ -1,9 +1,12 @@
-use gpui_kit::SharedString;
+use crate::pages::character::character_page::CharacterPage;
+use crate::pages::script::script_page::ScriptPage;
+use crate::pages::stage::stage_page::StagePage;
 use gpui_kit::assets::IconName;
+use gpui_kit::{AnyElement, AnyView, App, AppContext, IntoElement, Render, SharedString};
 use lunaria_ui::i18n::keys;
 use lunaria_ui::i18n_text;
 
-#[derive(Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Clone, Copy, PartialEq, Eq, Default, Hash)]
 pub enum EditorRoute {
     #[default]
     Script,
@@ -28,6 +31,14 @@ impl EditorRoute {
                 i18n_text!(keys::editor::menu::CHARACTER, "角色"),
                 IconName::UserRound,
             ),
+        }
+    }
+
+    pub fn build(self, cx: &mut App) -> AnyView {
+        match self {
+            Self::Script => cx.new(|_| ScriptPage::new()).into(),
+            Self::Stage => cx.new(|_| StagePage::new()).into(),
+            Self::Character => cx.new(|_| CharacterPage::new()).into(),
         }
     }
 }
