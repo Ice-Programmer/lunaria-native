@@ -13,7 +13,7 @@ pub(crate) fn open_start_up_project(cx: &mut App) -> Result<(), String> {
         cx,
         move |services| async move { services.project_service.open(path).await },
         |result, cx| match result {
-            Ok(_) => ProjectEditorWindow::direct_open(cx),
+            Ok(project) => ProjectEditorWindow::direct_open(project, cx),
             Err(error) => eprintln!("[Lunaria dev] {error}"),
         },
     );

@@ -87,15 +87,18 @@ impl LanguageSwitcher {
                 this.update(cx, |_, cx| match result {
                     Ok(language) => {
                         locale::set_locale(language.locale(), cx);
+                        Ok(())
                     }
                     Err(error) => {
                         if let Some(handle) = cx.active_window() {
-                            let _ = handle.update(cx, |_, window, cx| {
+                            handle.update(cx, |_, window, cx| {
                                 window.push_notification(
                                     Notification::error(format!("切换界面语言失败 {}", error)),
                                     cx,
                                 );
-                            });
+                            })
+                        } else {
+                            Ok(())
                         }
                     }
                 })

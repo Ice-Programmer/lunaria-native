@@ -20,15 +20,15 @@ pub struct ProjectEditorWindow {
 }
 
 impl ProjectEditorWindow {
-    fn new(cx: &mut Context<Self>) -> Self {
+    fn new(cx: &mut Context<Self>, project: Project) -> Self {
         Self {
-            title_bar: cx.new(|_| EditorTitleBar),
+            title_bar: cx.new(|_| EditorTitleBar::new(project)),
             sidebar: cx.new(|_| EditorSidebar),
             status_bar: cx.new(|_| EditorStatusBar),
         }
     }
 
-    pub fn open(launcher: &mut Window, cx: &mut App) {
+    pub fn open(project: Project, launcher: &mut Window, cx: &mut App) {
         let launcher_handler = launcher.window_handle();
 
         custom_window::open(
@@ -46,12 +46,12 @@ impl ProjectEditorWindow {
                     });
                 });
 
-                Self::new(cx)
+                Self::new(cx, project)
             },
         );
     }
 
-    pub fn direct_open(cx: &mut App) {
+    pub fn direct_open(project: Project, cx: &mut App) {
         custom_window::open(
             (),
             WindowConfig {
@@ -60,7 +60,7 @@ impl ProjectEditorWindow {
                 ..Default::default()
             },
             cx,
-            |_, cx| Self::new(cx),
+            |_, cx| Self::new(cx, project),
         )
     }
 }

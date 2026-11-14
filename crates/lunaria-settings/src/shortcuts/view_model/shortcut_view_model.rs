@@ -304,17 +304,16 @@ impl ShortcutViewModel {
                     match result {
                         Ok(items) => {
                             bindings::apply(&items, cx);
-
                             this.items = items;
-
                             cx.emit(ShortcutEvent::Saved);
 
-                            let _ = window_handle.update(cx, |_, window, _| {
+                            window_handle.update(cx, |_, window, _| {
                                 window.remove_window();
-                            });
+                            })
                         }
                         Err(error) => {
                             cx.emit(ShortcutEvent::Failed(error));
+                            Ok(())
                         }
                     }
                 })

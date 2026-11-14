@@ -38,14 +38,14 @@ impl OpenProjectViewModel {
                 this.update(cx, |this, cx| {
                     this.set_opening(false, cx);
 
-                    let _ = window_handle.update(cx, |_, window, cx| match result {
-                        Ok(_) => {
-                            ProjectEditorWindow::open(window, cx);
+                    window_handle.update(cx, |_, window, cx| match result {
+                        Ok(project) => {
+                            ProjectEditorWindow::open(project, window, cx);
                         }
                         Err(error) => {
                             window.push_notification(Notification::error(error), cx);
                         }
-                    });
+                    })
                 })
             },
         );
