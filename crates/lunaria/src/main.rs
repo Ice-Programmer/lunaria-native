@@ -4,6 +4,8 @@ pub mod init;
 mod launcher;
 mod platform;
 
+#[cfg(debug_assertions)]
+use crate::dev::router;
 use crate::init::router::init_app_router;
 use crate::launcher::launcher_window::LaunchWindow;
 use gpui_kit::assets::AllAssets;
@@ -16,8 +18,8 @@ use lunaria_ui::ThemeManager;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::runtime::Handle;
-#[cfg(debug_assertions)]
-use crate::dev::router;
+#[cfg(target_os = "macos")]
+use crate::init::macos::init_macos_config;
 
 // get Lunaria app directory
 fn app_data_directory() -> PathBuf {
@@ -75,6 +77,9 @@ async fn main() {
 
         // init global shortcut listener
         init_bindings(&shortcut_items, settings_window::open_settings, cx);
+
+        #[cfg(target_os = "macos")]
+        init_macos_config(cx);
 
         init_app_router(cx);
 
