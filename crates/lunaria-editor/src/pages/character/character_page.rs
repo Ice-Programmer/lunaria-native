@@ -1,16 +1,40 @@
-use gpui_kit::{Context, IntoElement, Render, Styled, Window, px};
+use crate::pages::character::components::character_sidebar::CharacterSidebar;
+use gpui_kit::component::h_flex;
+use gpui_kit::{
+    AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, px,
+};
 use lunaria_ui::components::placeholder::Placeholder;
 
-pub struct CharacterPage;
+pub struct CharacterPage {
+    sidebar: Entity<CharacterSidebar>,
+}
+
+const CHARACTER_SIDEBAR_WIDTH: f32 = 200.0;
 
 impl CharacterPage {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(cx: &mut Context<Self>) -> Self {
+        Self {
+            sidebar: cx.new(|_| CharacterSidebar::new()),
+        }
     }
 }
 
 impl Render for CharacterPage {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        Placeholder::new("Character").size_full()
+        h_flex()
+            .relative()
+            .size_full()
+            .child(
+                div()
+                    .h_full()
+                    .w(px(CHARACTER_SIDEBAR_WIDTH))
+                    .child(self.sidebar.clone()),
+            )
+            .child(
+                div()
+                    .h_full()
+                    .flex_1()
+                    .child(Placeholder::new("character content").size_full()),
+            )
     }
 }

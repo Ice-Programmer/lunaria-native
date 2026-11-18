@@ -38,7 +38,7 @@ impl EditorRoute {
         match self {
             Self::Script => cx.new(|_| ScriptPage::new()).into(),
             Self::Stage => cx.new(|_| StagePage::new()).into(),
-            Self::Character => cx.new(|_| CharacterPage::new()).into(),
+            Self::Character => cx.new(CharacterPage::new).into(),
         }
     }
 }
