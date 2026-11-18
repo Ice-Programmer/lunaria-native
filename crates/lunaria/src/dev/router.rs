@@ -1,8 +1,9 @@
+use crate::dev::project::open_start_up_project;
 use crate::launcher::router::{LauncherRoute, LauncherRouter};
 use gpui_kit::App;
+use lunaria_editor::route::editor_route::EditorRoute;
 use lunaria_settings::settings_window::open_settings;
 use std::env;
-use crate::dev::project::open_start_up_project;
 
 const DEV_ROUTE_ENV: &str = "LUNARIA_DEV_ROUTE";
 
@@ -42,8 +43,16 @@ fn navigate_dev_route(value: &str, cx: &mut App) -> Result<(), String> {
             }
 
             Ok(())
-        },
-        "editor" => open_start_up_project(cx),
+        }
+        "editor" => {
+            let route = match page {
+                "main" => EditorRoute::default(),
+                "character" => EditorRoute::Character,
+                unknown => return Err(format!("Unknown editor page: {unknown}")),
+            };
+
+            open_start_up_project(route, cx)
+        }
 
         unknown => Err(format!("Unknown module: {unknown}")),
     }
