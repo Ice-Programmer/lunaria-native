@@ -35,6 +35,9 @@ pub enum DatabaseError {
 
     #[error("Unix timestamp is outside the supported range")]
     TimestampOutOfRange,
+
+    #[error("no project is open")]
+    NoOpenProject,
 }
 
 impl DatabaseError {

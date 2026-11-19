@@ -25,8 +25,10 @@ impl DatabaseManager {
     }
 
     pub async fn current_project_directory(&self) -> Option<PathBuf> {
-        self.current_project()
+        self.current_project
+            .read()
             .await
+            .as_ref()
             .map(|project| project.directory().to_path_buf())
     }
 
@@ -38,7 +40,11 @@ impl DatabaseManager {
         *self.current_project.write().await = Some(Arc::new(project));
     }
 
-    pub(crate) async fn current_project(&self) -> Option<Arc<ProjectDatabase>> {
-        self.current_project.read().await.clone()
+    pub(crate) async fn current_project(&self) -> Result<Arc<ProjectDatabase>, DatabaseError> {
+        self.current_project
+            .read()
+            .await
+            .clone()
+            .ok_or(DatabaseError::NoOpenProject)
     }
 }

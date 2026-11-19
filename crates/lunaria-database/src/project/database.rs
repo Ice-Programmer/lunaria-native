@@ -16,8 +16,8 @@ const PROJECT_DATABASE_ID: i64 = 0x4c554e41;
 const PROJECT_SCHEMA_VERSION: i64 = 1;
 
 pub(crate) struct ProjectDatabase {
-    directory: PathBuf,
-    connection: DatabaseConnection,
+    pub directory: PathBuf,
+    pub connection: DatabaseConnection,
 }
 
 impl ProjectDatabase {
@@ -105,7 +105,10 @@ async fn create_database_file(
 
     let result: Result<(), DatabaseError> = async {
         let transaction = database.begin().await?;
+
+        // 1. 创建所有表
         create_table(&transaction, project_meta::Entity).await?;
+        create_table(&transaction, crate::character::character::Entity).await?;
 
         project_meta::ActiveModel {
             id: Set(1),
