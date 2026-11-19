@@ -6,7 +6,6 @@ use gpui_kit::component::{ActiveTheme, WindowExt};
 use gpui_kit::{Anchor, Context, Entity, EventEmitter, SharedString, Styled, Subscription, Window};
 use lunaria_app::app_services::AppServices;
 use lunaria_app::setting::shortcuts::{bindings, to_keystroke};
-use lunaria_core::settings::error::SettingError;
 use lunaria_core::settings::shortcuts::model::{
     Shortcut, ShortcutAction, ShortcutCategory, ShortcutItem,
 };
@@ -239,9 +238,11 @@ impl ShortcutViewModel {
             cx,
             |services| async move {
                 let restored = services.shortcut_service.undo_reset_all().await?;
-                let items = services.shortcut_service.list().await?;
-
-                Ok::<_, SettingError>((restored, items))
+                services
+                    .shortcut_service
+                    .list()
+                    .await
+                    .map(|items| (restored, items))
             },
             move |result, cx| {
                 this.update(cx, |this, cx| {

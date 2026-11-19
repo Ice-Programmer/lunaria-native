@@ -1,9 +1,9 @@
-use crate::settings::error::SettingError;
 use crate::settings::shortcuts::catalog;
 use crate::settings::shortcuts::model::{
     Shortcut, ShortcutAction, ShortcutDefinition, ShortcutItem, ShortcutOverrides,
 };
 use crate::settings::shortcuts::repository::ShortcutRepository;
+use anyhow::Result;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -35,7 +35,7 @@ impl ShortcutService {
         })
     }
 
-    pub async fn reset_all(&self) -> Result<(), SettingError> {
+    pub async fn reset_all(&self) -> Result<()> {
         let mut state = self.state.write().await;
         let defaults = ShortcutOverrides::new();
 
@@ -47,7 +47,7 @@ impl ShortcutService {
         Ok(())
     }
 
-    pub async fn undo_reset_all(&self) -> Result<bool, SettingError> {
+    pub async fn undo_reset_all(&self) -> Result<bool> {
         let mut state = self.state.write().await;
 
         let Some(previous) = state.undo.clone() else {
@@ -62,7 +62,7 @@ impl ShortcutService {
         Ok(true)
     }
 
-    pub async fn list(&self) -> Result<Vec<ShortcutItem>, SettingError> {
+    pub async fn list(&self) -> Result<Vec<ShortcutItem>> {
         let state = self.state.read().await;
         let overrides = &state.overrides;
 
@@ -93,11 +93,7 @@ impl ShortcutService {
         })
     }
 
-    pub async fn set(
-        &self,
-        action: ShortcutAction,
-        shortcuts: Vec<Shortcut>,
-    ) -> Result<(), SettingError> {
+    pub async fn set(&self, action: ShortcutAction, shortcuts: Vec<Shortcut>) -> Result<()> {
         let is_default = self
             .definitions
             .iter()
@@ -115,11 +111,7 @@ impl ShortcutService {
         .await
     }
 
-    pub async fn remove_shortcut(
-        &self,
-        action: ShortcutAction,
-        shortcut: &Shortcut,
-    ) -> Result<(), SettingError> {
+    pub async fn remove_shortcut(&self, action: ShortcutAction, shortcut: &Shortcut) -> Result<()> {
         let defaults = self
             .definitions
             .iter()
@@ -154,24 +146,21 @@ impl ShortcutService {
         .await
     }
 
-    pub async fn disable(&self, action: ShortcutAction) -> Result<(), SettingError> {
+    pub async fn disable(&self, action: ShortcutAction) -> Result<()> {
         self.update(move |overrides| {
             overrides.insert(action, None);
         })
         .await
     }
 
-    pub async fn reset(&self, action: ShortcutAction) -> Result<(), SettingError> {
+    pub async fn reset(&self, action: ShortcutAction) -> Result<()> {
         self.update(move |overrides| {
             overrides.remove(&action);
         })
         .await
     }
 
-    async fn update(
-        &self,
-        change: impl FnOnce(&mut ShortcutOverrides),
-    ) -> Result<(), SettingError> {
+    async fn update(&self, change: impl FnOnce(&mut ShortcutOverrides)) -> Result<()> {
         let mut state = self.state.write().await;
         let mut next = state.overrides.clone();
 

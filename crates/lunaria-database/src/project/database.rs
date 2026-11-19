@@ -1,9 +1,9 @@
 use super::project_meta;
-use crate::DatabaseError;
 use crate::connection::{
     check_integrity, connect, create_table, publish, set_database_metadata,
     validate_database_metadata,
 };
+use anyhow::{Context, Result};
 use sea_orm::{
     ActiveModelTrait, DatabaseConnection, EntityTrait, QuerySelect, Set, TransactionTrait,
 };
@@ -25,23 +25,34 @@ impl ProjectDatabase {
         parent_directory: &Path,
         project_name: &str,
         created_at: i64,
-    ) -> Result<Self, DatabaseError> {
+    ) -> Result<Self> {
         let parent_directory = tokio::fs::canonicalize(parent_directory)
             .await
-            .map_err(|source| DatabaseError::io(parent_directory, source))?;
+            .with_context(|| {
+                format!(
+                    "failed to resolve directory: {}",
+                    parent_directory.display()
+                )
+            })?;
         let directory = parent_directory.join(project_name);
 
-        tokio::fs::create_dir(&directory)
-            .await
-            .map_err(|source| match source.kind() {
-                ErrorKind::AlreadyExists => DatabaseError::AlreadyExists(directory.clone()),
-                ErrorKind::NotADirectory => DatabaseError::PathNotDirectory(parent_directory),
-                _ => DatabaseError::io(&directory, source),
-            })?;
+        tokio::fs::create_dir(&directory).await.map_err(|source| {
+            let message = match source.kind() {
+                ErrorKind::AlreadyExists => format!("file already exists: {}", directory.display()),
+                ErrorKind::NotADirectory => {
+                    format!("path is not a directory: {}", parent_directory.display())
+                }
+                _ => format!(
+                    "failed to create project directory: {}",
+                    directory.display()
+                ),
+            };
+            anyhow::Error::new(source).context(message)
+        })?;
 
         let directory = tokio::fs::canonicalize(&directory)
             .await
-            .map_err(|source| DatabaseError::io(&directory, source))?;
+            .with_context(|| format!("failed to resolve directory: {}", directory.display()))?;
 
         match create_database_file(&directory, project_name, created_at).await {
             Ok(connection) => Ok(Self {
@@ -66,10 +77,10 @@ impl ProjectDatabase {
     }
 
     /// fetch opened project's database
-    pub(crate) async fn open(path: &PathBuf) -> Result<Self, DatabaseError> {
+    pub(crate) async fn open(path: &PathBuf) -> Result<Self> {
         let directory = tokio::fs::canonicalize(path)
             .await
-            .map_err(|source| DatabaseError::io(path, source))?;
+            .with_context(|| format!("failed to resolve directory: {}", path.display()))?;
 
         let project_database_path = directory.join(PROJECT_DATABASE_FILE);
         let project_database_connection = connect(&project_database_path).await?;
@@ -82,12 +93,15 @@ impl ProjectDatabase {
         })
     }
 
-    pub(crate) async fn fetch_metadata(&self) -> Result<project_meta::Model, DatabaseError> {
+    pub(crate) async fn fetch_metadata(&self) -> Result<project_meta::Model> {
         project_meta::Entity::find_by_id(1)
             .one(&self.connection)
             .await?
-            .ok_or_else(|| {
-                DatabaseError::InvalidDatabase(self.directory.join(PROJECT_DATABASE_FILE))
+            .with_context(|| {
+                format!(
+                    "invalid Lunaria database: {}",
+                    self.directory.join(PROJECT_DATABASE_FILE).display()
+                )
             })
     }
 }
@@ -96,14 +110,19 @@ async fn create_database_file(
     directory: &Path,
     project_name: &str,
     created_at: i64,
-) -> Result<DatabaseConnection, DatabaseError> {
+) -> Result<DatabaseConnection> {
     let destination = directory.join(PROJECT_DATABASE_FILE);
     let temporary = NamedTempFile::new_in(directory)
-        .map_err(|source| DatabaseError::io(directory, source))?
+        .with_context(|| {
+            format!(
+                "failed to create temporary database in {}",
+                directory.display()
+            )
+        })?
         .into_temp_path();
     let database = connect(&temporary).await?;
 
-    let result: Result<(), DatabaseError> = async {
+    let result: Result<()> = async {
         let transaction = database.begin().await?;
 
         // 1. 创建所有表
@@ -137,14 +156,14 @@ async fn create_database_file(
     Ok(database)
 }
 
-async fn validate(database: &DatabaseConnection, path: &Path) -> Result<(), DatabaseError> {
+async fn validate(database: &DatabaseConnection, path: &Path) -> Result<()> {
     validate_database_metadata(database, path, PROJECT_DATABASE_ID, PROJECT_SCHEMA_VERSION).await?;
 
     project_meta::Entity::find()
         .limit(0)
         .all(database)
         .await
-        .map_err(|_| DatabaseError::InvalidDatabase(path.to_path_buf()))?;
+        .with_context(|| format!("invalid Lunaria database: {}", path.display()))?;
     check_integrity(database).await
 }
 

@@ -3,9 +3,9 @@ use std::{
     sync::Arc,
 };
 
+use anyhow::{Context, Result};
 use tokio::sync::RwLock;
 
-use crate::DatabaseError;
 use crate::app_database::AppDatabase;
 use crate::project::database::ProjectDatabase;
 
@@ -15,7 +15,7 @@ pub struct DatabaseManager {
 }
 
 impl DatabaseManager {
-    pub async fn initialize(app_data_directory: impl AsRef<Path>) -> Result<Self, DatabaseError> {
+    pub async fn initialize(app_data_directory: impl AsRef<Path>) -> Result<Self> {
         let app_database = AppDatabase::open_or_create(app_data_directory.as_ref()).await?;
 
         Ok(Self {
@@ -40,11 +40,11 @@ impl DatabaseManager {
         *self.current_project.write().await = Some(Arc::new(project));
     }
 
-    pub(crate) async fn current_project(&self) -> Result<Arc<ProjectDatabase>, DatabaseError> {
+    pub(crate) async fn current_project(&self) -> Result<Arc<ProjectDatabase>> {
         self.current_project
             .read()
             .await
             .clone()
-            .ok_or(DatabaseError::NoOpenProject)
+            .context("no project is open")
     }
 }

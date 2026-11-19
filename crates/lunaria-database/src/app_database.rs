@@ -1,10 +1,10 @@
-use crate::DatabaseError;
 use crate::connection::{
     check_integrity, connect, create_table, publish, read_integer, set_database_metadata,
     validate_database_metadata,
 };
 use crate::project::recent_project;
 use crate::settings::app_setting;
+use anyhow::{Context, Result, bail};
 use sea_orm::{ConnectionTrait, DatabaseConnection, EntityTrait, QuerySelect, TransactionTrait};
 use std::path::Path;
 use tempfile::NamedTempFile;
@@ -18,21 +18,20 @@ pub(crate) struct AppDatabase {
 }
 
 impl AppDatabase {
-    pub(crate) async fn open_or_create(directory: &Path) -> Result<Self, DatabaseError> {
+    pub(crate) async fn open_or_create(directory: &Path) -> Result<Self> {
         tokio::fs::create_dir_all(directory)
             .await
-            .map_err(|source| DatabaseError::IO {
-                path: directory.to_path_buf(),
-                source,
+            .with_context(|| {
+                format!(
+                    "failed to create database directory: {}",
+                    directory.display()
+                )
             })?;
 
         let path = directory.join(APP_DATABASE_FILE);
         if !tokio::fs::try_exists(&path)
             .await
-            .map_err(|source| DatabaseError::IO {
-                path: path.to_path_buf(),
-                source,
-            })?
+            .with_context(|| format!("failed to check database path: {}", path.display()))?
         {
             create_database_file(directory, &path).await?;
         }
@@ -51,17 +50,19 @@ impl AppDatabase {
     }
 }
 
-async fn create_database_file(directory: &Path, destination: &Path) -> Result<(), DatabaseError> {
+async fn create_database_file(directory: &Path, destination: &Path) -> Result<()> {
     let temporary = NamedTempFile::new_in(directory)
-        .map_err(|source| DatabaseError::IO {
-            path: directory.to_path_buf(),
-            source,
+        .with_context(|| {
+            format!(
+                "failed to create temporary database in {}",
+                directory.display()
+            )
         })?
         .into_temp_path();
 
     let database = connect(&temporary).await?;
 
-    let result: Result<(), DatabaseError> = async {
+    let result: Result<()> = async {
         let transaction = database.begin().await?;
         create_table(&transaction, recent_project::Entity).await?;
         create_table(&transaction, app_setting::Entity).await?;
@@ -77,7 +78,7 @@ async fn create_database_file(directory: &Path, destination: &Path) -> Result<()
     publish(temporary, destination)
 }
 
-async fn prepare_schema(database: &DatabaseConnection, path: &Path) -> Result<(), DatabaseError> {
+async fn prepare_schema(database: &DatabaseConnection, path: &Path) -> Result<()> {
     let transaction = database.begin().await?;
     let version = read_integer(&transaction, "PRAGMA user_version").await?;
 
@@ -93,10 +94,10 @@ async fn prepare_schema(database: &DatabaseConnection, path: &Path) -> Result<()
         }
         APP_SCHEMA_VERSION => {}
         _ => {
-            return Err(DatabaseError::UnsupportedSchemaVersion {
-                path: path.to_path_buf(),
-                version,
-            });
+            bail!(
+                "unsupported database schema version {version}: {}",
+                path.display()
+            );
         }
     }
 
@@ -107,7 +108,7 @@ async fn prepare_schema(database: &DatabaseConnection, path: &Path) -> Result<()
     Ok(())
 }
 
-async fn validate<C>(database: &C, path: &Path) -> Result<(), DatabaseError>
+async fn validate<C>(database: &C, path: &Path) -> Result<()>
 where
     C: ConnectionTrait,
 {
@@ -117,13 +118,13 @@ where
         .limit(0)
         .all(database)
         .await
-        .map_err(|_| DatabaseError::InvalidDatabase(path.to_path_buf()))?;
+        .with_context(|| format!("invalid Lunaria database: {}", path.display()))?;
 
     app_setting::Entity::find()
         .limit(0)
         .all(database)
         .await
-        .map_err(|_| DatabaseError::InvalidDatabase(path.to_path_buf()))?;
+        .with_context(|| format!("invalid Lunaria database: {}", path.display()))?;
 
     check_integrity(database).await
 }

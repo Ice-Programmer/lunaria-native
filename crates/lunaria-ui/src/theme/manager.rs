@@ -1,10 +1,9 @@
+use anyhow::{Context, Result};
 use gpui_kit::{
     App, WindowAppearance,
     component::{Theme, ThemeRegistry},
     px,
 };
-
-use crate::theme::error::ThemeError;
 
 pub struct ThemeManager;
 
@@ -12,25 +11,21 @@ impl ThemeManager {
     pub const LIGHT: &'static str = "Lunaria Light";
     pub const DARK: &'static str = "Lunaria Dark";
 
-    pub fn init(cx: &mut App) -> Result<(), ThemeError> {
+    pub fn init(cx: &mut App) -> Result<()> {
         ThemeRegistry::global_mut(cx)
             .load_themes_from_str(lunaria_assets::themes::LUNARIA_THEME)
-            .map_err(|err| ThemeError::LoadFailed {
-                err: err.to_string(),
-            })?;
+            .context("failed to load themes")?;
         Self::use_light(cx)?;
 
         Ok(())
     }
 
-    pub fn set_theme(name: &str, cx: &mut App) -> Result<(), ThemeError> {
+    pub fn set_theme(name: &str, cx: &mut App) -> Result<()> {
         let config = ThemeRegistry::global(cx)
             .themes()
             .get(name)
             .cloned()
-            .ok_or_else(|| ThemeError::NotFound {
-                name: name.to_string(),
-            })?;
+            .with_context(|| format!("theme not found: {name}"))?;
 
         let theme = Theme::global_mut(cx);
         theme.apply_config(&config);
@@ -51,15 +46,15 @@ impl ThemeManager {
         Ok(())
     }
 
-    pub fn use_light(cx: &mut App) -> Result<(), ThemeError> {
+    pub fn use_light(cx: &mut App) -> Result<()> {
         Self::set_theme(Self::LIGHT, cx)
     }
 
-    pub fn use_dark(cx: &mut App) -> Result<(), ThemeError> {
+    pub fn use_dark(cx: &mut App) -> Result<()> {
         Self::set_theme(Self::DARK, cx)
     }
 
-    pub fn toggle(cx: &mut App) -> Result<(), ThemeError> {
+    pub fn toggle(cx: &mut App) -> Result<()> {
         if Theme::global(cx).is_dark() {
             Self::use_light(cx)
         } else {

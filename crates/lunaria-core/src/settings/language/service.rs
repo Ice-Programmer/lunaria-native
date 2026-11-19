@@ -1,6 +1,6 @@
-use crate::settings::error::SettingError;
 use crate::settings::language::model::Language;
 use crate::settings::language::repository::LanguageRepository;
+use anyhow::Result;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -30,7 +30,7 @@ impl LanguageService {
         *self.language.read().await
     }
 
-    pub async fn set(&self, language: Language) -> Result<(), SettingError> {
+    pub async fn set(&self, language: Language) -> Result<()> {
         let mut current = self.language.write().await;
 
         self.repository.save(language).await?;

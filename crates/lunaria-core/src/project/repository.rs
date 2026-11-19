@@ -1,13 +1,13 @@
-use crate::project::error::ProjectError;
 use crate::project::model::Project;
+use anyhow::Result;
 use async_trait::async_trait;
 use std::path::PathBuf;
 
 #[async_trait]
 pub trait ProjectRepository: Send + Sync {
-    async fn create(&self, name: String, path: PathBuf) -> Result<Project, ProjectError>;
+    async fn create(&self, name: String, path: PathBuf) -> Result<Project>;
 
-    async fn open(&self, path: PathBuf) -> Result<Project, ProjectError>;
+    async fn open(&self, path: PathBuf) -> Result<Project>;
 
-    async fn list_recent(&self) -> Result<Vec<Project>, ProjectError>;
+    async fn list_recent(&self) -> Result<Vec<Project>>;
 }

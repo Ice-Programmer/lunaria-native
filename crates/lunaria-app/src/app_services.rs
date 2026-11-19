@@ -55,7 +55,7 @@ impl AppServices {
             let result = task
                 .await
                 .map_err(|error| format!("Task execution failed: {error}"))
-                .and_then(|result| result.map_err(|error| error.to_string()));
+                .and_then(|result| result.map_err(|error| format!("{error:#}")));
 
             let _ = cx.update(move |cx| on_result(result, cx));
         })

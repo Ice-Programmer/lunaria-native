@@ -3,8 +3,9 @@ use std::{path::PathBuf, sync::Arc};
 use super::{database::ProjectDatabase, recent_project};
 use crate::manager::DatabaseManager;
 use crate::utils::unix_timestamp_secs;
+use anyhow::{Context, Result, bail};
 use async_trait::async_trait;
-use lunaria_core::project::{Project, ProjectError, ProjectRepository};
+use lunaria_core::project::{Project, ProjectRepository};
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder, Set,
 };
@@ -24,7 +25,7 @@ impl Repository {
         path: &str,
         created_at: i64,
         last_opend_at: i64,
-    ) -> Result<recent_project::Model, sea_orm::DbErr> {
+    ) -> Result<recent_project::Model> {
         let database = self.databases.app_database();
 
         if let Some(existing) = recent_project::Entity::find()
@@ -37,10 +38,10 @@ impl Repository {
             active.project_name = Set(name.to_owned());
             active.created_at = Set(created_at);
             active.last_opened_at = Set(last_opend_at);
-            active.update(database).await
+            Ok(active.update(database).await?)
         } else {
             // create model
-            recent_project::ActiveModel {
+            Ok(recent_project::ActiveModel {
                 project_name: Set(name.to_owned()),
                 project_path: Set(path.to_owned()),
                 created_at: Set(created_at),
@@ -48,30 +49,22 @@ impl Repository {
                 ..Default::default()
             }
             .insert(database)
-            .await
+            .await?)
         }
     }
 }
 
 #[async_trait]
 impl ProjectRepository for Repository {
-    async fn create(
-        &self,
-        name: String,
-        parent_directory: PathBuf,
-    ) -> Result<Project, ProjectError> {
-        let timestamp = unix_timestamp_secs().map_err(ProjectError::storage)?;
-        let project_database = ProjectDatabase::create(&parent_directory, &name, timestamp)
-            .await
-            .map_err(ProjectError::storage)?;
+    async fn create(&self, name: String, parent_directory: PathBuf) -> Result<Project> {
+        let timestamp = unix_timestamp_secs()?;
+        let project_database = ProjectDatabase::create(&parent_directory, &name, timestamp).await?;
 
         let project_path = match project_database.directory().to_str() {
             Some(path) => path.to_owned(),
             None => {
                 project_database.rollback().await;
-                return Err(ProjectError::storage(
-                    "project path is not valid UTF-8 and cannot be stored in SQLite",
-                ));
+                bail!("project path is not valid UTF-8 and cannot be stored in SQLite");
             }
         };
 
@@ -82,7 +75,7 @@ impl ProjectRepository for Repository {
             Ok(record) => record,
             Err(error) => {
                 project_database.rollback().await;
-                return Err(ProjectError::storage(error));
+                return Err(error);
             }
         };
 
@@ -97,28 +90,23 @@ impl ProjectRepository for Repository {
         ))
     }
 
-    async fn open(&self, path: PathBuf) -> Result<Project, ProjectError> {
+    async fn open(&self, path: PathBuf) -> Result<Project> {
         // 1. 生成 project database
-        let project_database = ProjectDatabase::open(&path)
-            .await
-            .map_err(ProjectError::storage)?;
+        let project_database = ProjectDatabase::open(&path).await?;
 
         // 2. 获取 project 元信息
-        let metadata = project_database
-            .fetch_metadata()
-            .await
-            .map_err(ProjectError::storage)?;
+        let metadata = project_database.fetch_metadata().await?;
 
-        let project_path = project_database.directory().to_str().ok_or_else(|| {
-            ProjectError::storage("project path is not valid UTF-8 and cannot be stored in SQLite")
-        })?;
+        let project_path = project_database
+            .directory()
+            .to_str()
+            .context("project path is not valid UTF-8 and cannot be stored in SQLite")?;
 
-        let timestamp = unix_timestamp_secs().map_err(ProjectError::storage)?;
+        let timestamp = unix_timestamp_secs()?;
 
         let record = self
             .save_recent_project(&metadata.name, project_path, metadata.created_at, timestamp)
-            .await
-            .map_err(ProjectError::storage)?;
+            .await?;
 
         self.databases.set_current_project(project_database).await;
 
@@ -131,13 +119,12 @@ impl ProjectRepository for Repository {
         ))
     }
 
-    async fn list_recent(&self) -> Result<Vec<Project>, ProjectError> {
+    async fn list_recent(&self) -> Result<Vec<Project>> {
         let records = recent_project::Entity::find()
             .order_by_desc(recent_project::Column::LastOpenedAt)
             .order_by_desc(recent_project::Column::Id)
             .all(self.databases.app_database())
-            .await
-            .map_err(ProjectError::storage)?;
+            .await?;
 
         Ok(records
             .into_iter()

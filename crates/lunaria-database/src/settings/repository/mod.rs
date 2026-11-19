@@ -1,5 +1,5 @@
 use crate::settings::app_setting;
-use lunaria_core::settings::error::SettingError;
+use anyhow::Result;
 use sea_orm::sea_query::OnConflict;
 use sea_orm::{DatabaseConnection, EntityTrait, Set};
 use serde::de::DeserializeOwned;
@@ -7,31 +7,19 @@ use serde::de::DeserializeOwned;
 pub mod language;
 pub mod shortcuts;
 
-async fn load_setting<T>(
-    database: &DatabaseConnection,
-    key: &str,
-) -> Result<Option<T>, SettingError>
+async fn load_setting<T>(database: &DatabaseConnection, key: &str) -> Result<Option<T>>
 where
     T: DeserializeOwned,
 {
-    let record = app_setting::Entity::find_by_id(key)
-        .one(database)
-        .await
-        .map_err(SettingError::storage)?;
+    let record = app_setting::Entity::find_by_id(key).one(database).await?;
 
     match record {
-        Some(record) => serde_json::from_str(&record.value)
-            .map(Some)
-            .map_err(SettingError::storage),
+        Some(record) => Ok(Some(serde_json::from_str(&record.value)?)),
         None => Ok(None),
     }
 }
 
-async fn save_setting(
-    database: &DatabaseConnection,
-    key: &str,
-    value: String,
-) -> Result<(), SettingError> {
+async fn save_setting(database: &DatabaseConnection, key: &str, value: String) -> Result<()> {
     app_setting::Entity::insert(app_setting::ActiveModel {
         key: Set(key.to_owned()),
         value: Set(value),
@@ -42,8 +30,7 @@ async fn save_setting(
             .to_owned(),
     )
     .exec_without_returning(database)
-    .await
-    .map_err(SettingError::storage)?;
+    .await?;
 
     Ok(())
 }

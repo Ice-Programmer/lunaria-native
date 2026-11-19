@@ -3991,10 +3991,10 @@ version = "0.1.0"
 name = "lunaria-core"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "lunaria-ui",
  "serde",
- "thiserror 2.0.20",
  "tokio",
 ]
 
@@ -4002,13 +4002,13 @@ dependencies = [
 name = "lunaria-database"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "lunaria-core",
  "sea-orm",
  "serde",
  "serde_json",
  "tempfile",
- "thiserror 2.0.20",
  "tokio",
 ]
 
@@ -4036,11 +4036,11 @@ dependencies = [
 name = "lunaria-ui"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "gpui-kit",
  "lunaria-assets",
  "rfd",
  "rust-i18n",
- "thiserror 2.0.20",
 ]
 
 [[package]]

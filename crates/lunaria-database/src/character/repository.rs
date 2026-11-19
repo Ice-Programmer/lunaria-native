@@ -1,7 +1,7 @@
 use crate::DatabaseManager;
 use crate::character::character;
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
-use lunaria_core::character::error::CharacterError;
 use lunaria_core::character::model::Character;
 use lunaria_core::character::repository::CharacterRepository;
 use sea_orm::{ActiveModelTrait, Set};
@@ -19,7 +19,7 @@ impl Repository {
 
 #[async_trait]
 impl CharacterRepository for Repository {
-    async fn create(&self, character: Character) -> Result<(), CharacterError> {
+    async fn create(&self, character: Character) -> Result<()> {
         let project = self.databases.current_project().await?;
 
         let avatar_path = character
@@ -27,7 +27,7 @@ impl CharacterRepository for Repository {
             .map(|path| {
                 path.into_os_string()
                     .into_string()
-                    .map_err(|_| CharacterError::storage("avatar path is not valid UTF-8"))
+                    .map_err(|_| anyhow!("avatar path is not valid UTF-8"))
             })
             .transpose()?;
 
@@ -39,8 +39,7 @@ impl CharacterRepository for Repository {
             ..Default::default()
         }
         .insert(&project.connection)
-        .await
-        .map_err(CharacterError::storage)?;
+        .await?;
 
         Ok(())
     }
