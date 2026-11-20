@@ -1,10 +1,10 @@
 use crate::DatabaseManager;
-use crate::character::character;
+use crate::character::model;
 use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use lunaria_core::character::model::Character;
 use lunaria_core::character::repository::CharacterRepository;
-use sea_orm::{ActiveModelTrait, Set};
+use sea_orm::{ActiveModelTrait, EntityTrait, Set};
 use std::sync::Arc;
 
 pub struct Repository {
@@ -20,27 +20,26 @@ impl Repository {
 #[async_trait]
 impl CharacterRepository for Repository {
     async fn create(&self, character: Character) -> Result<()> {
-        let project = self.databases.current_project().await?;
+        let project_db = self.databases.current_project().await?;
 
-        let avatar_path = character
-            .avatar_path
-            .map(|path| {
-                path.into_os_string()
-                    .into_string()
-                    .map_err(|_| anyhow!("avatar path is not valid UTF-8"))
-            })
-            .transpose()?;
-
-        character::ActiveModel {
-            name: Set(character.name),
-            code: Set(character.code),
-            description: Set(character.description),
-            avatar_path: Set(avatar_path),
-            ..Default::default()
-        }
-        .insert(&project.connection)
-        .await?;
+        model::ActiveModel::try_from(character)?
+            .insert(&project_db.connection)
+            .await?;
 
         Ok(())
+    }
+
+    async fn list(&self) -> Result<Vec<Character>> {
+        let project_db = self.databases.current_project().await?;
+
+        let character_list = model::Entity::find()
+            .order_by_id_asc()
+            .all(&project_db.connection)
+            .await?
+            .into_iter()
+            .map(Character::from)
+            .collect::<Vec<Character>>();
+
+        Ok(character_list)
     }
 }

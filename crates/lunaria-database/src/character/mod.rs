@@ -1,2 +1,2 @@
-pub mod character;
+pub mod model;
 pub mod repository;

@@ -5,4 +5,6 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait CharacterRepository: Send + Sync {
     async fn create(&self, character: Character) -> Result<()>;
+
+    async fn list(&self) -> Result<Vec<Character>>;
 }

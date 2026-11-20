@@ -127,7 +127,7 @@ async fn create_database_file(
 
         // 1. 创建所有表
         create_table(&transaction, project_meta::Entity).await?;
-        create_table(&transaction, crate::character::character::Entity).await?;
+        create_table(&transaction, crate::character::model::Entity).await?;
 
         project_meta::ActiveModel {
             id: Set(1),
