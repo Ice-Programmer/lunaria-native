@@ -12,9 +12,9 @@ pub struct CharacterPage {
 const CHARACTER_SIDEBAR_WIDTH: f32 = 200.0;
 
 impl CharacterPage {
-    pub fn new(cx: &mut Context<Self>) -> Self {
+    pub fn new(cx: &mut Context<Self>, window: &mut Window) -> Self {
         Self {
-            sidebar: cx.new(|_| CharacterSidebar::new()),
+            sidebar: cx.new(|cx| CharacterSidebar::new(cx, window)),
         }
     }
 }

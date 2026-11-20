@@ -70,3 +70,5 @@ editor:
     script: "脚本"
     stage: "舞台"
     character: "角色"
+  character_page:
+    search_placeholder: "搜索角色"

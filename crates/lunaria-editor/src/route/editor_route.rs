@@ -2,7 +2,7 @@ use crate::pages::character::character_page::CharacterPage;
 use crate::pages::script::script_page::ScriptPage;
 use crate::pages::stage::stage_page::StagePage;
 use gpui_kit::assets::IconName;
-use gpui_kit::{AnyElement, AnyView, App, AppContext, IntoElement, Render, SharedString};
+use gpui_kit::{AnyElement, AnyView, App, AppContext, IntoElement, Render, SharedString, Window};
 use lunaria_ui::i18n::keys;
 use lunaria_ui::i18n_text;
 
@@ -34,11 +34,11 @@ impl EditorRoute {
         }
     }
 
-    pub fn build(self, cx: &mut App) -> AnyView {
+    pub fn build(self, cx: &mut App, window: &mut Window) -> AnyView {
         match self {
             Self::Script => cx.new(|_| ScriptPage::new()).into(),
             Self::Stage => cx.new(|_| StagePage::new()).into(),
-            Self::Character => cx.new(CharacterPage::new).into(),
+            Self::Character => cx.new(|cx| CharacterPage::new(cx, window)).into(),
         }
     }
 }

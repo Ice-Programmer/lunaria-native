@@ -69,13 +69,13 @@ impl ProjectEditorWindow {
 }
 
 impl Render for ProjectEditorWindow {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let route = self.sidebar.read(cx).route();
 
         let content = self
             .pages
             .entry(route)
-            .or_insert_with(|| route.build(cx))
+            .or_insert_with(|| route.build(cx, window))
             .clone();
 
         EditorLayout::new(

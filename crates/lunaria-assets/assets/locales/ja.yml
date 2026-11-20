@@ -70,3 +70,5 @@ editor:
     script: "シナリオ"
     stage: "ステージ"
     character: "キャラクター"
+  character:
+    search_placeholder: "キャラクターを検索"

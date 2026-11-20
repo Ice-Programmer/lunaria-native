@@ -70,3 +70,5 @@ editor:
     script: "Script"
     stage: "Stage"
     character: "Character"
+  character_page:
+    search_placeholder: "Search Character"
