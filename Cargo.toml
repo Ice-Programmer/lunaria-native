@@ -9,6 +9,7 @@ members = [
     "crates/lunaria-settings",
     "crates/lunaria-app",
     "crates/lunaria-editor",
+    "crates/lunaria-macros", "crates/lunaria-di",
 ]
 
 default-members = [
@@ -26,6 +27,8 @@ lunaria-database = { path = "crates/lunaria-database" }
 lunaria-settings = { path = "crates/lunaria-settings" }
 lunaria-app = { path = "crates/lunaria-app" }
 lunaria-editor = { path = "crates/lunaria-editor" }
+lunaria-macros = { path = "crates/lunaria-macros" }
+lunaria-di = { path = "crates/lunaria-di" }
 
 gpui-kit = "0.6"
 gpui-fps = "=0.6.1"
@@ -52,3 +55,6 @@ serde = {
 }
 serde_json = "1"
 rust-i18n = "=4.2.2"
+quote = "1"
+syn = { version = "2", features = ["full"] }
+inventory = "0.3"

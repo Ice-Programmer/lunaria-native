@@ -6,7 +6,9 @@ edition = "2024"
 [dependencies]
 lunaria-database.workspace = true
 lunaria-core.workspace = true
+lunaria-ui.workspace = true
+lunaria-di.workspace = true
+anyhow.workspace = true
 tokio.workspace = true
 gpui-kit.workspace = true
 gpui-fps.workspace = true
-lunaria-ui.workspace = true

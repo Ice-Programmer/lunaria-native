@@ -8,6 +8,7 @@ use lunaria_database::DatabaseManager;
 use lunaria_database::project::Repository as ProjectRepository;
 use lunaria_database::settings::repository::language::Repository as LanguageRepository;
 use lunaria_database::settings::repository::shortcuts::Repository as ShortcutRepository;
+use lunaria_di::{Backend, BuildService, RepositoryResolver, SourceKind, resolve_repository};
 use tokio::runtime::Handle;
 
 #[derive(Clone)]
@@ -16,9 +17,23 @@ pub struct AppServices {
     pub shortcut_service: Arc<ShortcutService>,
     pub language_service: Arc<LanguageService>,
     pub runtime: Handle,
+    backend: Backend,
+    source_kinds: SourceKind,
 }
 
 impl Global for AppServices {}
+
+impl RepositoryResolver for AppServices {
+    fn current_repository<T: 'static>(&self) -> anyhow::Result<T> {
+        resolve_repository(self.source_kinds, &self.backend)
+    }
+}
+
+impl AppServices {
+    pub fn service<T: BuildService<Self>>(&self) -> anyhow::Result<T> {
+        T::build(self)
+    }
+}
 
 impl AppServices {
     pub async fn new(databases: Arc<DatabaseManager>, runtime: Handle) -> Self {
@@ -36,6 +51,9 @@ impl AppServices {
             shortcut_service,
             language_service,
             runtime,
+            backend: databases,
+            // currently fixed Local
+            source_kinds: SourceKind::Local,
         }
     }
 

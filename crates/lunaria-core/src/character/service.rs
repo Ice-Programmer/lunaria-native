@@ -2,8 +2,10 @@ use crate::character::model::Character;
 use crate::character::repository::CharacterRepository;
 use anyhow::Result;
 use std::sync::Arc;
+use lunaria_di::service;
 
 #[derive(Clone)]
+#[service]
 pub struct CharacterService {
     repository: Arc<dyn CharacterRepository>,
 }

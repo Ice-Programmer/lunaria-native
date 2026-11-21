@@ -1,10 +1,11 @@
 use crate::DatabaseManager;
 use crate::character::model;
-use anyhow::{Result, anyhow};
+use anyhow::Result;
 use async_trait::async_trait;
 use lunaria_core::character::model::Character;
 use lunaria_core::character::repository::CharacterRepository;
-use sea_orm::{ActiveModelTrait, EntityTrait, Set};
+use lunaria_di::{SourceKind, repository};
+use sea_orm::{ActiveModelTrait, EntityTrait};
 use std::sync::Arc;
 
 pub struct Repository {
@@ -18,6 +19,7 @@ impl Repository {
 }
 
 #[async_trait]
+#[repository(key = SourceKind::Local)]
 impl CharacterRepository for Repository {
     async fn create(&self, character: Character) -> Result<()> {
         let project_db = self.databases.current_project().await?;

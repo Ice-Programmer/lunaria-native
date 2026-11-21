@@ -3975,10 +3975,12 @@ dependencies = [
 name = "lunaria-app"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "gpui-fps",
  "gpui-kit",
  "lunaria-core",
  "lunaria-database",
+ "lunaria-di",
  "lunaria-ui",
  "tokio",
 ]
@@ -3993,6 +3995,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "lunaria-di",
  "serde",
  "tokio",
 ]
@@ -4004,11 +4007,21 @@ dependencies = [
  "anyhow",
  "async-trait",
  "lunaria-core",
+ "lunaria-di",
  "sea-orm",
  "serde",
  "serde_json",
  "tempfile",
  "tokio",
+]
+
+[[package]]
+name = "lunaria-di"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "inventory",
+ "lunaria-macros",
 ]
 
 [[package]]
@@ -4019,6 +4032,14 @@ dependencies = [
  "lunaria-app",
  "lunaria-core",
  "lunaria-ui",
+]
+
+[[package]]
+name = "lunaria-macros"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]
