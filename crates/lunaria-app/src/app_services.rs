@@ -15,7 +15,6 @@ use tokio::runtime::Handle;
 pub struct AppServices {
     pub project_service: Arc<ProjectService>,
     pub shortcut_service: Arc<ShortcutService>,
-    pub language_service: Arc<LanguageService>,
     pub runtime: Handle,
     backend: Backend,
     source_kinds: SourceKind,
@@ -49,13 +48,9 @@ impl AppServices {
         let shortcut_service =
             ShortcutService::new(ShortcutRepository::new(databases.clone())).await;
 
-        let language_service =
-            LanguageService::new(LanguageRepository::new(databases.clone())).await;
-
         Self {
             project_service,
             shortcut_service,
-            language_service,
             runtime,
             backend: databases,
             // currently fixed Local

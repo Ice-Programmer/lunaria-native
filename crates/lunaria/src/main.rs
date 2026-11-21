@@ -6,6 +6,8 @@ mod platform;
 
 #[cfg(debug_assertions)]
 use crate::dev::router;
+#[cfg(target_os = "macos")]
+use crate::init::macos::init_macos_config;
 use crate::init::router::init_app_router;
 use crate::launcher::launcher_window::LaunchWindow;
 use gpui_kit::assets::AllAssets;
@@ -18,8 +20,7 @@ use lunaria_ui::ThemeManager;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::runtime::Handle;
-#[cfg(target_os = "macos")]
-use crate::init::macos::init_macos_config;
+use lunaria_core::settings::language::service::LanguageService;
 
 // get Lunaria app directory
 fn app_data_directory() -> PathBuf {
@@ -42,7 +43,11 @@ async fn main() {
 
     let app_services = AppServices::new(databases, Handle::current()).await;
 
-    let init_language = app_services.language_service.current().await;
+    let init_language = app_services
+        .service::<LanguageService>()
+        .expect("failed to resolve language service")
+        .current()
+        .await;
 
     let shortcut_items = app_services
         .shortcut_service

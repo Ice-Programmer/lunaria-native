@@ -8,6 +8,7 @@ use gpui_kit::{
     px,
 };
 use lunaria_core::settings::language::model::Language;
+use lunaria_core::settings::language::service::LanguageService;
 use lunaria_ui::components::custom_notification::Notification;
 use lunaria_ui::extensions::focus::FocusExt;
 use lunaria_ui::i18n::locale;
@@ -72,36 +73,19 @@ impl LanguageSwitcher {
 
         self.close(cx);
 
-        let this = cx.weak_entity();
+        let service = AppServices::require_service::<LanguageService>(cx);
 
-        AppServices::run(
+        AppServices::run_future(
             cx,
-            |services| async move {
-                services
-                    .language_service
-                    .set(language)
-                    .await
-                    .map(|_| language)
-            },
-            move |result, cx| {
-                this.update(cx, |_, cx| match result {
-                    Ok(language) => {
-                        locale::set_locale(language.locale(), cx);
-                        Ok(())
-                    }
-                    Err(error) => {
-                        if let Some(handle) = cx.active_window() {
-                            handle.update(cx, |_, window, cx| {
-                                window.push_notification(
-                                    Notification::error(format!("切换界面语言失败 {}", error)),
-                                    cx,
-                                );
-                            })
-                        } else {
-                            Ok(())
-                        }
-                    }
-                })
+            async move { service.set(language).await },
+            move |_, result, window, cx| match result {
+                Ok(()) => locale::set_locale(language.locale(), cx),
+                Err(error) => {
+                    window.push_notification(
+                        Notification::error(format!("switch language error {error}")),
+                        cx,
+                    );
+                }
             },
         );
     }

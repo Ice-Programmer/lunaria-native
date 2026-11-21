@@ -1,41 +1,30 @@
 use crate::settings::language::model::Language;
 use crate::settings::language::repository::LanguageRepository;
 use anyhow::Result;
+use lunaria_di::service;
 use std::sync::Arc;
-use tokio::sync::RwLock;
 
+#[service]
 pub struct LanguageService {
-    language: RwLock<Language>,
     repository: Arc<dyn LanguageRepository>,
 }
 
 impl LanguageService {
-    pub async fn new(repository: Arc<dyn LanguageRepository>) -> Arc<Self> {
-        let language = match repository.load().await {
-            Ok(language) => language.unwrap_or_default(),
-            Err(error) => {
-                eprintln!("Failed to load language, using default: {error}");
-
-                Language::default()
-            }
-        };
-
-        Arc::new(Self {
-            language: RwLock::new(language),
-            repository,
-        })
+    pub fn new(repository: Arc<dyn LanguageRepository>) -> Self {
+        Self { repository }
     }
 
     pub async fn current(&self) -> Language {
-        *self.language.read().await
+        match self.repository.load().await {
+            Ok(language) => language.unwrap_or_default(),
+            Err(error) => {
+                eprintln!("Failed to load language, using default, {error:#}");
+                Language::default()
+            }
+        }
     }
 
     pub async fn set(&self, language: Language) -> Result<()> {
-        let mut current = self.language.write().await;
-
-        self.repository.save(language).await?;
-        *current = language;
-
-        Ok(())
+        self.repository.save(language).await
     }
 }
