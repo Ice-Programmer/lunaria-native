@@ -165,7 +165,12 @@ pub fn open<K, V>(
                 content: content.into(),
             });
 
-            create_window_root_with_fps(frame, false, window, cx)
+            create_window_root_with_fps(
+                frame,
+                std::env::var("LUNARIA_FPS").map_or(cfg!(debug_assertions), |value| value == "1"),
+                window,
+                cx,
+            )
         }) {
             Ok(handle) => {
                 cx.global_mut::<WindowRegistry<K>>()
