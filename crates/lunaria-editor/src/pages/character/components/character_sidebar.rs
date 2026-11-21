@@ -1,3 +1,4 @@
+use crate::pages::character::view_model::character_view_model::CharacterViewModel;
 use gpui_kit::assets::IconName;
 use gpui_kit::base::h_flex;
 use gpui_kit::base::input::InputState;
@@ -8,17 +9,24 @@ use gpui_kit::{
 };
 use lunaria_ui::components::custom_input::CustomInput;
 use lunaria_ui::extensions::input_18n::InputI18nExt;
-use lunaria_ui::extensions::space_ext;
 use lunaria_ui::extensions::space_ext::SpaceExt;
 use lunaria_ui::i18n::keys;
 use lunaria_ui::i18n_text;
 
 pub struct CharacterSidebar {
     search_input: Entity<InputState>,
+    view_model: Entity<CharacterViewModel>,
 }
 
 impl CharacterSidebar {
     pub fn new(cx: &mut Context<Self>, window: &mut Window) -> Self {
+        let view_model: Entity<CharacterViewModel> = cx.new(CharacterViewModel::new);
+
+        // subscribe view model
+        CharacterViewModel::subscribe(&view_model, cx);
+        // init list character
+        view_model.update(cx, |vm, cx| vm.list_character(cx));
+
         let search_input = cx.new(|cx| {
             InputState::new(window, cx).placeholder_i18n(
                 keys::editor::character::SEARCH_PLACEHOLDER,
@@ -28,10 +36,15 @@ impl CharacterSidebar {
             )
         });
 
-        Self { search_input }
+        Self {
+            search_input,
+            view_model,
+        }
     }
 
-    fn render_title(cx: &mut Context<Self>) -> Div {
+    fn render_title(&self, cx: &mut Context<Self>) -> Div {
+        let vm = self.view_model.read(cx);
+
         h_flex()
             .justify_between()
             .child(
@@ -47,13 +60,13 @@ impl CharacterSidebar {
                             .text_xs()
                             .items_end()
                             .text_color(cx.theme().muted_foreground)
-                            .child("3"),
+                            .child(vm.get_total().to_string()),
                     ),
             )
             .child(Icon::new(IconName::Plus))
     }
 
-    fn render_search(&self, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render_search(&self, _cx: &mut Context<Self>) -> impl IntoElement {
         CustomInput::new(&self.search_input)
             .id("search-character")
             .prefix(IconName::Search)
@@ -70,7 +83,7 @@ impl Render for CharacterSidebar {
             .border_l_1()
             .border_color(cx.theme().sidebar_border)
             .bg(cx.theme().sidebar)
-            .child(Self::render_title(cx))
+            .child(self.render_title(cx))
             .child(10.vertical_space())
             .child(self.render_search(cx))
     }

@@ -1,6 +1,6 @@
 use std::{fmt::Display, future::Future, sync::Arc};
 
-use gpui_kit::{App, Global};
+use gpui_kit::{App, Context, Global, Window};
 use lunaria_core::project::ProjectService;
 use lunaria_core::settings::language::service::LanguageService;
 use lunaria_core::settings::shortcuts::service::ShortcutService;
@@ -32,6 +32,12 @@ impl RepositoryResolver for AppServices {
 impl AppServices {
     pub fn service<T: BuildService<Self>>(&self) -> anyhow::Result<T> {
         T::build(self)
+    }
+
+    pub fn require_service<T: BuildService<Self>>(cx: &App) -> T {
+        cx.global::<Self>()
+            .service::<T>()
+            .expect("failed to resolve service")
     }
 }
 
@@ -76,6 +82,30 @@ impl AppServices {
                 .and_then(|result| result.map_err(|error| format!("{error:#}")));
 
             let _ = cx.update(move |cx| on_result(result, cx));
+        })
+        .detach();
+    }
+
+    pub fn run_future<V, R, E>(
+        cx: &mut Context<V>,
+        task: impl Future<Output = Result<R, E>> + Send + 'static,
+        on_result: impl FnOnce(&mut V, Result<R, String>, &mut Window, &mut Context<V>) + 'static,
+    ) where
+        V: 'static,
+        R: Send + 'static,
+        E: Display + Send + 'static,
+    {
+        let handle = cx.global::<Self>().runtime.spawn(task);
+
+        cx.spawn(async move |vm, cx| {
+            let result = match handle.await {
+                Ok(result) => result.map_err(|error| format!("{error:#}")),
+                Err(error) => Err(format!("Task execution failed: {error}")),
+            };
+
+            let _ = vm.update_in(cx, |vm, window, cx| {
+                on_result(vm, result, window, cx);
+            });
         })
         .detach();
     }

@@ -87,6 +87,14 @@ impl ProjectDatabase {
 
         validate(&project_database_connection, &project_database_path).await?;
 
+        //
+        #[cfg(debug_assertions)]
+        if std::env::var("LUNARIA_DEV").map_or(cfg!(debug_assertions), |value| value == "1") {
+            let tx = project_database_connection.begin().await?;
+            create_all_table(&tx).await?;
+            tx.commit().await?;
+        }
+
         Ok(Self {
             directory,
             connection: project_database_connection,
@@ -126,8 +134,7 @@ async fn create_database_file(
         let transaction = database.begin().await?;
 
         // 1. 创建所有表
-        create_table(&transaction, project_meta::Entity).await?;
-        create_table(&transaction, crate::character::model::Entity).await?;
+        create_all_table(&transaction).await?;
 
         project_meta::ActiveModel {
             id: Set(1),
@@ -170,4 +177,10 @@ async fn validate(database: &DatabaseConnection, path: &Path) -> Result<()> {
 async fn remove_created_project(directory: &Path) {
     let _ = tokio::fs::remove_file(directory.join(PROJECT_DATABASE_FILE)).await;
     let _ = tokio::fs::remove_dir(directory).await;
+}
+
+async fn create_all_table(tx: &sea_orm::DatabaseTransaction) -> Result<()> {
+    create_table(tx, project_meta::Entity).await?;
+    create_table(tx, crate::character::model::Entity).await?;
+    Ok(())
 }
